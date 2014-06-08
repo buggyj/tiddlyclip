@@ -1,0 +1,48 @@
+<!-- preview.xul -->
+<!ENTITY  tiddlerwindow.title             "Preview snippet to save">
+<!ENTITY  tiddlertitle.label              "Tiddler title:">
+<!ENTITY  tiddlertags.label               "Tiddler tags:">
+<!ENTITY  tiddlertext.label               "Tiddler text:">
+<!ENTITY  tiddlerwindowsave.label         "Save">
+<!ENTITY  tiddlerwindowcancel.label       "Cancel">
+<!ENTITY  tiddlerwindowskip.label         "Skip">
+
+<!-- userInput.xul -->
+<!ENTITY  inputwindow.title             "select tids with title OR tag">
+<!ENTITY  inputtitle.label              "Tiddler title:">
+<!ENTITY  inputtags.label               "Tiddler tag:">
+<!ENTITY  inputwindowsave.label         "Save">
+<!ENTITY  inputwindowcancel.label       "Cancel">
+<!ENTITY  editMode.label                 "show tids before saving">
+<!ENTITY  allMode.label                  "copy whole tiddlers as is">
+
+
+<!-- existdialog.xul -->
+<!ENTITY  existwindow.title               "Title already in use">
+<!ENTITY  existcaption.label              "A tiddler with this title exists:">
+<!ENTITY  exist.rename                    "move">
+<!ENTITY  exist.append                    "Append">
+<!ENTITY  exist.overwrite                 "Overwrite">
+<!ENTITY  exist.abort		              "Cancel">
+
+<!-- prefs.xul -->
+<!ENTITY  prefwindow.title                "tiddlycut Preferences">
+<!ENTITY  preftabgeneral.label            "General">
+<!ENTITY  file1.label                     "File1">
+<!ENTITY  file2.label                     "File2">
+<!ENTITY  file3.label                     "File3">
+<!ENTITY  file4.label                     "File4">
+<!ENTITY  twoptions.label                 "TiddlyWiki options">
+<!ENTITY  twfileloc.label                 "File location:">
+<!ENTITY  defaulttags.label               "Default tiddler tags:">
+<!ENTITY  loadOpts.label                  "Load catergories from TW file">
+
+<!ENTITY  cancel.label                    "Cancel">
+
+<!ENTITY  submitchanges.label             "Submit Changes">
+<!ENTITY  ufile1.label                 "File1">
+<!ENTITY  ufile2.label                 "File2">
+<!ENTITY  ufile3.label                 "File3">
+<!ENTITY  ufile4.label                 "File4">
+<!ENTITY  usefile.label                 "File to Clip to">
+
