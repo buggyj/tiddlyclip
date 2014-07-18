@@ -7,7 +7,7 @@ tiddlycut.modules.tcBrowser= (function () {
 		getHtml:getHtml, 					hasCopiedText:hasCopiedText, 			hasSelectedText:hasSelectedText, 		
 		winWrapper:winWrapper,				EnterTidNameDialog:EnterTidNameDialog, 
 		getPageTitle:getPageTitle, 			getPageRef:getPageRef, 					getStr:getStr, 
-		getImageURL:getImageURL,			
+		getImageURL:getImageURL,			snap:snap,
 	    log:log,							htmlEncode:htmlEncode,					onImage:onImage,
 	    onLink:onLink,						setOnImage:setOnImage,					
 	    getSelectedAsHtml:getSelectedAsHtml,createDiv:createDiv,
@@ -35,7 +35,22 @@ tiddlycut.modules.tcBrowser= (function () {
 
     //variables to store non-persistance broswer data (from gContextMenu)
     var onImage, onLink, imageUrl;
-
+    
+	function snap(size){
+		var tab = gBrowser.selectedTab;
+		var thumbnail = window.document.createElementNS("http://www.w3.org/1999/xhtml", "canvas");
+		thumbnail.mozOpaque = true;
+		var win = tab.linkedBrowser.contentWindow;
+		var ctx = thumbnail.getContext("2d");
+		thumbnail.width = win.innerWidth*size;
+		thumbnail.height = win.innerHeight*size;
+		ctx.scale(size, size);
+		ctx.drawWindow(	win, win.scrollX, win.scrollY, win.innerWidth,
+						win.innerHeight, "rgb(255,255,255)");
+		//Create a data url from the canvas
+		var data = thumbnail.toDataURL("image/png")
+		return data.substring(data.indexOf(',') + 1);
+	}
 	function setImageURL() {
 		imageUrl= gContextMenu.imageURL || gContextMenu.mediaURL;
 	}

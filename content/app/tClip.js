@@ -8,12 +8,11 @@ tiddlycut.modules.tClip = (function () {
 	var api = 
 	{
 		onLoad:onLoad,				getSectionNames:getSectionNames,
-									getCategories:getCategories,				
+		getCategories:getCategories,getTidContents:getTidContents,				
 		hasMode:hasMode,			loadSectionFromFile:loadSectionFromFile, 	
 		hasAnyModes:hasAnyModes,	setClipConfig:setClipConfig,
 		SELECTMODES:SELECTMODES,	getCurentSection:getCurentSection,
-		ALLSELMODES:ALLSELMODES,	
-		getTidContents:getTidContents,
+		ALLSELMODES:ALLSELMODES,	getModeBegining:getModeBegining,
 		hasModeBegining:hasModeBegining	
 
 	};
@@ -96,6 +95,11 @@ tiddlycut.modules.tClip = (function () {
 		for (var i=0; i< cat.modes.length;i++)
 			if (mode === cat.modes[i].substr(0,mode.length)) return true;
 		return false;
+	}
+	function getModeBegining (cat,mode) {
+			if (!cat.modes) return "";
+		for (var i=0; i< cat.modes.length;i++)
+			if (mode === cat.modes[i].substr(0,mode.length)) return cat.modes[i];
 	}
 //////////////////////////////////////		
 

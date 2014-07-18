@@ -22,6 +22,12 @@
 	function SetTidlist(tidlist) {
 		api.remoteTidArr=tidlist;
 	}
+	function makepercent (value) {
+		if(/^[0-9][0-9]$/.test(value)) {
+			return Number(value)/100;
+		}
+		return NaN;
+	}
 
 	function SetupVars(category,currentSection) {
 		var title={}, tag={}, editMode={}, cancelled={};
@@ -65,10 +71,15 @@
         //////////end of remote data struct //////////////////
         
 		//execute any user defined extensions
-		if (tClip.hasMode(tClip.getCategories()[category],"addtext") )  { 	//tiddler mode try and retrieve as tiddler
+		if (tClip.hasMode(tClip.getCategories()[category],"addtext") )  { 
 		    var userString = {value:''};
 			tcBrowser.UserInputDialog("Enter text",userString);
 			api.data.userString=userString.value;
+		}
+		if (tClip.hasModeBegining(tClip.getCategories()[category],"snap") )  { 
+		    var size=makepercent(tClip.getModeBegining(tClip.getCategories()[category],"snap").split("snap")[1]);
+			if (isNaN(size)) size =1;
+			api.data.snap=tcBrowser.snap(size);
 		}
 		for (var userExtends in api.userExtensions) {
 
