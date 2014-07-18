@@ -292,6 +292,25 @@ tiddlycut.modules.browserOverlay = (function ()
 					}
 			return;
 		}
+		//-----highlight control------
+		if (tClip.hasModeBegining(tClip.getCategories()[category],"highlight") ) {
+			//set edit comand in document - this causes loss of selection of text - so remember here
+			var range, sel = content.getSelection();
+			if (sel.getRangeAt) {
+				range = sel.getRangeAt(0);
+			}
+			content.document.designMode = "on";
+			//restore selection of text
+			if (range) {
+				sel.removeAllRanges();
+				sel.addRange(range);
+			} 
+			//content.setTimeout('document.designMode = "on"',1000);
+			content.document.execCommand("styleWithCSS",false,"false");
+			content.document.execCommand("forecolor",false,"#fe0d0c");
+			content.document.designMode = 'Off'; 
+			return;
+		}
 		//-----end debug stuff ---------
 		if (!pageData.SetupVars(category,currentsection)) return false;//sets mode - determines what is copied	
 		if (!pageData.cutTids(category)) return false;

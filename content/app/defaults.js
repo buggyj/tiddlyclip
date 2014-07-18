@@ -2,25 +2,20 @@
 {
 	var api = 
 	{
-		onLoad:onLoad, getDefaultRule:getDefaultRule, 
+		onLoad:onLoad, 
 		getDefaultCategories:getDefaultCategories,
 		getTWPrefs:getTWPrefs,
 	}
 	var defaultCategories = [
-		"|tid|copy tids||defaultTid|tiddlers|",
-		"|text|save text||defaultText||",
-		"|web|save html||defaultWeb||"
+		"|tid|copy tids||tiddlers|",
+		"|text|save text||||",
+		"|web|save html||||"
 	];
-	var defaultRules = {
-		defaultTid:'|{{{%($remoteTidTitle)%}}}|{{{%($remoteTidText)%}}}|{{{%($remoteTidTags)%}}}|||append|',
-		defaultText:'|{{{%($PageTitle)%}}}|{{{%($PageRef)% <br>date="%($DateTimeLong)%", <html>%($Text)%</html>}}}||||append|',
-		defaultWeb: '|{{{%($PageTitle)%}}}|{{{%($PageRef)% <br>date="%($DateTimeLong)%", <html>%($Web)%</html>}}}||||append|'
-	}
+
 	var defaultPrefs = {
 		ConfigOptsTiddler:'ConfigOptions',
 		filechoiceclip:1,
-		txtUserName:'default',
-		txtBackupFolder:'x'
+		txtUserName:'default'
 	}
 	
 	function getTWPrefs(){ return defaultPrefs;}
