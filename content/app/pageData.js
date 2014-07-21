@@ -77,9 +77,20 @@
 			api.data.userString=userString.value;
 		}
 		if (tClip.hasModeBegining(tClip.getCategories()[category],"snap") )  { 
+			var range, sel = content.getSelection();
+			if (sel.getRangeAt) {
+				range = sel.getRangeAt(0);
+			}
+
+			if (range) {
+				sel.removeAllRanges();
+			} 
 		    var size=makepercent(tClip.getModeBegining(tClip.getCategories()[category],"snap").split("snap")[1]);
 			if (isNaN(size)) size =1;
 			api.data.snap=tcBrowser.snap(size);
+			if (range) {
+				sel.addRange(range);
+			} 
 		}
 		for (var userExtends in api.userExtensions) {
 

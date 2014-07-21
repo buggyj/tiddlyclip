@@ -306,6 +306,7 @@ tiddlycut.modules.browserOverlay = (function ()
 				sel.addRange(range);
 			} 
 			//content.setTimeout('document.designMode = "on"',1000);
+			//here I should also add my own class and then use this in the application ".tchighlight"
 			content.document.execCommand("styleWithCSS",false,"false");
 			content.document.execCommand("forecolor",false,"#fe0d0c");
 			content.document.designMode = 'Off'; 
