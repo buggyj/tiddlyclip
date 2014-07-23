@@ -34,30 +34,30 @@
 			
 		//expose parameters - used for userExtensions
 		api.data ={};
-		api.data.Section  = tClip.getSectionNames()[currentSection];
-		api.data.Category = category;
-		api.data.PageTitle= tcBrowser.getPageTitle();//replaces  %PageTitle%
-		api.data.PageRef =  tcBrowser.getPageRef();  //replaces  %PageRef%
-		api.data.Text = 	tcBrowser.getSelectedAsText();
-		api.data.Clip = 	tcBrowser.getClipboardString();
-		api.data.ImageURL=	tcBrowser.getImageURL();
+		api.data.section  = tClip.getSectionNames()[currentSection];
+		api.data.category = category;
+		api.data.pageTitle= tcBrowser.getPageTitle();//replaces  %PageTitle%
+		api.data.pageRef =  tcBrowser.getPageRef();  //replaces  %PageRef%
+		api.data.text = 	tcBrowser.getSelectedAsText();
+		api.data.clip = 	tcBrowser.getClipboardString();
+		api.data.imageURL=	tcBrowser.getImageURL();
 		api.data.hasText=	(tcBrowser.hasSelectedText()).toString();
 		api.data.clipText=	(tcBrowser.hasCopiedText()).toString();
 		api.data.onImage =	(tcBrowser.onImage()).toString();
 		api.data.onLink=	(tcBrowser.onLink()).toString();
-		api.data.Classic =	(tcBrowser.isTiddlyWikiClassic()).toString();
+		api.data.classic =	(tcBrowser.isTiddlyWikiClassic()).toString();
 		api.data.linkUrl;
 
 
 
-		var locale = api.data.PageRef.split('/');
+		var locale = api.data.pageRef.split('/');
 			locale.length--;
 			locale = locale.join('/');
 		var styles=false;
 		var safety=true;
 		    if (tClip.hasMode(tClip.getCategories()[category],"keepstyle") ) styles = true;
 		    if (tClip.hasMode(tClip.getCategories()[category],"safetyoff") ) safety = false;
-			api.data.Web  = tcBrowser.getSelectedAsHtml(locale,styles,safety);
+			api.data.web  = tcBrowser.getSelectedAsHtml(locale,styles,safety);
 
 		// these are the structures for hold an array of tiddlers from a remote tw
 		// that are to to be pasted into the local tw
