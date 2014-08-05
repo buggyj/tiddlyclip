@@ -7,7 +7,7 @@
 		getTWPrefs:getTWPrefs,
 	}
 	var defaultCategories = [
-		"|tid|copy tids||tiddlers|",
+		"|tid|copy tids|||tiddlerscopy|",
 		"|text|save text||||",
 		"|web|save html||||"
 	];
