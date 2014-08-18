@@ -73,38 +73,24 @@ tiddlycut.modules.tcBrowser= (function () {
 	function getSelectedAsText()
 	{
 		var selectedText = "";
-		var notElement = false;
-
-		var focusedElement = chrome.commandDispatcher.focusedElement;
-		if(focusedElement && focusedElement != null)
-			{
-			try
-				{
-				selectedText = focusedElement.value.substring(focusedElement.selectionStart,focusedElement.selectionEnd);
-				}
-			catch(e)
-				{
-				notElement = true;
-				}
+		var element = chrome.commandDispatcher.focusedElement;
+		if(element) {// only allow input[type=text]/textarea
+			if (element.tagName === "TEXTAREA" ||(element.tagName === "INPUT" && element.type === "text")) {
+				return element.value.substring(element.selectionStart,element.selectionEnd);
 			}
-		else
-			{
-			notElement = true;
-			}
+		} else {
 
-		if(notElement)
-			{
 			var focusedWindow = chrome.commandDispatcher.focusedWindow;
 			try
 				{
-				var winWrapper = new XPCNativeWrapper(focusedWindow,'document','getSelection()');
-				var selection = winWrapper.getSelection();
+					var selection = focusedWindow.getSelection();
+					selectedText = selection.toString();
 				}
 			catch(e)
 				{
-				var selection = focusedWindow.getSelection();
+				
 				}
-			selectedText = selection.toString();
+			
 			}
 		return selectedText;
 	}
@@ -158,32 +144,31 @@ tiddlycut.modules.tcBrowser= (function () {
 	function getHtml(styles)
 	{
 		var focusedWindow = chrome.commandDispatcher.focusedWindow;
+		var selection;
 		try
 			{
-			var winWrapper = new XPCNativeWrapper(focusedWindow);
-			var selection = focusedWindow.getSelection();
+			selection = focusedWindow.getSelection();
 			}
 		catch(e)
 			{
-			var selection = focusedWindow.getSelection();
+
 			}
 		var range;	
 		try {
 			range = selection.getRangeAt(0);
 			var documentFragment = range.cloneContents();
-			var frag = XPCNativeWrapper.unwrap(documentFragment);
 			var mydiv = content.document.createElement("div");
 
 			if (styles){				
 				mydiv.style.cssText = "display: none";
-				mydiv.appendChild(frag);
+				mydiv.appendChild(documentFragment);
 				var container = range["startContainer"];
 			   // Check if the container is a text node and return its parent if so
 				var mycon =( container.nodeType === 3 ? container.parentNode : container);
 				mycon.appendChild(mydiv);
 			}
 			else
-				mydiv.appendChild(frag);
+				mydiv.appendChild(documentFragment);
 			return mydiv;
 		}
 		catch(e) { return null; }//if there is no selected

@@ -49,9 +49,7 @@ tiddlycut.contextListener= function(e) {
 
 tiddlycut.Init = function() {
 	//tiddlycut.log("2cs" + tiddlycut.tabN);
-	addMessageListener('tcutunload',tiddlycut.stop);
-	addEventListener('DOMContentLoaded', tiddlycut.DOMLoaded, false);
-	addEventListener('contextmenu',tiddlycut.contextListener );
+
 
 		tiddlycut.paste = function(messageEvent) {
 			// @param -id is tab id
@@ -78,16 +76,20 @@ tiddlycut.Init = function() {
 				message.setAttribute("data-tiddlyclip-category",messageEvent.json.data.category);
 				message.setAttribute("data-tiddlyclip-pageData",messageEvent.json.data.pageData);
 				message.setAttribute("data-tiddlyclip-currentsection",messageEvent.json.data.currentsection);
+				tiddlycut.log("paste put in message box")
 				messageBox.appendChild(message);
 				// Create and dispatch the custom event to the extension
 				var event = content.document.createEvent("Events");
 				event.initEvent("tiddlyclip-save-file",true,false);
+				tiddlycut.log("paste event ready to sent to page");
 				message.dispatchEvent(event);
-				tiddlycut.log("paste event sent to page");
+				tiddlycut.log("after paste event sent to page");
 			}
 			} catch (e) {tiddlycut.log(e);};
 		}
-		
+	addMessageListener('tcutunload',tiddlycut.stop);
+	addEventListener('DOMContentLoaded', tiddlycut.DOMLoaded, false);
+	addEventListener('contextmenu',tiddlycut.contextListener );
 };
 
 tiddlycut.DOMLoaded= function(ev) {

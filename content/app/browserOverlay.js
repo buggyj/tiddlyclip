@@ -155,10 +155,18 @@ tiddlycut.modules.browserOverlay = (function ()
 			menu.appendChild(tempItem);
 			
 		}
-		//add dock
-		var tempItem = docu.createElement("menuitem");
+		//add dock 
+		var tempItem = docu.createElement("menuseparator");
+		menu.appendChild(tempItem);
+		
+		tempItem = docu.createElement("menuitem");
 		tempItem.setAttribute("label","dock here");
+		//tempItem.setAttribute("class","menu-iconic");
+		//tempItem.setAttribute("image","resource://tiddlycut/skin/icon16.png");//BJ can't get this working
 		tempItem.setAttribute("oncommand", "tiddlycut.modules.browserOverlay.dock()");
+		menu.appendChild(tempItem);
+		
+		tempItem = docu.createElement("menuseparator");
 		menu.appendChild(tempItem);
 		
 		var secName=tClip.getSectionNames();		
@@ -265,8 +273,13 @@ tiddlycut.modules.browserOverlay = (function ()
 
 		if (found) { //remove and bubble down those that follow
 			if (i== pref.getCharPref("tiddlycut.filechoiceclip")) {
-				tClip.setClipConfig(0);//if currently selected disable categories	
-			}
+				if (tot ==1)  tClip.setClipConfig(0);//diable
+				else {
+					if (i < tot) changeFile(i+1);
+					else changeFile(i-1);
+				}
+				currentsection =0;
+			} 
 			for (tab = i; tab <tot; tab++) { 
 				pref.Set('tabid'+tab, pref.Get('tabid'+(tab+1)));
 				pref.Set('wikifile'+tab, pref.Get('wikifile'+(tab+1))) ;

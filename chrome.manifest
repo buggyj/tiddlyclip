@@ -1,7 +1,7 @@
 content 	tiddlycut  			content/ contentaccessible=yes
 skin 		tiddlycut	classic/1.0	skin/
 locale 		tiddlycut en-US 		locale/en-US/tiddlycut/
-overlay		chrome://browser/content/browser.xul		chrome://tiddlycut/content/browserOverlay.xul
+
 
 
 
