@@ -15,7 +15,8 @@
 	var defaultPrefs = {
 		ConfigOptsTiddler:'ConfigOptions',
 		filechoiceclip:1,
-		txtUserName:'default'
+		txtUserName:'default',
+		string:'enter input'
 	}
 	
 	function getTWPrefs(){ return defaultPrefs;}

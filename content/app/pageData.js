@@ -11,6 +11,7 @@
 	var tClip, tcBrowser, tiddlerAPI, browseris;	
 	function onLoad(browser) {
 		browseris 	= browser;
+		pref		= tiddlycut.modules.pref;
 		tClip	 	= tiddlycut.modules.tClip;
 		tcBrowser	= tiddlycut.modules.tcBrowser;
 		tiddlerAPI	= tiddlycut.modules.tiddlerAPI;
@@ -71,12 +72,14 @@
         //////////end of remote data struct //////////////////
         
 		//execute any user defined extensions
-		if (tClip.hasMode(tClip.getCategories()[category],"addtext") )  { 
+		if (tClip.hasModeBegining(tClip.getCategories()[category],"user") )  { 
 		    var userString = {value:''};
-			tcBrowser.UserInputDialog("Enter text",userString);
-			api.data.userString=userString.value;
+		    var promptindex =tClip.getModeBegining(tClip.getCategories()[category],"user").split("user")[1];
+			tcBrowser.UserInputDialog(pref.getCharPref("tiddlycut."+promptindex),userString);
+			api.data["user"+promptindex]=userString.value;
 		}
 		if (tClip.hasModeBegining(tClip.getCategories()[category],"snap") )  { 
+			//if any text is selected temporarly remove this while making the snap
 			var range, sel = content.getSelection();
 			if (sel.getRangeAt) {
 				range = sel.getRangeAt(0);
@@ -85,9 +88,11 @@
 			if (range) {
 				sel.removeAllRanges();
 			} 
+			//make the snap
 		    var size=makepercent(tClip.getModeBegining(tClip.getCategories()[category],"snap").split("snap")[1]);
 			if (isNaN(size)) size =1;
 			api.data.snap=tcBrowser.snap(size);
+			//re-apply selected text (if any)
 			if (range) {
 				sel.addRange(range);
 			} 
