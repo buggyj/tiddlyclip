@@ -179,8 +179,10 @@ tiddlycut.modules.tClip = (function () {
 			activeCategories={}; //no section so no categories
 			sectionNames=[];
 			tiddlycut.log("activeCategories set to {}");
+			pref.initPrefs();//BJ not sure about this...
 		} else {
 			ClipConfig = pref.Get('ClipConfig'+(filen));
+			pref.loadOpts(filen);
 			tiddlycut.log("setclipconfig ",ClipConfig);
 		}
 	}

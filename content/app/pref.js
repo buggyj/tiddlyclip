@@ -35,12 +35,14 @@ tiddlycut.modules.pref = (function ()
 			Save[element] = false; 
 		},
 
-		  loadValFromTW= function() {
+		  loadOpts = function(num) {
 			 //load additional prefs from targetTW
-			 var pieces = getTidContents(getCharPref("tiddlycut.ConfigOptsTiddler"));
+			 var pieces = pref.Get('ClipOpts'+num);
 			 if (!pieces) {
-				  //loadDefaultTWPrefs();
-				  return;
+				var defs = defaults.getTWPrefs();
+				for (var i in defs) 
+					Map[i] = defs[i];
+				return;
 			 }
 			 pieces = pieces.split('\n');
 			 var item;
@@ -62,7 +64,8 @@ tiddlycut.modules.pref = (function ()
 	{
 		onLoad:onLoad,	getBoolPref:getBoolPref, 	getCharPref:getCharPref, 		
 		Get:Get,		getFileNames:getFileNames, 	setBoolPref:setBoolPref, 
-		Set:Set,			loadTheOpts:loadTheOpts,		SetPrefs:SetPrefs
+		Set:Set,			loadTheOpts:loadTheOpts,		SetPrefs:SetPrefs,
+		initPrefs:initPrefs, loadOpts:loadOpts
 	}
 
 	var tcBrowser, defaults, pageData, browseris;

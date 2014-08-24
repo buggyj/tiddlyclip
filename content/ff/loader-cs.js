@@ -20,15 +20,16 @@ tiddlycut.tabN =tiddlycut.tiddlycutgettabN();
 
 tiddlycut.log("cs" + tiddlycut.tabN);
 
-tiddlycut.unload = function() {
-	if (!!content) content.removeEventListener('unload', tiddlycut.unload);
-	tiddlycut.log("unload ev cs",tiddlycut.tabN);
+tiddlycut.unloadpre = function() {
+	if (!!content) content.removeEventListener('unload', this.unload);
+	this.log("unload ev cs",this.tabN);
 	try { 	// if the tab is closing then the source of the message can be invalid
 			//- tabclose is watch for in background-server and sends this message when seen  
-		sendAsyncMessage('tcutrequest', {data:{req: 'pageChanged', id: tiddlycut.tabN}}); 
+		sendAsyncMessage('tcutrequest', {data:{req: 'pageChanged', id: this.tabN}}); 
 	} catch (e) {
 	}
 }	 
+tiddlycut.unload=tiddlycut.unloadpre.bind(tiddlycut);
 
 tiddlycut.docLoad = function(doc) {
 	if (doc.nodeName != '#document') tiddlycut.log("in docload fail");

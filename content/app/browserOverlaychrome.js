@@ -68,7 +68,7 @@ tiddlycut.modules.browserOverlay = (function ()
 				pref.Set('tabid'+tab, pref.Get('tabid'+(tab+1)));
 				pref.Set('wikifile'+tab, pref.Get('wikifile'+(tab+1))) ;
 				pref.Set('ClipConfig'+tab, pref.Get('ClipConfig'+(tab+1)));
-			}
+				//pref.Set('ClipOpts'+tab, pref.Get('ClipOpts'+(tab+1)));
 			pref.Set('tabtot',tot-1);
 			
 			if (i==pref.Get('filechoiceclip')) pref.Set('filechoiceclip',0);
@@ -102,6 +102,7 @@ tiddlycut.modules.browserOverlay = (function ()
 	function changeFile(n) {
 		pref.Set('filechoiceclip',n);
 		tClip.setClipConfig(n);
+		//tClip.setClipOpts(n)??????
 		tClip.loadSectionFromFile(0); //load default section
 		createFilesPopups();
 	}
@@ -221,6 +222,7 @@ tiddlycut.modules.browserOverlay = (function ()
 		pref.Set('wikifile'+tot,url);
 		pref.Set('tabid'+tot,id);
 		pref.Set('ClipConfig'+tot,configtid.body);
+	    //pref.Set('ClipOpts'+tot,????????);//BJ fixme needs to be got when getting config??
 		createFilesPopups();
 	};
 	function injectMessageBox(doc) {

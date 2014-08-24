@@ -98,11 +98,13 @@ tiddlycut.modules.browserOverlay = (function ()
 		
 	}
 	function reload (n) {
+		tiddlycut.log("reload is ====", n);
 		currentsection =n;
 		tClip.loadSectionFromFile(n);//TODO what about tClip.defaultCategories()?
 		
 	}
 	function changeFile(n) {	
+		tiddlycut.log("changeFile is ====", n);
 		pref.Set('filechoiceclip',n);
 		tClip.setClipConfig(n);
 		tClip.loadSectionFromFile(0); //load default section
@@ -239,6 +241,7 @@ tiddlycut.modules.browserOverlay = (function ()
 			if (pref.Get('wikifile'+i) ==content.location.href) {return};//already on our list-do nothing
 		}
 		//else add to our list
+		//gettiddlycutcur() is the global function defined in winN.jsm - current tab number
 		tiddlycut.log("docked ",content.location.href,gettiddlycutcur());
 		var startPos = content.location.href.search(":")+1;
 		var tot =pref.Get('tabtot')+1;
@@ -249,8 +252,12 @@ tiddlycut.modules.browserOverlay = (function ()
 		
         //record tab id in 'tab dom' used when we hear tab closed events to see if we need to respond - 
         gBrowser.selectedTab.setAttribute("tctabid",gettiddlycutcur()); //BJ change modus opos to one global collection of tabs?
-
 		pref.Set('ClipConfig'+tot,tClip.getTidContents("TiddlyClipConfig"));
+		
+		var opts=tClip.getTidContents(pref.getCharPref("tiddlycut.ConfigOptsTiddler"));
+		if (!!opts) pref.Set('ClipOpts'+tot,opts);
+		else pref.Set('ClipOpts'+tot,null);
+		
 		changeFile(tot);//load configuration from this TW
 		injectMessageBox(content.document);
 	};
@@ -266,6 +273,7 @@ tiddlycut.modules.browserOverlay = (function ()
 	};
 
 	function tabchange(tabId) {
+		tiddlycut.log("**tabchange**",tabId);
 		var i, tab, found, tot =pref.Get('tabtot');
 		for (i = 1; i < tot+1;i++) {
 			if (pref.Get('tabid'+i) ==tabId) {found = true; break;};
@@ -284,6 +292,7 @@ tiddlycut.modules.browserOverlay = (function ()
 				pref.Set('tabid'+tab, pref.Get('tabid'+(tab+1)));
 				pref.Set('wikifile'+tab, pref.Get('wikifile'+(tab+1))) ;
 				pref.Set('ClipConfig'+tab, pref.Get('ClipConfig'+(tab+1)));
+				pref.Set('ClipOpts'+tab, pref.Get('ClipOpts'+(tab+1)));
 			}
 			pref.Set('tabtot',tot-1);
 			

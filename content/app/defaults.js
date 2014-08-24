@@ -13,8 +13,7 @@
 	];
 
 	var defaultPrefs = {
-		ConfigOptsTiddler:'ConfigOptions',
-		filechoiceclip:1,
+		ConfigOptsTiddler:'TiddlyClipOpts',
 		txtUserName:'default',
 		string:'enter input'
 	}
