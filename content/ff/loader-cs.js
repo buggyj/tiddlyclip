@@ -1,4 +1,4 @@
-'use strict';
+//'use strict'; - cannot delect tiddlycut with this
 (function ()
 {
 	var tiddlycut = {};
@@ -13,7 +13,6 @@ if (typeof(tiddlycut.log) === 'undefined'){
 		consoleService.logStringMessage('tiddlycut: ' + concated);
 	};
 };
-
 tiddlycut.entry = {};
 Components.utils.import("chrome://tiddlycut/content/ff/tabId.jsm",tiddlycut);//just a common numbering for tabs
 tiddlycut.tabN =tiddlycut.tiddlycutgettabN();
@@ -23,18 +22,22 @@ tiddlycut.log("cs" + tiddlycut.tabN);
 tiddlycut.unloadpre = function() {
 	if (!!content) content.removeEventListener('unload', this.unload);
 	this.log("unload ev cs",this.tabN);
-	try { 	// if the tab is closing then the source of the message can be invalid
-			//- tabclose is watch for in background-server and sends this message when seen  
-		sendAsyncMessage('tcutrequest', {data:{req: 'pageChanged', id: this.tabN}}); 
-	} catch (e) {
-	}
+
 }	 
 tiddlycut.unload=tiddlycut.unloadpre.bind(tiddlycut);
 
 tiddlycut.docLoad = function(doc) {
+	if (doc.defaultView.frameElement) return;
 	if (doc.nodeName != '#document') tiddlycut.log("in docload fail");
 			//return?;
 		tiddlycut.log("in docload");
+
+		try { 	// if the tab is closing then the source of the message can be invalid
+				//- tabclose is watch for in background-server and sends this message when seen  
+			sendAsyncMessage('tcutrequest', {data:{req: 'pageChanged', id: this.tabN}}); 
+		} catch (e) {
+		}
+
 		content.addEventListener('unload', tiddlycut.unload);
 }
 
@@ -103,8 +106,8 @@ tiddlycut.stop= function() {
 	tiddlycut.log("stop "+ tiddlycut.tabN); 
 	removeEventListener('contextmenu',tiddlycut.contextListener,false );
 	removeEventListener('DOMContentLoaded', tiddlycut.DOMLoaded, false);  
-	//delete tiddlycut;  delete window.tiddlycut; delete  browser.tiddlyclut;???? dont work
-	tiddlycut = null;            
+	tiddlycut = null; 
+	delete tiddlycut;           
 
 };
 

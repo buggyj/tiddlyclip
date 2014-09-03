@@ -81,13 +81,14 @@
 		if (tClip.hasModeBegining(tClip.getCategories()[category],"snap") )  { 
 			//if any text is selected temporarly remove this while making the snap
 			var range, sel = content.getSelection();
-			if (sel.getRangeAt) {
-				range = sel.getRangeAt(0);
-			}
-
-			if (range) {
-				sel.removeAllRanges();
-			} 
+			try{
+				if (sel.getRangeAt) {
+					range = sel.getRangeAt(0);
+				}
+				if (range) {
+					sel.removeAllRanges();
+				} 
+			} catch(e) {range=null;} 
 			//make the snap
 		    var size=makepercent(tClip.getModeBegining(tClip.getCategories()[category],"snap").split("snap")[1]);
 			if (isNaN(size)) size =1;

@@ -78,17 +78,17 @@ tiddlycut.modules.tcBrowser= (function () {
 			if (element.tagName === "TEXTAREA" ||(element.tagName === "INPUT" && element.type === "text")) {
 				return element.value.substring(element.selectionStart,element.selectionEnd);
 			}
-		} else {
+		} {
 
 			var focusedWindow = chrome.commandDispatcher.focusedWindow;
 			try
 				{
 					var selection = focusedWindow.getSelection();
-					selectedText = selection.toString();
+					selectedText = selection.getRangeAt(0).toString();
 				}
 			catch(e)
 				{
-				
+				alert(e)
 				}
 			
 			}
@@ -179,14 +179,10 @@ tiddlycut.modules.tcBrowser= (function () {
 	}
 	// Check if there is any selected text.
 	function hasSelectedText(){
-		try
-			{
+		try	{
 			var text = getSelectedAsText();
-			if(text != null && text.length > 0)
-				return true;
-			}
-		catch(err)
-			{}
+			if(text != "") return true;
+		}catch(e) {}
 		return false;
 	}
 	
