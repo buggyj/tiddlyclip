@@ -88,7 +88,7 @@ tiddlycut.modules.tcBrowser= (function () {
 				}
 			catch(e)
 				{
-				alert(e)
+
 				}
 			
 			}

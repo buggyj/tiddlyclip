@@ -107,6 +107,7 @@ tiddlycut.modules.browserOverlay = (function ()
 		tiddlycut.log("changeFile is ====", n);
 		pref.Set('filechoiceclip',n);
 		tClip.setClipConfig(n);
+		currentsection = 0;
 		tClip.loadSectionFromFile(0); //load default section
 	}
 	function toggleTCContextMenu(e)
@@ -329,8 +330,10 @@ tiddlycut.modules.browserOverlay = (function ()
 			} 
 			//content.setTimeout('document.designMode = "on"',1000);
 			//here I should also add my own class and then use this in the application ".tchighlight"
+			content.document.execCommand("backcolor", false, "#ffd700");
 			content.document.execCommand("styleWithCSS",false,"false");
 			content.document.execCommand("forecolor",false,"#fe0d0c");
+
 			content.document.designMode = 'Off'; 
 			return;
 		}
