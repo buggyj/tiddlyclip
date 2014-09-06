@@ -51,26 +51,22 @@ tiddlycut.contextListener= function(e) {
 	  } else sendAsyncMessage('tcutrequest', {data:{req: 'focusedtab', id: 0}});
 }
 
-tiddlycut.Init = function() {
-	//tiddlycut.log("2cs" + tiddlycut.tabN);
-
-
-		tiddlycut.paste = function(messageEvent) {
+		tiddlycut.pastepre = function(messageEvent) {
 			// @param -id is tab id
 			//tiddlycut.focusedtab=request.id;
-			tiddlycut.log("paste recieved");
+			this.log("paste recieved");
 			try {
-				if (messageEvent.json.data.tid != tiddlycut.tabN)
+				if (messageEvent.json.data.tid != this.tabN)
 				{
-					tiddlycut.log("paste wrong id mine yors",tiddlycut.tabN,messageEvent.json.data.tid);	
+					this.log("paste wrong id mine yors",this.tabN,messageEvent.json.data.tid);	
 					return;}
 
 
 			} catch (e) {
-				tiddlycut.log('callback error:', e);
+				this.log('callback error:', e);
 				return;
 			}
-			tiddlycut.log("paste found",tiddlycut.tabN);
+			this.log("paste found",this.tabN);
 			try{
 			// Find the message box element
 			var messageBox = content.document.getElementById("tiddlyclip-message-box");
@@ -80,17 +76,24 @@ tiddlycut.Init = function() {
 				message.setAttribute("data-tiddlyclip-category",messageEvent.json.data.category);
 				message.setAttribute("data-tiddlyclip-pageData",messageEvent.json.data.pageData);
 				message.setAttribute("data-tiddlyclip-currentsection",messageEvent.json.data.currentsection);
-				tiddlycut.log("paste put in message box")
+				this.log("paste put in message box")
 				messageBox.appendChild(message);
 				// Create and dispatch the custom event to the extension
 				var event = content.document.createEvent("Events");
 				event.initEvent("tiddlyclip-save-file",true,false);
-				tiddlycut.log("paste event ready to sent to page");
+				this.log("paste event ready to sent to page");
 				message.dispatchEvent(event);
-				tiddlycut.log("after paste event sent to page");
+				this.log("after paste event sent to page");
 			}
-			} catch (e) {tiddlycut.log(e);};
+			} catch (e) {this.log(e);};
 		}
+tiddlycut.paste=tiddlycut.pastepre.bind(tiddlycut);
+
+tiddlycut.Init = function() {
+	//tiddlycut.log("2cs" + tiddlycut.tabN);
+
+
+
 	addMessageListener('tcutunload',tiddlycut.stop);
 	addEventListener('DOMContentLoaded', tiddlycut.DOMLoaded, false);
 	addEventListener('contextmenu',tiddlycut.contextListener );
