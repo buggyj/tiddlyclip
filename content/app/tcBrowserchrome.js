@@ -6,7 +6,7 @@ tiddlycut.modules.tcBrowser= (function () {
 		setOnLink:setOnLink,				getClipboardString:getClipboardString, 	setImageURL:setImageURL,
 		getHtml:getHtml, 					hasCopiedText:hasCopiedText, 			hasSelectedText:hasSelectedText, 		
 		getPageTitle:getPageTitle, 			getPageRef:getPageRef, 					
-		getImageURL:getImageURL,			winWrapper:winWrapper,
+		getImageURL:getImageURL,			getLargestImgURL:getLargestImgURL,		winWrapper:winWrapper,
 	    log:log,							htmlEncode:htmlEncode,					onImage:onImage,
 	    onLink:onLink,						setOnImage:setOnImage,					
 	    getSelectedAsHtml:getSelectedAsHtml,createDiv:createDiv,
@@ -50,6 +50,9 @@ tiddlycut.modules.tcBrowser= (function () {
 	}
 	function getImageURL() {
 		return imageUrl;
+	}
+	function getLargestImgURL() {
+		return ''l
 	}
 	function setOnImage(){
 		onImage= gContextMenu.onImage;

@@ -7,7 +7,7 @@ tiddlycut.modules.tcBrowser= (function () {
 		getHtml:getHtml, 					hasCopiedText:hasCopiedText, 			hasSelectedText:hasSelectedText, 		
 		winWrapper:winWrapper,				EnterTidNameDialog:EnterTidNameDialog, 
 		getPageTitle:getPageTitle, 			getPageRef:getPageRef, 					getStr:getStr, 
-		getImageURL:getImageURL,			snap:snap,
+		getImageURL:getImageURL,			getLargestImgURL:getLargestImgURL,		snap:snap,
 	    log:log,							htmlEncode:htmlEncode,					onImage:onImage,
 	    onLink:onLink,						setOnImage:setOnImage,					
 	    getSelectedAsHtml:getSelectedAsHtml,createDiv:createDiv,
@@ -56,6 +56,19 @@ tiddlycut.modules.tcBrowser= (function () {
 	}
 	function getImageURL() {
 		return imageUrl;
+	}
+	function getLargestImgURL() {
+		var isize=0, url='', imgs = content.document.querySelectorAll('img');	
+		for (var img in imgs) {
+			//var imgh = imgs[img].height?imgs[img].height|1;
+			var imgsize = imgs[img].width;
+			if (!imgsize) imgsize = 0;
+			if (isize < imgsize) {
+				isize = imgsize;
+				url = imgs[img].src;
+			}	
+		}
+		return url;
 	}
 	function setOnImage(){
 		onImage= gContextMenu.onImage;

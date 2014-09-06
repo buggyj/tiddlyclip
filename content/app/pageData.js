@@ -42,6 +42,7 @@
 		api.data.text = 	tcBrowser.getSelectedAsText();
 		api.data.clip = 	tcBrowser.getClipboardString();
 		api.data.imageURL=	tcBrowser.getImageURL();
+		api.data.largestImgURL=	tcBrowser.getLargestImgURL();
 		api.data.hasText=	(tcBrowser.hasSelectedText()).toString();
 		api.data.clipText=	(tcBrowser.hasCopiedText()).toString();
 		api.data.onImage =	(tcBrowser.onImage()).toString();
