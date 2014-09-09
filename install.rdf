@@ -4,7 +4,7 @@
     <Description about="urn:mozilla:install-manifest">
         <em:type>2</em:type> <!-- 2 : Extension -->
         <em:id>buggyjeftidclip@gmail.com</em:id>  
-        <em:version>1.3</em:version>
+        <em:version>0.0.3alpha</em:version>
         <em:name>tiddlyclip</em:name>
         <em:description>clip web content to tiddlywiki</em:description>
         <em:creator>buggyj</em:creator>
