@@ -97,7 +97,7 @@ tiddlycut.modules.tcBrowser= (function () {
 			try
 				{
 					var selection = focusedWindow.getSelection();
-					selectedText = selection.getRangeAt(0).toString();
+					selectedText = selection.toString();
 				}
 			catch(e)
 				{
