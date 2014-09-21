@@ -89,7 +89,7 @@ tiddlycut.modules.browserOverlay = (function ()
 		if (tcBrowser.hasCopiedText()) 	curModes.push(tClip.SELECTMODES.Clip);
 		if (tcBrowser.onImage()) 		curModes.push(tClip.SELECTMODES.Image);
 		if (tcBrowser.onLink())			curModes.push(tClip.SELECTMODES.Link);	
-		if (tcBrowser.isTiddlyWikiClassic()) curModes.push(tClip.SELECTMODES.TW);	
+		if (tcBrowser.isTiddlyWikiClassic()) curModes.push(tClip.SELECTMODES.TWC);	
 			//alert(curModes);
 		return 	curModes;
 	}

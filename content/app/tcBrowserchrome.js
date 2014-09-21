@@ -121,19 +121,9 @@ tiddlycut.modules.tcBrowser= (function () {
 		return twc;
 	}
 
-	function isTiddlyWiki5() {
-		//from tiddlyfox
-		// Test whether the document is a TiddlyWiki5 (we don't have access to JS objects in it)
-		var doc = content.document;
-		var metaTags = doc.getElementsByTagName("meta"),
-			generator = false;
-		for(var t=0; t<metaTags.length; t++) {
-			if(metaTags[t].name === "application-name" && metaTags[t].content === "TiddlyWiki") {
-				generator = true;
-			}
-		}
-		return (doc.location.protocol === "file:") && generator;
-	}
+	//function isTiddlyWiki5() {
+		//must be implement in the cs
+	//}
 	
 	function log(str){
 		console.log("tc: "+sstr);

@@ -49,6 +49,9 @@
 		api.data.onLink=	(tcBrowser.onLink()).toString();
 		api.data.classic =	(tcBrowser.isTiddlyWikiClassic()).toString();
 		api.data.linkURL =	tcBrowser.getlinkURL();
+		api.data.onLinkLocal=	(tcBrowser.onLinkLocal()).toString();		
+		api.data.onLinkRemote=	(tcBrowser.onLinkRemote()).toString();
+		api.data.tw5 =		(tcBrowser.isTiddlyWiki5()).toString();
 
 
 

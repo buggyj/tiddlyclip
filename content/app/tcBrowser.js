@@ -12,7 +12,9 @@ tiddlycut.modules.tcBrowser= (function () {
 	    onLink:onLink,						setOnImage:setOnImage,					
 	    getSelectedAsHtml:getSelectedAsHtml,createDiv:createDiv,
 	    isTiddlyWikiClassic:isTiddlyWikiClassic, UserInputDialog:UserInputDialog,
-	    setlinkURL:setlinkURL,				getlinkURL:getlinkURL
+	    setlinkURL:setlinkURL,				getlinkURL:getlinkURL,
+	    onLinkLocal:onLinkLocal,			onLinkRemote:onLinkRemote, 
+	    isTiddlyWiki5:isTiddlyWiki5
 	}
 	var parser = Components.classes["@mozilla.org/parserutils;1"].
 			getService(Components.interfaces.nsIParserUtils);  
@@ -82,6 +84,14 @@ tiddlycut.modules.tcBrowser= (function () {
 	}
 	function onLink(){
 		return  vonLink;
+	}
+	function onLinkLocal(){
+		var local = /^file:/;
+		return local.test(vlinkURL);
+	}
+	function onLinkRemote(){
+		var local = /^file:/;
+		return !local.test(vlinkURL);
 	}
 	function setlinkURL() {
 		vlinkURL= gContextMenu.linkURL;
@@ -228,7 +238,7 @@ tiddlycut.modules.tcBrowser= (function () {
 				generator = true;
 			}
 		}
-		return (doc.location.protocol === "file:") && generator;
+		return generator;
 	}
 	
  	function EnterTidNameDialog(title, tag, cancelled) {
