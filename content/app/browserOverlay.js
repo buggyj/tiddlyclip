@@ -80,7 +80,8 @@ tiddlycut.modules.browserOverlay = (function ()
 	function setSelectModes(){
 		tcBrowser.setOnImage();
 		tcBrowser.setOnLink();
-		tcBrowser.setImageURL();		
+		tcBrowser.setImageURL();	
+		tcBrowser.setlinkURL();	
 	}	
 
 	function currentSelectModes() {

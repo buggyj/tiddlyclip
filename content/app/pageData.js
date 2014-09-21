@@ -48,7 +48,7 @@
 		api.data.onImage =	(tcBrowser.onImage()).toString();
 		api.data.onLink=	(tcBrowser.onLink()).toString();
 		api.data.classic =	(tcBrowser.isTiddlyWikiClassic()).toString();
-		api.data.linkUrl;
+		api.data.linkURL =	tcBrowser.getlinkURL();
 
 
 

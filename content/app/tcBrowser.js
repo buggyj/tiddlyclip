@@ -11,7 +11,8 @@ tiddlycut.modules.tcBrowser= (function () {
 	    log:log,							htmlEncode:htmlEncode,					onImage:onImage,
 	    onLink:onLink,						setOnImage:setOnImage,					
 	    getSelectedAsHtml:getSelectedAsHtml,createDiv:createDiv,
-	    isTiddlyWikiClassic:isTiddlyWikiClassic, UserInputDialog:UserInputDialog
+	    isTiddlyWikiClassic:isTiddlyWikiClassic, UserInputDialog:UserInputDialog,
+	    setlinkURL:setlinkURL,				getlinkURL:getlinkURL
 	}
 	var parser = Components.classes["@mozilla.org/parserutils;1"].
 			getService(Components.interfaces.nsIParserUtils);  
@@ -34,7 +35,7 @@ tiddlycut.modules.tcBrowser= (function () {
 	}
 
     //variables to store non-persistance broswer data (from gContextMenu)
-    var onImage, onLink, imageUrl;
+    var vonImage, vonLink, vimageUrl, vlinkURL;
     
 	function snap(size){
 		var tab = gBrowser.selectedTab;
@@ -71,17 +72,24 @@ tiddlycut.modules.tcBrowser= (function () {
 		return url;
 	}
 	function setOnImage(){
-		onImage= gContextMenu.onImage;
+		vonImage= gContextMenu.onImage;
 	}
 	function onImage(){
-		return onImage;
+		return vonImage;
 	}
 	function setOnLink(){
-		onLink= gContextMenu.onLink;
+		vonLink= gContextMenu.onLink;
 	}
 	function onLink(){
-		return onLink;
+		return  vonLink;
 	}
+	function setlinkURL() {
+		vlinkURL= gContextMenu.linkURL;
+	}
+	function getlinkURL() {
+		return vlinkURL;
+	}
+	
 	// Return plain text selection as a string.
 	function getSelectedAsText()
 	{
