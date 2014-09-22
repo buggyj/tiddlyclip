@@ -91,8 +91,8 @@ tiddlycut.modules.browserOverlay = (function ()
 		if (tcBrowser.onImage()) 		curModes.push(tClip.SELECTMODES.Image);
 		if (tcBrowser.onLink())			curModes.push(tClip.SELECTMODES.Link);	
 		if (tcBrowser.isTiddlyWikiClassic()) 	curModes.push(tClip.SELECTMODES.TWC);	
-		if (tcBrowser.onLinkLocal())			curModes.push(tClip.SELECTMODES.LinkLocal);			
-		if (tcBrowser.onLinkRemote())			curModes.push(tClip.SELECTMODES.LinkRemote);	
+		if (tcBrowser.onLinkLocal())			curModes.push(tClip.SELECTMODES.linkLocal);			
+		if (tcBrowser.onLinkRemote())			curModes.push(tClip.SELECTMODES.linkRemote);	
 		if (tcBrowser.isTiddlyWiki5()) 			curModes.push(tClip.SELECTMODES.TW5);	
 			//alert(curModes);
 		return 	curModes;

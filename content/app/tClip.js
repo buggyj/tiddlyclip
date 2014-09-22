@@ -1,8 +1,8 @@
 tiddlycut.modules.tClip = (function () {
 	//api const must be defined before api structure (or else will be assigned null)
 
-	var SELECTMODES ={Clip:'Clip', Image:'Image', Text:'Text', Link:'Link', LinkLocal:"LinkLocal", LinkRemote:"LinkRemote", TWC:'TWC', TW5:'TW5'};
-	var ALLSELMODES =[SELECTMODES.Clip, SELECTMODES.Image, SELECTMODES.Text, SELECTMODES.Link, SELECTMODES.LinkLocal, SELECTMODES.LinkRemote, SELECTMODES.TWC, SELECTMODES.TW5];	
+	var SELECTMODES ={Clip:'Clip', Image:'Image', Text:'Text', Link:'Link', linkLocal:"linkLocal", linkRemote:"linkRemote", TWC:'TWC', TW5:'TW5'};
+	var ALLSELMODES =[SELECTMODES.Clip, SELECTMODES.Image, SELECTMODES.Text, SELECTMODES.Link, SELECTMODES.linkLocal, SELECTMODES.linkRemote, SELECTMODES.TWC, SELECTMODES.TW5];	
 	
 
 	var api = 
