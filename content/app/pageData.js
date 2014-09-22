@@ -41,14 +41,14 @@
 		api.data.pageRef =  tcBrowser.getPageRef();  //replaces  %PageRef%
 		api.data.text = 	tcBrowser.getSelectedAsText();
 		api.data.clip = 	tcBrowser.getClipboardString();
-		api.data.imageURL=	tcBrowser.getImageURL();
-		api.data.largestImgURL=	tcBrowser.getLargestImgURL();
+		api.data.imageURL=	unescape(tcBrowser.getImageURL());
+		api.data.largestImgURL=	unescape(tcBrowser.getLargestImgURL());
 		api.data.hasText=	(tcBrowser.hasSelectedText()).toString();
 		api.data.clipText=	(tcBrowser.hasCopiedText()).toString();
 		api.data.onImage =	(tcBrowser.onImage()).toString();
 		api.data.onLink=	(tcBrowser.onLink()).toString();
 		api.data.classic =	(tcBrowser.isTiddlyWikiClassic()).toString();
-		api.data.linkURL =	tcBrowser.getlinkURL();
+		api.data.linkURL =	unescape(tcBrowser.getlinkURL());
 		api.data.onLinkLocal=	(tcBrowser.onLinkLocal()).toString();		
 		api.data.onLinkRemote=	(tcBrowser.onLinkRemote()).toString();
 		api.data.tw5 =		(tcBrowser.isTiddlyWiki5()).toString();
