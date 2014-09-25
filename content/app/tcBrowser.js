@@ -21,7 +21,6 @@ tiddlycut.modules.tcBrowser= (function () {
     var defaults;
     var _strings_bundle_default;
     var chrome, browseris;
-    const PREF_BRANCH = "extensions.tiddlyfox";
 
 	function onLoad(browser, doc) {
 		browseris 	= browser;

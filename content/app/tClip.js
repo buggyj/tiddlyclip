@@ -128,7 +128,7 @@ tiddlycut.modules.tClip = (function () {
         sectionNames=['Default'];
         var sectionStrgs;
 
-		if (activeSection===0) defaultCategories();//load default rules defined by this program 
+		//if (activeSection===0) defaultCategories();//load default rules defined by this program 
 
 		var content = ClipConfig;//where all sections are defined
 		if (content != null) {
@@ -146,8 +146,10 @@ tiddlycut.modules.tClip = (function () {
 				currentsection = activeSection;
 			} else { //straight text table
 				sectionStrgs = content.split('\n!'); //sections begin with a title, eg !mysection, followed by a table of categories
+				//the ! has not be removed by the split in the case of the first section
+				sectionStrgs[0] = sectionStrgs[0].substr(1);
 				//remember all section names - used to allow the user to see sections and change which is active
-				for (var  j =1; j< sectionStrgs.length;  j++) { //j =0 is the Default title, which is not overridden
+				for (var  j =0; j< sectionStrgs.length;  j++) { 
 					
 							sectionNames[j] = sectionStrgs[j].split('\n')[0];//first line is name
 				}	

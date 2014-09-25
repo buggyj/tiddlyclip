@@ -32,7 +32,7 @@ tiddlycut.modules.browserOverlay = (function ()
 		// contextmenu
 		let popup =doc.getElementById('contentAreaContextMenu');
         src = '<menu xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" '+
-        'id="contextTidCutFiles" label="tiddlyclip sets"  tooltiptext="Select table" >'+
+        'id="contextTidCutFiles" label="Tiddlyclip Setup"  tooltiptext="Select tiddlywiki and Actions" >'+
 	    '<menupopup id="contextTidCutFilesPopup" onpopupshowing="tiddlycut.modules.browserOverlay.createFilesPopups()"/>'+
         '</menu>';
  		var xul = parser.parseFromString(src, "application/xml");
@@ -41,7 +41,7 @@ tiddlycut.modules.browserOverlay = (function ()
 		                  doc.getElementById('context-paste').nextSibling);
 		 
 		src =  '<menu xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" '+
-		'id="contextTidCutClip" label="tiddlyclip  as.." insertafter="context-stop">'+
+		'id="contextTidCutClip" label="Tiddlyclip  Using.." insertafter="context-stop">'+
 	    '<menupopup id="contextTidCutClipPopup" onpopupshowing="tiddlycut.modules.browserOverlay.createCategoryPopups()"/>'+
         '</menu>';
 		var xul = parser.parseFromString(src, "application/xml");
@@ -50,8 +50,8 @@ tiddlycut.modules.browserOverlay = (function ()
 		                  doc.getElementById('context-paste').nextSibling);
 		     
 			
-		var menu = doc.getElementById("contentAreaContextMenu");
-		if(menu) menu.addEventListener("popupshowing",toggleTCContextMenu,false);
+		//var menu = doc.getElementById("contentAreaContextMenu");
+		//if(menu) menu.addEventListener("popupshowing",toggleTCContextMenu,false);
 
 		//execute any user definitions
 		for (var method in api.adaptions) {
@@ -71,8 +71,8 @@ tiddlycut.modules.browserOverlay = (function ()
 			popup.removeChild(chromerefs.contextLinkItemB);
 		let menupopup = doc.getElementById('menu_ToolsPopup');
 
-		var menu = doc.getElementById("contentAreaContextMenu");
-		if(menu) menu.removeEventListener("popupshowing",toggleTCContextMenu,false);
+		//var menu = doc.getElementById("contentAreaContextMenu");
+		//if(menu) menu.removeEventListener("popupshowing",toggleTCContextMenu,false);
 		var e = doc.getElementById("contentAreaContextMenu")
 		if(e) e.removeEventListener("popupshowing",ContextMenuShowing, false);
 	}
@@ -105,7 +105,7 @@ tiddlycut.modules.browserOverlay = (function ()
 		tiddlycut.log("reload is ====", n);
 		currentsection =n;
 		tClip.loadSectionFromFile(n);//TODO what about tClip.defaultCategories()?
-		
+		contextMenuClipAs();	
 	}
 	function changeFile(n) {	
 		tiddlycut.log("changeFile is ====", n);
@@ -194,6 +194,13 @@ tiddlycut.modules.browserOverlay = (function ()
 			menu.appendChild(tempItem);
 		}
 	}
+	
+	function contextMenuClipAs() {
+		var secName=tClip.getSectionNames();
+		var menu = docu.getElementById("contextTidCutClip");		
+			menu.setAttribute("label","Tiddlyclip using "+secName[currentsection]);
+	}
+	
 	function createCategoryPopups()
 	{
 		
@@ -265,7 +272,9 @@ tiddlycut.modules.browserOverlay = (function ()
 		
 		changeFile(tot);//load configuration from this TW
 		injectMessageBox(content.document);
-	};
+		contextMenuClipAs();
+	}
+	
 	function injectMessageBox(doc) {
 		// Inject the message box
 		var messageBox = doc.getElementById("tiddlyclip-message-box");
@@ -275,7 +284,7 @@ tiddlycut.modules.browserOverlay = (function ()
 			messageBox.style.display = "none";
 			doc.body.appendChild(messageBox);
 		}
-	};
+	}
 
 	function tabchange(tabId) {
 		tiddlycut.log("**tabchange**",tabId);
