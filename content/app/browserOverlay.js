@@ -318,14 +318,16 @@ tiddlycut.modules.browserOverlay = (function ()
 
 	function Go(category)//ff only
 	{ 
+		var mm = Cc["@mozilla.org/globalmessagemanager;1"].getService(Ci.nsIMessageListenerManager);
 		//-----debug control------
 		if (tClip.hasMode(tClip.getCategories()[category],"status") ) {
 					var i, tablist='', tot =pref.Get('tabtot');
 					for (i = 1; i < tot+1;i++) {
 						tablist = tablist +   pref.Get('tabid'+i)+"=" 
 								+ pref.getCharPref("wikifile"+i)+ "\n";
-					alert(tablist);
+					tiddlycut.log(tablist);
 					}
+					mm.broadcastAsyncMessage('tcutidentify',{});
 			return;
 		}
 		//-----highlight control------
@@ -357,7 +359,7 @@ tiddlycut.modules.browserOverlay = (function ()
 		id = pref.Get('tabid'+(pref.Get('filechoiceclip')));
 		//send kick to content script
 		tiddlycut.log("sending paste",id);
-		var mm = Cc["@mozilla.org/globalmessagemanager;1"].getService(Ci.nsIMessageListenerManager);
+	
 		mm.broadcastAsyncMessage('tcutpaste', {
 								data: { tid:id, 
 								category:category, pageData:JSON.stringify(pageData),currentsection:currentsection}});
