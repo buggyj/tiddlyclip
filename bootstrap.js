@@ -2,7 +2,6 @@
 
 const Cc = Components.classes;
 const Ci = Components.interfaces;
-
 function isNativeUI() {
   let appInfo = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULAppInfo);
   return (appInfo.ID == "{aa3c5121-dab2-40e2-81ca-7ea25febc110}");
@@ -47,7 +46,7 @@ function startup(aData, aReason) {
  //BJ additon
  let mm = Cc["@mozilla.org/globalmessagemanager;1"].getService(Ci.nsIMessageListenerManager);
 //setup message manager to inject loader-cs.js into all 'browsers' (browser instance in each tab)
-  mm.loadFrameScript('chrome://tiddlycut/content/ff/loader-cs.js', true);	
+  mm.loadFrameScript('chrome://tiddlycut/content/ff/loader-cs.js'+"?"+aData.version, true);	
 }
 
 function shutdown(aData, aReason) {
@@ -55,14 +54,16 @@ function shutdown(aData, aReason) {
   // up any UI changes made
   if (aReason == APP_SHUTDOWN)
     return;
+
+
   //BJ addition
   let mm = Cc["@mozilla.org/globalmessagemanager;1"].getService(Ci.nsIMessageListenerManager);
   //send message to all script to remove listens from their dom
-  mm.broadcastAsyncMessage('tcutunload', {data: "none"});
-  // unload content scripts
-  mm.removeDelayedFrameScript('chrome://tiddlycut/content/ff/loader-cs.js');
+  mm.broadcastAsyncMessage('tcutunload', {data: {version:aData.version}});
   //BJ addition end
   let wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Ci.nsIWindowMediator);
+
+  mm.removeDelayedFrameScript('chrome://tiddlycut/content/ff/loader-cs.js'+"?"+aData.version);
 
   // Stop listening for new windows
   wm.removeListener(windowListener);
@@ -73,6 +74,8 @@ function shutdown(aData, aReason) {
     let domWindow = windows.getNext().QueryInterface(Ci.nsIDOMWindow);
     unloadFromWindow(domWindow);
   }
+  Components.utils.import("resource://gre/modules/Services.jsm");
+  Services.obs.notifyObservers(null, "startupcache-invalidate", null);
 }
 
 function install(aData, aReason) {}
