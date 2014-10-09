@@ -13,6 +13,7 @@ tiddlycut.modules.browserOverlay = (function ()
 		onUnload:onUnload, Go:Go
 	}
 	var currentsection=0;
+	var tabid = [], wikifile = [], wikititle = [];
 	var tClip, tcBrowser, pref;
 	var docu, browseris;
 	var chromerefs ={};
@@ -145,29 +146,32 @@ tiddlycut.modules.browserOverlay = (function ()
 		for(var m = 1; m <pref.Get('tabtot')+1;m++) {
 			// Create a new menu item to be added
 			var tempItem = docu.createElement("menuitem");
-		    fileLoc  = pref.getCharPref("wikifile"+m);
-		    if (fileLoc.substr(fileLoc.length-1) =='/') fileLoc = fileLoc.substr(0,fileLoc.length-1);
-		    var startPos = fileLoc.lastIndexOf("/")+1;
-		    if ((fileLoc.length - startPos)> 4) fileLoc =fileLoc.substr(startPos)
-		    
+			if (wikititle[m]) { 
+				fileLoc =  wikititle[m];
+			} else {
+				fileLoc  = wikifile[m];
+				if (fileLoc.substr(fileLoc.length-1) =='/') fileLoc = fileLoc.substr(0,fileLoc.length-1);
+				var startPos = fileLoc.lastIndexOf("/")+1;
+				if ((fileLoc.length - startPos)> 4) fileLoc =fileLoc.substr(startPos)
+			}				
 			if (m== pref.getCharPref("tiddlycut.filechoiceclip"))
 				tempItem.setAttribute("label",+m+"*"+fileLoc); //so we can see which section we are currently using
 			else
 				tempItem.setAttribute("label",m+" "+fileLoc);
-			tiddlycut.log("filename is", pref.getCharPref("wikifile"+m));
-			//Set the function to fire when clicked
+				
+			tiddlycut.log("filename is", wikifile[m]);
+			tiddlycut.log("title is", wikititle[m]);			//Set the function to fire when clicked
 			tempItem.setAttribute("oncommand", "tiddlycut.modules.browserOverlay.changeFile("+m+");");
 
 			// Add the item to our menu
-			menu.appendChild(tempItem);
-			
+			menu.appendChild(tempItem);	
 		}
 		//add dock 
 		var tempItem = docu.createElement("menuseparator");
 		menu.appendChild(tempItem);
 		
 		tempItem = docu.createElement("menuitem");
-		tempItem.setAttribute("label","dock here");
+		tempItem.setAttribute("label","dock to this tiddlywiki");
 		//tempItem.setAttribute("class","menu-iconic");
 		//tempItem.setAttribute("image","resource://tiddlycut/skin/icon16.png");//BJ can't get this working
 		tempItem.setAttribute("oncommand", "tiddlycut.modules.browserOverlay.dock()");
@@ -246,11 +250,10 @@ tiddlycut.modules.browserOverlay = (function ()
 		
 	}
 	function dock() {
-		var tabid=gettiddlycutcur();
-		if (tabid==0) return;
+		if (gettiddlycutcur()==0) return;
 		var i, tot =pref.Get('tabtot');
 		for (i = 1; i < tot+1;i++) {
-			if (pref.Get('wikifile'+i) ==content.location.href) {return};//already on our list-do nothing
+			if (wikifile[i] == content.location.href) {return};//already on our list-do nothing
 		}
 		//else add to our list
 		//gettiddlycutcur() is the global function defined in winN.jsm - current tab number
@@ -258,19 +261,25 @@ tiddlycut.modules.browserOverlay = (function ()
 		var startPos = content.location.href.search(":")+1;
 		var tot =pref.Get('tabtot')+1;
 		pref.Set('tabtot',tot);
-		
-		pref.Set('wikifile'+tot,content.location.href);
-		pref.Set('tabid'+tot,gettiddlycutcur());
+		wikifile[tot] = content.location.href;
+		tabid[tot] = gettiddlycutcur();
 		
         //record tab id in 'tab dom' used when we hear tab closed events to see if we need to respond - 
         gBrowser.selectedTab.setAttribute("tctabid",gettiddlycutcur()); //BJ change modus opos to one global collection of tabs?
-		pref.Set('ClipConfig'+tot,tClip.getTidContents("TiddlyClipConfig"));
+		pref.ClipConfig[tot] = tClip.getTidContents("TiddlyClipConfig");
 		
 		var opts=tClip.getTidContents(pref.getCharPref("tiddlycut.ConfigOptsTiddler"));
-		if (!!opts) pref.Set('ClipOpts'+tot,opts);
-		else pref.Set('ClipOpts'+tot,null);
-		
+		if (!!opts) pref.ClipOpts[tot] = opts;
+		else pref.ClipOpts[tot] = null;
 		changeFile(tot);//load configuration from this TW
+		tiddlycut.log("ClipOpts",opts);
+		if (pref.Get("menuShowTitle")) { 		
+			wikititle[tot] = content.document.title;
+			tiddlycut.log("menuShowTitle");
+		} else {
+			wikititle[tot] = "";
+		}
+
 		injectMessageBox(content.document);
 		contextMenuClipAs();
 	}
@@ -290,7 +299,7 @@ tiddlycut.modules.browserOverlay = (function ()
 		tiddlycut.log("**tabchange**",tabId);
 		var i, tab, found, tot =pref.Get('tabtot');
 		for (i = 1; i < tot+1;i++) {
-			if (pref.Get('tabid'+i) ==tabId) {found = true; break;};
+			if (tabid[i] ==tabId) {found = true; break;};
 		}
 
 		if (found) { //remove and bubble down those that follow
@@ -303,10 +312,11 @@ tiddlycut.modules.browserOverlay = (function ()
 				currentsection =0;
 			} 
 			for (tab = i; tab <tot; tab++) { 
-				pref.Set('tabid'+tab, pref.Get('tabid'+(tab+1)));
-				pref.Set('wikifile'+tab, pref.Get('wikifile'+(tab+1))) ;
-				pref.Set('ClipConfig'+tab, pref.Get('ClipConfig'+(tab+1)));
-				pref.Set('ClipOpts'+tab, pref.Get('ClipOpts'+(tab+1)));
+				tabid[tab] = tabid[tab+1];
+				wikifile[tab] = wikifile[tab + 1];
+				wikititle[tab] = wikititle[tab + 1];		
+				pref.ClipConfig[tab] = pref.ClipConfig[tab+1];
+				pref.ClipOpts[tab] = pref.ClipOpts[tab+1];
 			}
 			pref.Set('tabtot',tot-1);
 			
@@ -323,8 +333,8 @@ tiddlycut.modules.browserOverlay = (function ()
 		if (tClip.hasMode(tClip.getCategories()[category],"status") ) {
 					var i, tablist='', tot =pref.Get('tabtot');
 					for (i = 1; i < tot+1;i++) {
-						tablist = tablist +   pref.Get('tabid'+i)+"=" 
-								+ pref.getCharPref("wikifile"+i)+ "\n";
+						tablist = tablist +   tabid[i]+"=" 
+								+ wikifile[i] + "\n";
 					tiddlycut.log(tablist);
 					}
 					mm.broadcastAsyncMessage('tcutidentify',{});
@@ -356,7 +366,7 @@ tiddlycut.modules.browserOverlay = (function ()
 		if (!pageData.SetupVars(category,currentsection)) return false;//sets mode - determines what is copied	
 		if (!pageData.cutTids(category)) return false;
 		//now we have the clip sent it to the docked tiddlywiki
-		id = pref.Get('tabid'+(pref.Get('filechoiceclip')));
+		id = tabid[pref.Get('filechoiceclip')];
 		//send kick to content script
 		tiddlycut.log("sending paste",id);
 	

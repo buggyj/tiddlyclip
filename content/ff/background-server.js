@@ -20,7 +20,7 @@ tiddlycut.CSserver.contentRequestsListener = function(messageEvent) {
 
 		if ('focusedtab' ==request.req) {
 			tiddlycut.log("in win  ",tiddlycut.winN, request.id);
-			settiddlycutcur(request.id);
+			settiddlycutcur(request.id);//BJ use tiddlycut.modules.browserOverlay.setcur()?? maybe I put this to enable one global background??
 			//used by dock to set the tabid of docked tw in browserOverlay
 			//and also recorded in the tab-dom to decide when a tabclose 
 			//causes a change to the context menu (removal of tw from the list)

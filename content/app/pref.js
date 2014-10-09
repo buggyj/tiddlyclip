@@ -5,53 +5,49 @@ if (!tiddlycut.modules)
 tiddlycut.modules.pref = (function ()
 {
 	 var Map ={},
-	  Save ={},
-	  Other={},
-	  userInput={},
+	 Global ={editMode:false,tabtot:0,filechoiceclip:0},
 	  Types = {"boolean" : "Bool", "string" : "Char", "number" : "Int"},
 	 
 		  Get = function (prefname) {
+			if (prefname === 'editMode' || prefname === 'tabtot' || prefname === 'filechoiceclip') return Global[prefname];
 			return Map[prefname];
 		 },
 		 
-		  Set = function (prefname,val,cache) {
-			Map[prefname]=val;
-			if (!!cache) Save[element] = cache; //save in browser
+		  Set = function (prefname,val) {
+			if (prefname === 'editMode' || prefname === 'tabtot' || prefname === 'filechoiceclip') Global[prefname]=val;			  
+			else Map[prefname]=val;
+
 		 },
 		 
 		 initPrefs= function () {
+			 Map={}; //remove old values
 			// load defaults - can be over written by the user
 			var defs = defaults.getTWPrefs();
 			for (var i in defs) {
 				Map[i] = defs[i];
-			}			
-			Map['editMode'] =false;
-			Map['tabtot'] =0;
-			Map['filechoiceclip']=0;		
+			}					
 		},
 		
-		 SetFilePrefElements = function (element, index, array) {
-			Map[element] = 		Map[element+SetFilePrefElements.num];
-			Save[element] = false; 
-		},
+		loadOpts = function(num) {
+			//load additional prefs from targetTW
+			var pieces = pref.ClipOpts[num];
+			if (!pieces) {
+			var defs = defaults.getTWPrefs();
+			for (var i in defs) 
+				Map[i] = defs[i];
+			return;
+			}
 
-		  loadOpts = function(num) {
-			 //load additional prefs from targetTW
-			 var pieces = pref.Get('ClipOpts'+num);
-			 if (!pieces) {
-				var defs = defaults.getTWPrefs();
-				for (var i in defs) 
-					Map[i] = defs[i];
-				return;
-			 }
-			 pieces = pieces.split('\n');
-			 var item;
-			 for (var i = 0; i< pieces.length; i++) {
-				 item = pieces[i].split("=");
-				 if (item.length!==2) continue;
-				 Set(item[0].trim(), item[1].trim(),false);
-				 //tiddlycut.log(item[0].trim(), item[1].trim());
-			}	
+			pieces.split(/\r?\n/mg).forEach(function(line) {
+				if(line.charAt(0) !== "#") {
+					var p = line.indexOf(":");
+					if(p !== -1) {
+						var field = line.substr(0, p).trim(),
+							value = line.substr(p+1).trim();
+						Set(field,value,false);
+					}
+				}
+			});
 		 },
 		 getTidContents= function (tidname) {
 			var tid = pageData.findTiddlerInPage_ByTitle(tidname);//find tid on current (infocus) page
@@ -59,16 +55,17 @@ tiddlycut.modules.pref = (function ()
 		};
 		 
 
-
+	var tcBrowser, defaults, pageData, browseris, ClipConfig = [], ClipOpts = [];
+	
 	var api = 
 	{
 		onLoad:onLoad,	getBoolPref:getBoolPref, 	getCharPref:getCharPref, 		
 		Get:Get,		getFileNames:getFileNames, 	setBoolPref:setBoolPref, 
-		Set:Set,			loadTheOpts:loadTheOpts,		SetPrefs:SetPrefs,
-		initPrefs:initPrefs, loadOpts:loadOpts
+		Set:Set,		SetPrefs:SetPrefs,			ClipConfig:ClipConfig,
+		initPrefs:initPrefs, loadOpts:loadOpts,		ClipOpts:ClipOpts
 	}
 
-	var tcBrowser, defaults, pageData, browseris;
+
 	function onLoad(browser) {
 		browseris 	= browser;
 		tcBrowser	= tiddlycut.modules.tcBrowser;
@@ -76,15 +73,10 @@ tiddlycut.modules.pref = (function ()
 		pageData	= tiddlycut.modules.pageData;
 		initPrefs();
 	}
-	
-	function loadTheOpts(){
-		SetFilePrefElements.num=getCharPref("tiddlycut.filechoiceclip");//num of set to copy
-		["wikifile"].forEach(SetFilePrefElements);
-	}
 
 	function SetPrefs(){
 			//tcBrowser.SetPrefsScreen();
-}
+	}
 	
 	function getBoolPref(prefString) {
 		var prefStringPart = prefString.split(".");

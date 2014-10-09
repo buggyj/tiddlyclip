@@ -177,13 +177,13 @@ tiddlycut.modules.tClip = (function () {
 		return tid?tid.body: null;
 	}
     function setClipConfig(filen){
+		pref.initPrefs();
 		if (0==filen) { //disable
 			activeCategories={}; //no section so no categories
 			sectionNames=[];
 			tiddlycut.log("activeCategories set to {}");
-			pref.initPrefs();//BJ not sure about this...
 		} else {
-			ClipConfig = pref.Get('ClipConfig'+(filen));
+			ClipConfig = pref.ClipConfig[filen];
 			pref.loadOpts(filen);
 			tiddlycut.log("setclipconfig ",ClipConfig);
 		}
