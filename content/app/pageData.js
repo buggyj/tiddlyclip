@@ -30,7 +30,7 @@
 		return NaN;
 	}
 
-	function SetupVars(category,currentSection) {
+	function SetupVars(category,currentSection,sourcetab) {
 		var title={}, tag={}, editMode={}, cancelled={};
 			
 		//expose parameters - used for userExtensions
@@ -39,21 +39,20 @@
 		api.data.category = category;
 		api.data.pageTitle= tcBrowser.getPageTitle();//replaces  %PageTitle%
 		api.data.pageRef =  tcBrowser.getPageRef();  //replaces  %PageRef%
-		api.data.text = 	tcBrowser.getSelectedAsText();
-		api.data.clip = 	tcBrowser.getClipboardString();
+		api.data.text = 	tcBrowser.getSelectedAsText()||"";
+		api.data.clip = 	tcBrowser.getClipboardString()||"";
 		api.data.imageURL=	unescape(tcBrowser.getImageURL());
-		api.data.largestImgURL=	unescape(tcBrowser.getLargestImgURL());
+		api.data.largestImgURL=	unescape(tcBrowser.getLargestImgURL())||"";
 		api.data.hasText=	(tcBrowser.hasSelectedText()).toString();
 		api.data.clipText=	(tcBrowser.hasCopiedText()).toString();
 		api.data.onImage =	(tcBrowser.onImage()).toString();
 		api.data.onLink=	(tcBrowser.onLink()).toString();
 		api.data.classic =	(tcBrowser.isTiddlyWikiClassic()).toString();
-		api.data.linkURL =	unescape(tcBrowser.getlinkURL());
+		api.data.linkURL =	unescape(tcBrowser.getlinkURL())||"";
 		api.data.onLinkLocal=	(tcBrowser.onLinkLocal()).toString();		
 		api.data.onLinkRemote=	(tcBrowser.onLinkRemote()).toString();
 		api.data.tw5 =		(tcBrowser.isTiddlyWiki5()).toString();
-
-
+		api.data.snap = tcBrowser.getSnapImage();
 
 		var locale = api.data.pageRef.split('/');
 			locale.length--;
@@ -82,26 +81,7 @@
 			tcBrowser.UserInputDialog(pref.getCharPref("tiddlycut."+promptindex),userString);
 			api.data["user"+promptindex]=userString.value;
 		}
-		if (tClip.hasModeBegining(tClip.getCategories()[category],"snap") )  { 
-			//if any text is selected temporarly remove this while making the snap
-			var range, sel = content.getSelection();
-			try{
-				if (sel.getRangeAt) {
-					range = sel.getRangeAt(0);
-				}
-				if (range) {
-					sel.removeAllRanges();
-				} 
-			} catch(e) {range=null;} 
-			//make the snap
-		    var size=makepercent(tClip.getModeBegining(tClip.getCategories()[category],"snap").split("snap")[1]);
-			if (isNaN(size)) size =1;
-			api.data.snap=tcBrowser.snap(size);
-			//re-apply selected text (if any)
-			if (range) {
-				sel.addRange(range);
-			} 
-		}
+
 		for (var userExtends in api.userExtensions) {
 
 			api.userExtensions[userExtends]();

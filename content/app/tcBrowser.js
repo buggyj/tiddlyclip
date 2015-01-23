@@ -5,7 +5,7 @@ tiddlycut.modules.tcBrowser= (function () {
 		onLoad:onLoad, 						getSelectedAsText:getSelectedAsText, 	
 		setOnLink:setOnLink,				getClipboardString:getClipboardString, 	setImageURL:setImageURL,
 		getHtml:getHtml, 					hasCopiedText:hasCopiedText, 			hasSelectedText:hasSelectedText, 		
-		winWrapper:winWrapper,				EnterTidNameDialog:EnterTidNameDialog, 
+		winWrapper:winWrapper,				EnterTidNameDialog:EnterTidNameDialog, 	getSnapImage:getSnapImage,
 		getPageTitle:getPageTitle, 			getPageRef:getPageRef, 					getStr:getStr, 
 		getImageURL:getImageURL,			getLargestImgURL:getLargestImgURL,		snap:snap,
 	    log:log,							htmlEncode:htmlEncode,					onImage:onImage,
@@ -35,10 +35,10 @@ tiddlycut.modules.tcBrowser= (function () {
 		return new XPCNativeWrapper(where);			
 	}
 
-    //variables to store non-persistance broswer data (from gContextMenu)
-    var vonImage, vonLink, vimageUrl, vlinkURL;
+    //variables to store non-persistance broswer data (from gContextMenu) and snap
+    var vonImage, vonLink, vimageUrl, vlinkURL, snapImage = "";
     
-	function snap(size){
+	function snap(size){ 
 		var tab = gBrowser.selectedTab;
 		var thumbnail = window.document.createElementNS("http://www.w3.org/1999/xhtml", "canvas");
 		thumbnail.mozOpaque = true;
@@ -50,14 +50,19 @@ tiddlycut.modules.tcBrowser= (function () {
 		ctx.drawWindow(	win, win.scrollX, win.scrollY, win.innerWidth,
 						win.innerHeight, "rgb(255,255,255)");
 		//Create a data url from the canvas
-		var data = thumbnail.toDataURL("image/png")
-		return data.substring(data.indexOf(',') + 1);
+		var data = thumbnail.toDataURL("image/png");
+		snapImage = data.substring(data.indexOf(',') + 1);
 	}
 	function setImageURL() {
 		imageUrl= gContextMenu.imageURL || gContextMenu.mediaURL;
 	}
 	function getImageURL() {
 		return imageUrl;
+	}
+	function getSnapImage() { //snap is not alway called so set to blank for this case.
+		var img = snapImage;
+		snapImage = "";
+		return img;
 	}
 	function getLargestImgURL() {
 		var isize=0, url='', imgs = content.document.querySelectorAll('img');	

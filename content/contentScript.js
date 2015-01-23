@@ -188,7 +188,8 @@
 					// first stage send back url
 					tiddlycut.log("cut  content cs");
 					remoteTidArr  = [''];
-					sendResponse({ url:window.location.href, html:getSelectedAsHtml(window.location.href), title:document.title, twc:isTiddlyWikiClassic()});
+					sendResponse({ url:window.location.href, html:getSelectedAsHtml(window.location.href), 
+						title:document.title, twc:isTiddlyWikiClassic()||false, tw5:isTiddlyWiki5()});
 				}
 		});
 	   chrome.runtime.onMessage.addListener(
@@ -197,7 +198,8 @@
 					// first stage send back url
 					tiddlycut.log("cutTid  content cs");
 
-					sendResponse({ url:window.location.href, tids:cutTids(), title:document.title, twc:isTiddlyWikiClassic()});
+					sendResponse({ url:window.location.href, tids:cutTids(), title:document.title, 
+						twc:isTiddlyWikiClassic()||false, tw5:isTiddlyWiki5()});
 				}
 		});
 		//callback for paste

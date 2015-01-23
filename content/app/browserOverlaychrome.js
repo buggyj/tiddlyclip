@@ -11,6 +11,8 @@ tiddlycut.modules.browserOverlay = (function ()
 		reload:reload, adaptions:adaptions, changeFile:changeFile , pushData:pushData
 	}
 	var currentsection=0;
+		
+	var tabid = [], wikifile = [], wikititle = [];
 	var tClip, tcBrowser, pref;
 	var docu, browseris;
 	function onLoad(browser, doc) {
@@ -57,7 +59,7 @@ tiddlycut.modules.browserOverlay = (function ()
 	function tabchange(tabId) {
 		var i, tab, found, tot =pref.Get('tabtot');
 		for (i = 1; i < tot+1;i++) {
-			if (pref.Get('tabid'+i) ==tabId) {found = true; break;};
+			if (tabid[i] == tabId) {found = true; break;};
 		}
 
 		if (found) { //remove and bubble down those that follow
@@ -65,10 +67,12 @@ tiddlycut.modules.browserOverlay = (function ()
 				tClip.setClipConfig(0);//if currently selected disable categories	
 			}
 			for (tab = i; tab <tot; tab++) { 
-				pref.Set('tabid'+tab, pref.Get('tabid'+(tab+1)));
-				pref.Set('wikifile'+tab, pref.Get('wikifile'+(tab+1))) ;
-				pref.Set('ClipConfig'+tab, pref.Get('ClipConfig'+(tab+1)));
-				//pref.Set('ClipOpts'+tab, pref.Get('ClipOpts'+(tab+1)));
+				tabid[tab] = tabid[tab+1];
+				wikifile[tab] = wikifile[tab + 1];
+				wikititle[tab] = wikititle[tab + 1];		
+				pref.ClipConfig[tab] = pref.ClipConfig[tab+1];
+				pref.ClipOpts[tab] = pref.ClipOpts[tab+1];
+			}
 			pref.Set('tabtot',tot-1);
 			
 			if (i==pref.Get('filechoiceclip')) pref.Set('filechoiceclip',0);
@@ -134,7 +138,8 @@ tiddlycut.modules.browserOverlay = (function ()
 				};
 			})(m);
 			var title = "";
-		    fileLoc  = pref.getCharPref("wikifile"+m);
+		    fileLoc  = wikifile[+m];
+		    tiddlycut.log('wikifile'+m,fileLoc);
 		    if (fileLoc.substr(fileLoc.length-1) =='/') fileLoc = fileLoc.substr(0,fileLoc.length-1);
 		    var startPos = fileLoc.lastIndexOf("/")+1;
 		    if ((fileLoc.length - startPos)> 4) fileLoc =fileLoc.substr(startPos);
@@ -210,18 +215,20 @@ tiddlycut.modules.browserOverlay = (function ()
 
 	function dockRegister(id, url, config) {
 		//ignore duplicate docks
+		var tot =pref.Get('tabtot');
 		for (var i=1; i< 1+pref.Get('tabtot');i++) 
-					if (id == pref.Get('tabid'+i)) return;
-		pref.Set('tabid'+tot,id);
+					if (id == tabid[i]) return;
+		tabid[tot]=id;
 		tiddlycut.log("docked ",url);
 		var startPos = url.search(":")+1;
-		var tot =pref.Get('tabtot')+1;
+		tot =pref.Get('tabtot')+1;
 		pref.Set('tabtot',tot);
 		var configtid =new tiddlerAPI.Tiddler(config);
 		//pref.Set('wikifile'+tot,content.location.href.substr(startPos));
-		pref.Set('wikifile'+tot,url);
-		pref.Set('tabid'+tot,id);
-		pref.Set('ClipConfig'+tot,configtid.body);
+		wikifile[tot]=url; console.log('wikifile'+tot,url);//BJ
+		tabid[tot]=id;
+		pref.ClipConfig[tot] = configtid.body;
+		//pref.Set('ClipConfig'+tot,configtid.body);
 	    //pref.Set('ClipOpts'+tot,????????);//BJ fixme needs to be got when getting config??
 		createFilesPopups();
 	};
@@ -235,45 +242,87 @@ tiddlycut.modules.browserOverlay = (function ()
 			doc.body.appendChild(messageBox);
 		}
 	};
-
+	function makepercent (value) {
+		if(/^[0-9][0-9]$/.test(value)) {
+			return Number(value)/100;
+		}
+		return NaN;
+	}
 	function pushData(category, info, tab) //chrome only
 	{
 		tcBrowser.setDataFromBrowser(info, tab) //enter data from chrome menu onclick;
 		//request data from content script
 		currentCat=category; //remember here for returning callback to pick it up
 		tiddlycut.log("inpusdata id",tab.id);
-		if (!tClip.hasMode(tClip.getCategories()[category],"tiddlers") )
+		if (!tClip.hasMode(tClip.getCategories()[category],"tiddlers") ) {
+			if (tClip.hasModeBegining(	tClip.getCategories()[category],"snap") )  { 
+				//if any text is selected temporarly remove this while making the snap
+				/*var range, sel = content.getSelection();
+				try{
+					if (sel.getRangeAt) {
+						range = sel.getRangeAt(0);
+					}
+					if (range) {
+						sel.removeAllRanges();
+					} 
+				} catch(e) {range=null;} */
+				//------make the snap--------
+				var size=makepercent(tClip.getModeBegining(tClip.getCategories()[category],"snap").split("snap")[1]);
+				if (isNaN(size)) size =1;
+				tcBrowser.snap(size,tab.id, function (dataURL) { 
+					tcBrowser.setSnapImage(dataURL);
+					chrome.tabs.sendMessage(tab.id,
+						{
+							action : 'cut'
+						}, function (source)
+						{ 
+							tcBrowser.setDatafromCS( source.url, source.html, source.title, source.twc, source.tw5); //add data to tcbrowser object -retrived later
+							tiddlycut.log ("currentCat",currentCat);
+							GoChrome(currentCat, null, tab.id);
+						}
+					);
+					
+				});
+				//re-apply selected text (if any)
+				/*if (range) {
+					sel.addRange(range);
+				} 
+				*/
+				return;
+			}	
 			chrome.tabs.sendMessage(tab.id,
 				{
 					action : 'cut'
 				}, function (source)
 				{ 
-					tcBrowser.setDatafromCS( source.url, source.html, source.title, source.twc); //add data to tcbrowser object -retrived later
-					tiddlycut.log ("currentCat",currentCat);
-					GoChrome(currentCat, null);
+					tiddlycut.log ("currentCat",currentCat,"tab.id",tab.id);
+					tcBrowser.setDatafromCS( source.url, source.html, source.title, source.twc, source.tw5); //add data to tcbrowser object -retrived later
+
+					GoChrome(currentCat, null, tab.id);
 				}
 			);
+		}
 		else
 			chrome.tabs.sendMessage(tab.id,
 				{
 					action : 'cutTid'
 				}, function (source)
 				{
-					tcBrowser.setDatafromCS( source.url, null, source.title, source.twc); //add data to tcbrowser object -retrived later
+					tcBrowser.setDatafromCS( source.url, null, source.title, source.twc, source.tw5); //add data to tcbrowser object -retrived later
 					tiddlycut.log ("cuttid reply tids",source.tids);
-					GoChrome(currentCat, source.tids);
+					GoChrome(currentCat, source.tids, tab.id);
 				}
 			);
 	}
 	
-	function GoChrome(category, tidlist)
+	function GoChrome(category, tidlist, sourcetab)
 	{
 		tiddlycut.log("go1");
-		if (false == pageData.SetupVars(category,currentsection)) return; //sets mode - determines what is copied
+		if (false == pageData.SetupVars(category,currentsection,sourcetab)) return; //sets mode - determines what is copied
 				tiddlycut.log("go2");
 		pageData.SetTidlist(tidlist);
 				tiddlycut.log("go3");
-		id = pref.Get('tabid'+(pref.Get('filechoiceclip')));
+		id = tabid[pref.Get('filechoiceclip')];
 		//send kick to content script
 		tiddlycut.log("sending paste",id);
 		chrome.tabs.sendMessage(id,

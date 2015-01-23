@@ -3,34 +3,63 @@ tiddlycut.modules.tcBrowser= (function () {
 	var api = 
 	{
 		onLoad:onLoad, 						getSelectedAsText:getSelectedAsText, 	
-		setOnLink:setOnLink,				getClipboardString:getClipboardString, 	setImageURL:setImageURL,
+		getClipboardString:getClipboardString, 	
 		getHtml:getHtml, 					hasCopiedText:hasCopiedText, 			hasSelectedText:hasSelectedText, 		
-		getPageTitle:getPageTitle, 			getPageRef:getPageRef, 					
+		getPageTitle:getPageTitle, 			getPageRef:getPageRef, 					snap:snap,
 		getImageURL:getImageURL,			getLargestImgURL:getLargestImgURL,		winWrapper:winWrapper,
 	    log:log,							htmlEncode:htmlEncode,					onImage:onImage,
-	    onLink:onLink,						setOnImage:setOnImage,					
-	    getSelectedAsHtml:getSelectedAsHtml,createDiv:createDiv,
+	    onLink:onLink,						setSnapImage:setSnapImage,			
+	    getSelectedAsHtml:getSelectedAsHtml,createDiv:createDiv,				getSnapImage:getSnapImage,
 	    setDatafromCS:setDatafromCS,		UserInputDialog:UserInputDialog,	setDataFromBrowser:setDataFromBrowser,
-	   isTiddlyWikiClassic:isTiddlyWikiClassic
+		getlinkURL:getlinkURL,				onLinkLocal:onLinkLocal,			onLinkRemote:onLinkRemote,
+		isTiddlyWikiClassic:isTiddlyWikiClassic, isTiddlyWiki5:isTiddlyWiki5
 	}
 
     var convert,defaults;
     var _strings_bundle_default;
-    var chrome, browseris;
+    var thechrome, browseris;
     const PREF_BRANCH = "extensions.tiddlyfox";
 
 	function onLoad(browser, doc) {
 		browseris 	= browser;
-		chrome=doc;
+		thechrome=doc;
 		defaults	= tiddlycut.modules.defaults;
 	}
 	
 	function winWrapper (where) {
-		return chrome; //BJ FIXME not sure if this is correct		
+		return thechrome; //BJ FIXME not sure if this is correct		
 	}
-    //variables to store non-persistance broswer data (from gContextMenu ff only - set by call otherwise
-    var onImage=false, onLink=false, image, linkUrl, selectionText, url, html ,title, twc=false;
+    //variables to store non-persistance broswer data  - set by call otherwise
+    var onImage=false, onLink=false, image, linkUrl, selectionText, url, html ,title, twc=false, snapImage = "";
+    
+	function snap(size,sourcetab, callback){ //async in chrome
 
+		var thumbnail = window.document.createElementNS("http://www.w3.org/1999/xhtml", "canvas");
+		var ctx = thumbnail.getContext("2d");
+//-------------------------------------
+
+//-------------------------------------			
+chrome.tabs.get(sourcetab, function(tab){
+	var h = tab.height, w = tab.width;
+	thumbnail.width = w * size;
+	thumbnail.height = h * size;
+	ctx.scale(size, size);
+          chrome.tabs.captureVisibleTab(null, {format: 'png', quality: 100}, function(dataURI) {
+                if (dataURI) {
+                    var image = new Image();
+                    image.onload = function() {
+                        ctx.drawImage(image,0, 0, w, h);
+                        //Create a data url from the canvas
+                        var data = thumbnail.toDataURL("image/png");
+                        callback(data.substring(data.indexOf(',') + 1));
+                    };
+                    image.src = dataURI;
+                }
+            });		
+//-----------------------------	
+
+	});
+}
     function setDataFromBrowser(info, tab) {
 		onImage = (info.mediaType==="image");
 		if (onImage)	imageUrl = info.srcUrl;
@@ -39,30 +68,32 @@ tiddlycut.modules.tcBrowser= (function () {
 		onLink = (!!linkUrl);
 		selectionText=info.selectionText;
 	};	
-	function setDatafromCS( aurl, ahtml, atitle, atwc) {
+	function setDatafromCS( aurl, ahtml, atitle, atwc, atw5) {
 		html = ahtml;
 		title =atitle;
 		url = aurl;
 		twc = atwc; 
-	}
-	function setImageURL() {
-		imageUrl= gContextMenu.imageURL || gContextMenu.mediaURL;
+		tw5 = atw5;
 	}
 	function getImageURL() {
 		return imageUrl;
 	}
-	function getLargestImgURL() {
-		return ''l
+	function getSnapImage() { //snap is not alway called so set to blank for this case.
+		var img = snapImage;
+		//snapImage = "";
+		return img;
 	}
-	function setOnImage(){
-		onImage= gContextMenu.onImage;
+	function setSnapImage(img) { //snap is not alway called so set to blank for this case.
+		
+		snapImage = img;
+	}
+	function getLargestImgURL() {
+		return '';
 	}
 	function onImage(){
 		return onImage;
 	}
-	function setOnLink(){
-		onLink= gContextMenu.onLink;
-	}
+
 	function onLink(){
 		return onLink;
 	}
@@ -120,11 +151,23 @@ tiddlycut.modules.tcBrowser= (function () {
 	function isTiddlyWikiClassic() {
 		return twc;
 	}
-
-	//function isTiddlyWiki5() {
-		//must be implement in the cs
-	//}
-	
+	function getlinkURL() {
+		return linkUrl;
+		return "";
+	}
+	function isTiddlyWiki5() {
+		return tw5;
+	}
+		function onLinkLocal(){
+		var local = /^file:/;
+		return local.test(linkUrl);
+		return false;
+	}
+	function onLinkRemote(){
+		var local = /^file:/;
+		return !local.test(linkUrl);
+		return false;
+	}
 	function log(str){
 		console.log("tc: "+sstr);
     }
@@ -144,9 +187,7 @@ tiddlycut.modules.tcBrowser= (function () {
 	}
 	
 	function  UserInputDialog(prompt, response) {
-			window.openDialog("chrome://tiddlycut/content/app/userInput.xul",
-						  "existWindow",
-						  "chrome,centerscreen,modal=yes",prompt,response);
+						response.value = window.prompt(prompt);
 	}
 //function must go before     
 	return api;

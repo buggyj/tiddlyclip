@@ -26,6 +26,7 @@
 	},
 	"name" : "tiddlycut",
 	"permissions" : [
+		"tabs", "<all_urls>",
 		"contextMenus",
 		"notifications"
 	],

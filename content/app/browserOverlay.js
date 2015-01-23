@@ -325,7 +325,12 @@ tiddlycut.modules.browserOverlay = (function ()
 			tiddlycut.log("choice n",pref.Get('filechoiceclip'));
 		}	
 	};
-
+	function makepercent (value) {
+		if(/^[0-9][0-9]$/.test(value)) {
+			return Number(value)/100;
+		}
+		return NaN;
+	}
 	function Go(category)//ff only
 	{ 
 		var mm = Cc["@mozilla.org/globalmessagemanager;1"].getService(Ci.nsIMessageListenerManager);
@@ -363,6 +368,26 @@ tiddlycut.modules.browserOverlay = (function ()
 			return;
 		}
 		//-----end debug stuff ---------
+		if (tClip.hasModeBegining(tClip.getCategories()[category],"snap") )  { 
+			//if any text is selected temporarly remove this while making the snap
+			var range, sel = content.getSelection();
+			try{
+				if (sel.getRangeAt) {
+					range = sel.getRangeAt(0);
+				}
+				if (range) {
+					sel.removeAllRanges();
+				} 
+			} catch(e) {range=null;} 
+			//------make the snap--------
+		    var size=makepercent(tClip.getModeBegining(tClip.getCategories()[category],"snap").split("snap")[1]);
+			if (isNaN(size)) size =1;
+			tcBrowser.snap(size);
+			//re-apply selected text (if any)
+			if (range) {
+				sel.addRange(range);
+			} 
+		}
 		if (!pageData.SetupVars(category,currentsection)) return false;//sets mode - determines what is copied	
 		if (!pageData.cutTids(category)) return false;
 		//now we have the clip sent it to the docked tiddlywiki
