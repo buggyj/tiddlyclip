@@ -150,7 +150,7 @@ fi
 
 # remove the working files
 rm -rf $TMP_DIR
-zip tiddlyclip.zip *
+zip -r tiddlyclip.zip .
 echo "Done!"
 
 $AFTER_BUILD
