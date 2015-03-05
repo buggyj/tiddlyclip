@@ -227,7 +227,8 @@ tiddlycut.modules.browserOverlay = (function ()
 		//pref.Set('wikifile'+tot,content.location.href.substr(startPos));
 		wikifile[tot]=url; console.log('wikifile'+tot,url);//BJ
 		tabid[tot]=id;
-		pref.ClipConfig[tot] = configtid.body;
+		if (config != null) pref.ClipConfig[tot] = configtid.body;
+		else pref.ClipConfig[tot] = null;
 		//pref.Set('ClipConfig'+tot,configtid.body);
 	    //pref.Set('ClipOpts'+tot,????????);//BJ fixme needs to be got when getting config??
 		createFilesPopups();
