@@ -57,6 +57,7 @@ tiddlycut.modules.browserOverlay = (function ()
 	chrome.tabs.onUpdated.addListener(tabchange);
 	chrome.tabs.onRemoved.addListener(tabchange);
 	function tabchange(tabId) {
+		tiddlycut.log("**tabchanged**",tabId);
 		var i, tab, found, tot =pref.Get('tabtot');
 		for (i = 1; i < tot+1;i++) {
 			if (tabid[i] == tabId) {found = true; break;};
@@ -218,7 +219,7 @@ tiddlycut.modules.browserOverlay = (function ()
 		var tot =pref.Get('tabtot');
 		for (var i=1; i< 1+pref.Get('tabtot');i++) 
 					if (id == tabid[i]) return;
-		tabid[tot]=id;
+
 		tiddlycut.log("docked ",url);
 		var startPos = url.search(":")+1;
 		tot =pref.Get('tabtot')+1;
