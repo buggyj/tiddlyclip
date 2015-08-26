@@ -161,7 +161,7 @@ tiddlycut.modules.browserOverlay = (function ()
 				
 			tiddlycut.log("filename is", wikifile[m]);
 			tiddlycut.log("title is", wikititle[m]);			//Set the function to fire when clicked
-			tempItem.setAttribute("oncommand", "tiddlycut.modules.browserOverlay.changeFile("+m+");");
+			tempItem.addEventListener('command', (function(x){return(function(){var m = x;return function(e){changeFile(m);}}())})(m),false);
 
 			// Add the item to our menu
 			menu.appendChild(tempItem);	
@@ -174,7 +174,9 @@ tiddlycut.modules.browserOverlay = (function ()
 		tempItem.setAttribute("label","dock to this tiddlywiki");
 		//tempItem.setAttribute("class","menu-iconic");
 		//tempItem.setAttribute("image","resource://tiddlycut/skin/icon16.png");//BJ can't get this working
-		tempItem.setAttribute("oncommand", "tiddlycut.modules.browserOverlay.dock()");
+		tempItem.addEventListener('command', dock, false);
+
+		
 		menu.appendChild(tempItem);
 		
 		tempItem = docu.createElement("menuseparator");
@@ -192,7 +194,7 @@ tiddlycut.modules.browserOverlay = (function ()
 				tempItem.setAttribute("label"," "+secName[m]);
 
 			//Set the function to fire when clicked
-			tempItem.setAttribute("oncommand", "tiddlycut.modules.browserOverlay.reload("+m+");");
+			tempItem.addEventListener('command', (function(x){return (function(){var m = x; return(function(e){reload(m);})}())})(m),false);
 
 			// Add the item to our menu
 			menu.appendChild(tempItem);
@@ -232,7 +234,8 @@ tiddlycut.modules.browserOverlay = (function ()
 				tempItem.setAttribute("tooltiptext",cat[m].tip);
 
 				//Set the function to fire when clicked
-				tempItem.setAttribute("oncommand", "tiddlycut.modules.browserOverlay.Go('"+m+"')");
+				tempItem.addEventListener('command', (function(x){return (function(){var m = x; return function(e){Go(m);}}())})(m),false);
+
 				if (cat[m].valid ===false) {
 					tempItem.setAttribute("disabled",true);
 					tempItem.setAttribute("tooltiptext",'format error');
@@ -249,7 +252,7 @@ tiddlycut.modules.browserOverlay = (function ()
 		}
 		
 	}
-	function dock() {
+	function dock() {tiddlycut.log("docked ","docked called");
 		if (gettiddlycutcur()==0) return;
 		var i, tot =pref.Get('tabtot');
 		for (i = 1; i < tot+1;i++) {

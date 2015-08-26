@@ -4,7 +4,7 @@
     <Description about="urn:mozilla:install-manifest">
         <em:type>2</em:type> <!-- 2 : Extension -->
         <em:id>buggyjeftidclip@gmail.com</em:id>  
-        <em:version>0.0.8</em:version>
+        <em:version>0.0.9</em:version>
         <em:name>tiddlyclip</em:name>
         <em:description>clip web content to tiddlywiki</em:description>
         <em:creator>buggyj</em:creator>
@@ -15,7 +15,7 @@
                 <!-- Firefox -->
                  <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
                 <em:minVersion>20.0</em:minVersion>
-                <em:maxVersion>40.0</em:maxVersion>
+                <em:maxVersion>42.0</em:maxVersion>
             </Description>
         </em:targetApplication>
         		<!-- Android -->

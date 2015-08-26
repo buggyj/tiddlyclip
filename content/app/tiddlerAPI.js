@@ -27,11 +27,7 @@ tiddlycut.modules.tiddlerAPI = (function () {
 			return this;
 		}
 		if((typeof el) ==="string"){ //convert html to dom ;
-			var wrapper= tcBrowser.createDiv();
-			//tiddlycut.log('whats this',wrapper);
-			wrapper.innerHTML= el;
-			el= wrapper.firstChild;
-			wrapper = {};//release div
+			tiddlycut.log("dom conversion not allowed")
 		}
 		this.attribs = [];
 		this.body = undoHtmlEncode(el.innerHTML.
