@@ -8,7 +8,7 @@ tiddlycut.modules.tClip = (function () {
 	var api = 
 	{
 		onLoad:onLoad,				getSectionNames:getSectionNames,
-		getCategories:getCategories,getTidContents:getTidContents,				
+		getCategories:getCategories,			
 		hasMode:hasMode,			loadSectionFromFile:loadSectionFromFile, 	
 		hasAnyModes:hasAnyModes,	setClipConfig:setClipConfig,
 		SELECTMODES:SELECTMODES,	getCurentSection:getCurentSection,
@@ -172,10 +172,7 @@ tiddlycut.modules.tClip = (function () {
 				tiddlycut.logoff =true;
 		} 
 	}
-	function getTidContents(tidname) {
-		var tid = pageData.findTiddlerInPage_ByTitle(tidname);//find tid on current (infocus) page
-		return tid?tid.body: null;
-	}
+
     function setClipConfig(filen){
 		pref.initPrefs();
 		if (0==filen) { //disable

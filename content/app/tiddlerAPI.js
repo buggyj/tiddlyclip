@@ -27,7 +27,19 @@ tiddlycut.modules.tiddlerAPI = (function () {
 			return this;
 		}
 		if((typeof el) ==="string"){ //convert html to dom ;
-			tiddlycut.log("dom conversion not allowed")
+			tiddlycut.log("conversion from json");
+			this.attribs = [];
+			var tid = JSON.parse(el);
+
+			for (var i in tid) {
+				if (i=="text") {
+					this["body"]= tid[i];
+				}else{
+					this[i] = tid[i] ;
+					this.attribs.push(i);
+				}
+			} 
+			return this;
 		}
 		this.attribs = [];
 		this.body = undoHtmlEncode(el.innerHTML.
@@ -47,7 +59,6 @@ tiddlycut.modules.tiddlerAPI = (function () {
 	Tiddler.prototype.EncodedDiv = function() {
 		var tiddler = "<div";
 		for (var i = 0; i<this.attribs.length; i++){
-			//with the program tags and extraTags are combined - seperate them before writing to file
 				tiddler += ' '+ this.attribs[i] + '="' +tcBrowser.htmlEncode(this[this.attribs[i]])+'"';
 		}
 		tiddler += 	">\n<pre>" + tcBrowser.htmlEncode(this.body) + "</pre>\n</div>";

@@ -15,20 +15,29 @@ if (!tiddlycut.CSserver)
 tiddlycut.CSserver.contentRequestsListener = function(messageEvent) {
 	//tiddlycut.log("enter bg listern",messageEvent.json.callbackToken);
 	var request = messageEvent.json.data;
+	var callback = messageEvent.data.callback;
 	tiddlycut.log("bg recv",request.id);
 	try {
-
+        if (callback) {
+			tiddlycut.modules.browserOverlay.getcallback(callback)(request); return
+		}
 		if ('focusedtab' ==request.req) {
-			tiddlycut.log("in win  ",tiddlycut.winN, request.id);
+			tiddlycut.log("focusedtab in win  ",tiddlycut.winN, request.id);
+			settiddlycutActive(request.istarget);//if the content contains a tc message box.
 			settiddlycutcur(request.id);//BJ use tiddlycut.modules.browserOverlay.setcur()?? maybe I put this to enable one global background??
+			settiddlycutloc(request.loc);//Changes for e10s - maybe use gBrowser.selectedBrowser.currentURI.spec
+			settiddlycuttit(request.tit);//Changes for e10s - gBrowser.selectedBrowser.contentTitle
+			tiddlycut.modules.tcBrowser.setOnTwclassic(request.twc);
+			tiddlycut.modules.tcBrowser.setOnTw5(request.tw5);
 			//used by dock to set the tabid of docked tw in browserOverlay
 			//and also recorded in the tab-dom to decide when a tabclose 
 			//causes a change to the context menu (removal of tw from the list)
+			tiddlycut.log("focusedtab fin in win  ",tiddlycut.winN, request.id,"target",request.istarget,request.loc,request.tit,request.twc,request.tw5);
 		};
 		if ('pageChanged' == request.req) {
 			tiddlycut.modules.browserOverlay.tabchange(request.id);
 			tiddlycut.log("pageChanged",request.id);
-		};		
+		};	
 	}
 	catch (e) {
 		tiddlycut.log('tiddlycut - background onRequest error: ', e);
@@ -36,11 +45,12 @@ tiddlycut.CSserver.contentRequestsListener = function(messageEvent) {
 	}
 };
 
+//this ensures that when a tab containing a docked tw closes, it is removed from the content menu
 tiddlycut.CSserver.findtab =function (ev) {
     var id;
     if (ev.target.hasAttribute("tctabid")) {
 		tiddlycut.log("tctabid closeTab",ev.target.getAttribute("tctabid"));
-				id = ev.target.getAttribute("tctabid"); //this was set  by dock();
+		id = ev.target.getAttribute("tctabid"); //this was set  by dock();
 		tiddlycut.modules.browserOverlay.tabchange(id);
 	}; 
 }

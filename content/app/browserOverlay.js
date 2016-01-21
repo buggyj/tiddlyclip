@@ -10,7 +10,7 @@ tiddlycut.modules.browserOverlay = (function ()
 	{
 		onLoad:onLoad, createCategoryPopups:createCategoryPopups, createFilesPopups:createFilesPopups,
 		reload:reload, adaptions:adaptions, changeFile:changeFile, dock:dock, tabchange:tabchange,
-		onUnload:onUnload, Go:Go
+		onUnload:onUnload, Go:Go, gopaste:gopaste, dockRegister:dockRegister,getcallback:getcallback
 	}
 	var currentsection=0;
 	var tabid = [], wikifile = [], wikititle = [];
@@ -24,6 +24,7 @@ tiddlycut.modules.browserOverlay = (function ()
 		tcBrowser	= tiddlycut.modules.tcBrowser;
 		pref	 	= tiddlycut.modules.pref;
 		pageData	= tiddlycut.modules.pageData;
+		tiddlerAPI	= tiddlycut.modules.tiddlerAPI;
 
 		var parser = Components.classes["@mozilla.org/xmlextras/domparser;1"]
              .createInstance(Components.interfaces.nsIDOMParser);
@@ -83,6 +84,7 @@ tiddlycut.modules.browserOverlay = (function ()
 		tcBrowser.setOnLink();
 		tcBrowser.setImageURL();	
 		tcBrowser.setlinkURL();	
+		tcBrowser.setHasSelectedText();
 	}	
 
 	function currentSelectModes() {
@@ -115,6 +117,7 @@ tiddlycut.modules.browserOverlay = (function ()
 		currentsection = 0;
 		tClip.loadSectionFromFile(0); //load default section
 	}
+	/* not used
 	function toggleTCContextMenu(e)
 	{
 		//tiddlycut.log('event is',e);
@@ -132,6 +135,7 @@ tiddlycut.modules.browserOverlay = (function ()
 				menus[i].setAttribute("disabled",false);
 			}
 	}
+	* */
 	function createFilesPopups()
 		{
 		// Get the menupopup element that we will be working with
@@ -252,26 +256,44 @@ tiddlycut.modules.browserOverlay = (function ()
 		}
 		
 	}
-	function dock() {tiddlycut.log("docked ","docked called");
-		if (gettiddlycutcur()==0) return;
+	
+	function dock() {
+		var id = gettiddlycutcur();
+		var mm = Cc["@mozilla.org/globalmessagemanager;1"].getService(Ci.nsIMessageListenerManager);
+
+		setcallback("dockrespond",function(request) {
+			tiddlycut.modules.tcBrowser.setDatafromCS(request.text, request.snap, request.html);
+			tiddlycut.modules.browserOverlay.dockRegister(request.config);
+			tiddlycut.log("dockrespond",request.config);
+		});
+
+		mm.broadcastAsyncMessage('tcdock', {data: {tid:id}, callback:"dockrespond"});
+		tiddlycut.log("sent tcdock");		
+	}
+	
+	
+	function dockRegister(configtid, optid) {tiddlycut.log("docked ","docked called");
+		if (gettiddlycutActive()===false) return;
 		var i, tot =pref.Get('tabtot');
 		for (i = 1; i < tot+1;i++) {
-			if (wikifile[i] == content.location.href) {return};//already on our list-do nothing
+			if (wikifile[i] == gettiddlycutloc()) {return};//already on our list-do nothing
 		}
 		//else add to our list
 		//gettiddlycutcur() is the global function defined in winN.jsm - current tab number
-		tiddlycut.log("docked ",content.location.href,gettiddlycutcur());
-		var startPos = content.location.href.search(":")+1;
+		tiddlycut.log("docked ",gettiddlycutloc(),gettiddlycutcur());
+		var startPos = gettiddlycutloc().search(":")+1;
 		var tot =pref.Get('tabtot')+1;
 		pref.Set('tabtot',tot);
-		wikifile[tot] = content.location.href;
+		wikifile[tot] = gettiddlycutloc();
 		tabid[tot] = gettiddlycutcur();
 		
         //record tab id in 'tab dom' used when we hear tab closed events to see if we need to respond - 
         gBrowser.selectedTab.setAttribute("tctabid",gettiddlycutcur()); //BJ change modus opos to one global collection of tabs?
-		pref.ClipConfig[tot] = tClip.getTidContents("TiddlyClipConfig");
-		
-		var opts=tClip.getTidContents(pref.getCharPref("tiddlycut.ConfigOptsTiddler"));
+        //load config ***** move to framescript and pass back as param to dock()
+		pref.ClipConfig[tot] = new tiddlerAPI.Tiddler(configtid).body;//tClip.getTidContents("TiddlyClipConfig");
+		tiddlycut.log("config",pref.ClipConfig[tot]);
+		var opts=null;//optstid;//tClip.getTidContents(pref.getCharPref("tiddlycut.ConfigOptsTiddler"));
+		// *****
 		if (!!opts) pref.ClipOpts[tot] = opts;
 		else pref.ClipOpts[tot] = null;
 		changeFile(tot);//load configuration from this TW
@@ -283,7 +305,7 @@ tiddlycut.modules.browserOverlay = (function ()
 			wikititle[tot] = "";
 		}
 
-		injectMessageBox(content.document);
+		// BJ fix - injectMessageBox(content.document);
 		contextMenuClipAs();
 	}
 	
@@ -337,71 +359,118 @@ tiddlycut.modules.browserOverlay = (function ()
 	function Go(category)//ff only
 	{ 
 		var mm = Cc["@mozilla.org/globalmessagemanager;1"].getService(Ci.nsIMessageListenerManager);
+		var title={}, tag={}, cancelled={};
+		
 		//-----debug control------
 		if (tClip.hasMode(tClip.getCategories()[category],"status") ) {
-					var i, tablist='', tot =pref.Get('tabtot');
-					for (i = 1; i < tot+1;i++) {
-						tablist = tablist +   tabid[i]+"=" 
-								+ wikifile[i] + "\n";
-					tiddlycut.log(tablist);
-					}
-					mm.broadcastAsyncMessage('tcutidentify',{});
+			var i, tablist='', tot =pref.Get('tabtot');
+			for (i = 1; i < tot+1;i++) {
+				tablist = tablist +   tabid[i]+"=" 
+						+ wikifile[i] + "\n";
+			tiddlycut.log(tablist);
+			}
+			mm.broadcastAsyncMessage('tcutidentify',{});
 			return;
 		}
+
 		//-----highlight control------
 		if (tClip.hasModeBegining(tClip.getCategories()[category],"highlight") ) {
-			//set edit comand in document - this causes loss of selection of text - so remember here
-			var range, sel = content.getSelection();
-			if (sel.getRangeAt) {
-				range = sel.getRangeAt(0);
-			}
-			content.document.designMode = "on";
-			//restore selection of text
-			if (range) {
-				sel.removeAllRanges();
-				sel.addRange(range);
-			} 
-			//content.setTimeout('document.designMode = "on"',1000);
-			//here I should also add my own class and then use this in the application ".tchighlight"
-			content.document.execCommand("backcolor", false, "#ffd700");
-			content.document.execCommand("styleWithCSS",false,"false");
-			content.document.execCommand("forecolor",false,"#fe0d0c");
+			
+			var id = gettiddlycutcur();
+					//send kick to content script
+			tiddlycut.log("sending hlight request",id);
+		
+			mm.broadcastAsyncMessage('tchlight', {
+									data: { tid:id, tchlight:true}});
+			tiddlycut.log("sent hlight request");
 
-			content.document.designMode = 'Off'; 
 			return;
 		}
-		//-----end debug stuff ---------
-		if (tClip.hasModeBegining(tClip.getCategories()[category],"snap") )  { 
-			//if any text is selected temporarly remove this while making the snap
-			var range, sel = content.getSelection();
-			try{
-				if (sel.getRangeAt) {
-					range = sel.getRangeAt(0);
+		//---------cut tiddlers------
+		if (tClip.hasModeBegining(tClip.getCategories()[category],"tiddler") )  { 	//tiddler mode try and retrieve as tiddler
+			var useSelectTitle = false;
+			var atitle = "", atag = "";
+			if (tcBrowser.hasSelectedText()) {
+				useSelectTitle = true;
+			} else {
+				//put up a window for the user to enter the name and tag
+				//of tiddlers then find matching tids in this page
+				tcBrowser.EnterTidNameDialog (title, tag, cancelled);
+				if (cancelled.value==true) {return false;}
+				if (tag.value ==="") {				
+					if (title.value == "") return false;
+					atitle = title.value;
 				}
-				if (range) {
-					sel.removeAllRanges();
-				} 
-			} catch(e) {range=null;} 
-			//------make the snap--------
-		    var size=makepercent(tClip.getModeBegining(tClip.getCategories()[category],"snap").split("snap")[1]);
-			if (isNaN(size)) size =1;
-			tcBrowser.snap(size);
-			//re-apply selected text (if any)
-			if (range) {
-				sel.addRange(range);
-			} 
-		}
-		if (!pageData.SetupVars(category,currentsection)) return false;//sets mode - determines what is copied	
-		if (!pageData.cutTids(category)) return false;
+				else { 
+					atag = tag.value;
+				}				
+			}
+			setcallback("cuttidrespond",function(request) {
+				tiddlycut.modules.tcBrowser.setDatafromCS(request.text, request.snap, request.html);
+				tiddlycut.modules.pageData.SetupVars(request.category,currentsection);
+				tiddlycut.modules.pageData.SetTidlist(request.tids);
+				tiddlycut.modules.browserOverlay.gopaste(request.category, request.id);
+				tiddlycut.log("cuttidrespond",request.id," page ",request.loc);
+			});
+			var id = gettiddlycutcur();
+			//send to content script
+			tiddlycut.log("sending cuttid request",id);	
+			mm.broadcastAsyncMessage('tcuttids', { 
+				data: { tid:id, category:category, useSelectTitle:useSelectTitle, title:atitle, tag:atag},
+				callback:"cuttidrespond"
+			});
+			tiddlycut.log("sent cuttid request");
+			return;	
+		}		
+		//---------snap--------
+		var doSnap = tClip.hasModeBegining(tClip.getCategories()[category],"snap") ;
+		var snapSize = 1;
+
+		if (doSnap)	{
+			snapSize=makepercent(tClip.getModeBegining(tClip.getCategories()[category],"snap").split("snap")[1]);
+			if (isNaN(snapSize)) snapSize =1;
+		}	
+		id = gettiddlycutcur();
+				//send kick to content script
+		tiddlycut.log("sending cut request",id);
+		
+		setcallback("cutrespond",function(request) {
+				
+			tiddlycut.modules.tcBrowser.setDatafromCS(request.text, request.snap, request.html);
+			if (!pageData.SetupVars(request.category,currentsection)) return false;
+			tiddlycut.log("befor cutrespond--",request.id," page ",request.loc);
+			gopaste(request.category, request.id);
+			tiddlycut.log("cutrespond--",request.id," page ",request.loc);
+		});
+		mm.broadcastAsyncMessage('tcut', {
+				data: { tid:id, category:category, doSnap:doSnap, snapSize:snapSize}, 
+				callback:"cutrespond"				
+		});
+		tiddlycut.log("sent cut request");
+	}
+
+	function gopaste(category) {
 		//now we have the clip sent it to the docked tiddlywiki
-		id = tabid[pref.Get('filechoiceclip')];
+		var mm = Cc["@mozilla.org/globalmessagemanager;1"].getService(Ci.nsIMessageListenerManager);
+		var id = tabid[pref.Get('filechoiceclip')];
+		//if (!pageData.SetupVars(category,currentsection)) return false;//sets mode - determines what is copied	
+		//if (!pageData.cutTids(category)) return false
 		//send kick to content script
+		
 		tiddlycut.log("sending paste",id);
 	
 		mm.broadcastAsyncMessage('tcutpaste', {
 								data: { tid:id, 
 								category:category, pageData:JSON.stringify(pageData),currentsection:currentsection}});
-		tiddlycut.log("sent paste");	
+		tiddlycut.log("sent paste");
+		
+	}
+	var callbacks=[];
+	function setcallback(name, fn) {
+		callbacks[name] = fn;
+	}
+	function getcallback(name) {
+		return callbacks[name]?callbacks[name]:null;
 	}
 	function $(param) {
 		return document.getElementById(param);

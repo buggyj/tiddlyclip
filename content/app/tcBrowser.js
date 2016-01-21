@@ -14,7 +14,9 @@ tiddlycut.modules.tcBrowser= (function () {
 	    isTiddlyWikiClassic:isTiddlyWikiClassic, UserInputDialog:UserInputDialog,
 	    setlinkURL:setlinkURL,				getlinkURL:getlinkURL,
 	    onLinkLocal:onLinkLocal,			onLinkRemote:onLinkRemote, 
-	    isTiddlyWiki5:isTiddlyWiki5
+	    isTiddlyWiki5:isTiddlyWiki5,		setDatafromCS:setDatafromCS,
+	    setOnTw5:setOnTw5,					setOnTwclassic:setOnTwclassic,
+	    setHasSelectedText:setHasSelectedText
 	}
 	var parser = Components.classes["@mozilla.org/parserutils;1"].
 			getService(Components.interfaces.nsIParserUtils);  
@@ -35,8 +37,7 @@ tiddlycut.modules.tcBrowser= (function () {
 		return new XPCNativeWrapper(where);			
 	}
 
-    //variables to store non-persistance broswer data (from gContextMenu) and snap
-    var vonImage, vonLink, vimageUrl, vlinkURL, snapImage = "";
+    var vonImage, vonLink, vimageUrl, vlinkURL, snapImage = "", selectedText, html="", istwclassic=false, istw5=false, textselected=false;
     
 	function snap(size){ 
 		var tab = gBrowser.selectedTab;
@@ -64,7 +65,7 @@ tiddlycut.modules.tcBrowser= (function () {
 		snapImage = "";
 		return img;
 	}
-	function getLargestImgURL() {
+	function getLargestImgURL() { return null;//BJ fix 
 		var isize=0, url='', imgs = content.document.querySelectorAll('img');	
 		for (var img in imgs) {
 			//var imgh = imgs[img].height?imgs[img].height|1;
@@ -103,32 +104,22 @@ tiddlycut.modules.tcBrowser= (function () {
 	function getlinkURL() {
 		return vlinkURL;
 	}
-	
-	// Return plain text selection as a string.
-	function getSelectedAsText()
-	{
-		var selectedText = "";
-		var element = chrome.commandDispatcher.focusedElement;
-		if(element) {// only allow input[type=text]/textarea
-			if (element.tagName === "TEXTAREA" ||(element.tagName === "INPUT" && element.type === "text")) {
-				return element.value.substring(element.selectionStart,element.selectionEnd);
-			}
-		} {
-
-			var focusedWindow = chrome.commandDispatcher.focusedWindow;
-			try
-				{
-					var selection = focusedWindow.getSelection();
-					selectedText = selection.toString();
-				}
-			catch(e)
-				{
-
-				}
-			
-			}
+	function getSelectedAsText(){
 		return selectedText;
+	}	
+	function setOnTwclassic(twclassic) {
+		istwclassic = twclassic;
 	}
+	function setOnTw5(tw5) {
+		istw5 = tw5;
+	}
+	function setDatafromCS( text, snap, ahtml, atwc, atw5) {
+		selectedText = text;
+		snapImage =snap;
+		html = ahtml
+		//tw5 = atw5;
+	}
+
 
 	// Remove certain characters from strings so that they don't interfere with tiddlyLink wikification.
 	function tiddlyLinkEncode(str) {
@@ -170,14 +161,14 @@ tiddlycut.modules.tcBrowser= (function () {
 		return text;
 	}
 
-	function getPageTitle() {
-		return tiddlyLinkEncode(content.document.title);
+	function getPageTitle() { 
+		return tiddlyLinkEncode(gettiddlycuttit()||"no title");
 	}
 	function getPageRef () {
-		return  tiddlyLinkEncode(content.location.href); 
+		return  tiddlyLinkEncode(gettiddlycutloc()||"no location"); 
 	}
 	function getHtml(styles)
-	{
+	{return null;//BJ fix
 		var focusedWindow = chrome.commandDispatcher.focusedWindow;
 		var selection;
 		try
@@ -212,37 +203,22 @@ tiddlycut.modules.tcBrowser= (function () {
 	function hasCopiedText() {
 		return getClipboardString().length > 0;
 	}
-	// Check if there is any selected text.
-	function hasSelectedText(){
-		try	{
-			var text = getSelectedAsText();
-			if(text != "") return true;
-		}catch(e) {}
-		return false;
+	function setHasSelectedText(){	
+		textselected = gContextMenu.isTextSelected;
 	}
 	
+	// Check if there is any selected text.
+	function hasSelectedText(){	
+		return textselected;
+	}
+
+// these function are used to control display in the context menus so must be fired before popup occurs so must be executed when context menu appears
 	function isTiddlyWikiClassic() {
-		//from tiddlyfox
-		// Test whether the document is a TiddlyWiki (we don't have access to JS objects in it)
-		
-		var doc =  winWrapper(content.document);
-		var versionArea = doc.getElementById("versionArea");
-		return !!(doc.getElementById("storeArea") &&
-			(versionArea && /TiddlyWiki/.test(versionArea.text)));
+		return istwclassic;
 	}
 
 	function isTiddlyWiki5() {
-		//from tiddlyfox
-		// Test whether the document is a TiddlyWiki5 (we don't have access to JS objects in it)
-		var doc =  winWrapper(content.document);
-		var metaTags = doc.getElementsByTagName("meta"),
-			generator = false;
-		for(var t=0; t<metaTags.length; t++) {
-			if(metaTags[t].name === "application-name" && metaTags[t].content === "TiddlyWiki") {
-				generator = true;
-			}
-		}
-		return generator;
+		return istw5;
 	}
 	
  	function EnterTidNameDialog(title, tag, cancelled) {
@@ -271,99 +247,8 @@ tiddlycut.modules.tcBrowser= (function () {
 	{
 		return(param.replace(/&/mg,"&amp;").replace(/</mg,"&lt;").replace(/>/mg,"&gt;").replace(/\"/mg,"&quot;"));
 	}
-	function getSelectedAsHtml(location,styles,safe){
-		var aDiv=getHtml(styles);
-		if (!!aDiv) 
-			if (safe) 
-				return parser.sanitize(htmlthis(aDiv,null,location,styles),0).replace (/([\s|\S]*)\<body\>([\s|\S]*)\<\/body\>([\s|\S]*)/,"$2");
-			else
-				return htmlthis(aDiv,null,location,styles);
-		else return null;
-	}
+	function getSelectedAsHtml(location,styles,safe) {return html}
 	
-	var htmlthis =( 
-		function() {
-		  var ELEMENT = this.Node?Node.ELEMENT_NODE:1,
-				 TEXT = this.Node?Node.TEXT_NODE:   3;
-		  return function html(el, outer, LOCALE, styles) {
-			  var focusedWindow = chrome.commandDispatcher.focusedWindow;
-					var i = 0, j = el.childNodes, k = outer?"<" + (m = el.nodeName.toLowerCase()) + attr(el,LOCALE) + ">":"",
-						l = j.length, m, n;//els[i].setAttribute("style", window.getComputedStyle(els[i]).cssText);
-					while(i !== l) switch((n = j[i++]).nodeType) {
-					  case ELEMENT: {
-						  if (styles) copyComputedStyles(n);
-						  k += html(n, true, LOCALE); break;
-						 }
-					  case TEXT:    k += htmlEncode( n.nodeValue);
-					} 
-					if (m==='br') return k;
-					return k + (outer?"</" + m + ">":"");
-				}; 
-		function attr(el,LOCALE) {
-			var i = 0, j = el.attributes, k = new Array(l = j.length), l, nm,v;
-			while(i !== l) {
-				nm = j[i].nodeName ;
-				v = j[i].value;
-				k[i]='';
-				//check to see if src is local, add path if it is 
-				if ((nm==='src')||(nm==='href')){
-					var pathStart = v.substring(0,4);
-									
-					if ((pathStart==='file') ||(pathStart === 'http'))
-						k[i] +=nm + '="'+ v + '"'; 
-					else {
-						if (nm==='src') {
-							var locale = LOCALE.split('//');
-							locale = locale[0]+'//'+locale[1].split('/')[0];
-							k[i] +=nm +  '="'+ locale+v + '"';
-						}
-						else
-							k[i] +=nm +  '="'+ LOCALE+v + '"';	
-					}
-				}
-				else
-					k[i] +=nm + '="'+ v +'"';
-				//alert(nm+" ="+v);
-				i++;
-			}
-			return (l?" ":"") + k.join(" ");
-	  }
-	})();
-function dumpComputedStyles(elem,prop) {
-
-  var cs = elem.ownerDocument.defaultView.getComputedStyle(elem,null);
-  if (prop) {
-    tiddlycut.log("    "+prop+" : "+cs.getPropertyValue(prop)+"\n");
-    return;
-  }
-  var len = cs.length;
-  for (var i=0;i<len;i++) {
- 
-    var style = cs[i];
-    tiddlycut.log("    "+style+" : "+cs.getPropertyValue(style)+"\n");
-  }
-
-};
-function copyComputedStyles(elem) {
-
-  var cs = elem.ownerDocument.defaultView.getComputedStyle(elem,null);
-  var xx='';
-  var len = cs.length;
-  for (var i=0;i<len;i++) {
-    var style = cs[i];
-     //tiddlycut.log("    "+style+" : "+cs.getPropertyValue(style)+"\n");
-
-    var val = cs.getPropertyValue(style);
-    var stl = style;
-    
-if (stl.substr(0,1) == '-') continue;//mozilla private styles
-    //elem.setAttribute(stl,val);
-    xx+=stl+':'+val+';';
-  }
-  elem.style.cssText = xx;
-
-};
-
 function  UserInputDialog(prompt, response) {
 		window.openDialog("chrome://tiddlycut/content/app/userInput.xul",
 					  "existWindow",

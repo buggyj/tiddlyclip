@@ -48,11 +48,7 @@ tiddlycut.modules.pref = (function ()
 					}
 				}
 			});
-		 },
-		 getTidContents= function (tidname) {
-			var tid = pageData.findTiddlerInPage_ByTitle(tidname);//find tid on current (infocus) page
-			return tid?tid.body: null;
-		};
+		 };
 		 
 
 	var tcBrowser, defaults, pageData, browseris, ClipConfig = [], ClipOpts = [];

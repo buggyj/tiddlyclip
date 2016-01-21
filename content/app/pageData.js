@@ -2,10 +2,8 @@
 {
 	var api = 
 	{
-		onLoad:onLoad,  					firstRemoteTid:firstRemoteTid, 
-		hasNextRemoteTid:hasNextRemoteTid,	findTiddlerInPage_ByTitle:findTiddlerInPage_ByTitle,
-		nextRemoteTid:nextRemoteTid,		loadTiddlerVarsFrom:loadTiddlerVarsFrom,
-		SetupVars:SetupVars,				cutTids:cutTids,
+		onLoad:onLoad,  					
+		SetupVars:SetupVars,				
 		SetTidlist:SetTidlist
 	}
 	var tClip, tcBrowser, tiddlerAPI, browseris;	
@@ -21,8 +19,17 @@
 	api.data = {};
 
 	function SetTidlist(tidlist) {
-		api.remoteTidArr=tidlist;
+		api.remoteTidArr=[];
+		if (Array.isArray(tidlist)) {
+			for (var i=0;i<tidlist.length;i++){
+				api.remoteTidArr[i]= (new tiddlerAPI.Tiddler(tidlist[i])).EncodedDiv();
+			}	
+		}else {
+			api.remoteTidArr[0]=(new tiddlerAPI.Tiddler(tidlist)).EncodedDiv();
+			tiddlycut.log("remoteTidArr",api.remoteTidArr[0],"<---",tidlist);
+		}
 	}
+	
 	function makepercent (value) {
 		if(/^[0-9][0-9]$/.test(value)) {
 			return Number(value)/100;
@@ -30,9 +37,9 @@
 		return NaN;
 	}
 
-	function SetupVars(category,currentSection,sourcetab) {
+	function SetupVars(category,currentSection) {
 		var title={}, tag={}, editMode={}, cancelled={};
-			
+			tiddlycut.log("setupvars ",category);
 		//expose parameters - used for userExtensions
 		api.data ={};
 		api.data.section  = tClip.getSectionNames()[currentSection];
@@ -59,9 +66,11 @@
 			locale = locale.join('/');
 		var styles=false;
 		var safety=true;
+		/*  The parser does not appear to work in content script - maybe move parsing here and only pass the 'keep styles to content script'
 		    if (tClip.hasMode(tClip.getCategories()[category],"keepstyle") ) styles = true;
 		    if (tClip.hasMode(tClip.getCategories()[category],"safetyoff") ) safety = false;
-			api.data.web  = tcBrowser.getSelectedAsHtml(locale,styles,safety);
+		    */
+		api.data.web  = tcBrowser.getSelectedAsHtml(locale,true,false);
 
 		// these are the structures for hold an array of tiddlers from a remote tw
 		// that are to to be pasted into the local tw
@@ -89,121 +98,6 @@
 		return true;//no error
 	}//end func
 
-	function cutTids(category) {
-		var title={}, tag={}, editMode={}, cancelled={};
-			
-		if (tClip.hasModeBegining(tClip.getCategories()[category],"tiddler") )  { 	//tiddler mode try and retrieve as tiddler
-
-			if (tcBrowser.hasSelectedText()) {//BJ does this work in chrome?
-				var tid=findTiddlerInPage_ByTitle(tcBrowser.getSelectedAsText());
-				if (!tid){ 
-					alert ("Not a tiddler");
-					return false; //error
-				}
-				else api.remoteTidArr[0]= tid.EncodedDiv();
-			} else {
-				//put up a window for the user to enter the name and tag
-				//of tiddlers then find matching tids in this page
-				tcBrowser.EnterTidNameDialog (title, tag, cancelled);
-				if (cancelled.value==true) {return false;}
-				if (tag.value ==="") {				
-					if (title.value == "") return false;
-					var tid=findTiddlerInPage_ByTitle(title.value);
-					if (!tid){ 
-						alert ("No tiddler");
-						return false; //error
-					}
-					else api.remoteTidArr[0]= tid.EncodedDiv();//string
-				}
-				else if (false===findTiddlersInPage_ByTag(tag.value)){ 
-						alert ("No tiddlers");
-						return false; //error
-				}				
-			}
-			return true;	
-		}
-		return true;//no error
-	}//end func
-	
-	function firstRemoteTid() {
-		api.remoteTidIndex = 0;
-		return api.remoteTidArr[0];
-	}
-	
-	function hasNextRemoteTid() {//alert(api.remoteTidArr.length + " len "+api.remoteTidIndex );
-		return (api.remoteTidIndex < api.remoteTidArr.length);
-	}
-	
-	function nextRemoteTid() {
-		api.remoteTidIndex += 1;
-		if (api.remoteTidIndex === api.remoteTidArr.length) return null;
-		return api.remoteTidArr[api.remoteTidIndex];	
-
-	}		
-
-	function loadTiddlerVarsFrom(tidObj) {
-		//alert(twobj.title + 'title');
-		api.data.remoteTidText= tidObj.body;
-		api.data.remoteTidTags= tidObj.tags||" ";
-		api.data.remoteTidTitle=tidObj.title;		
-	}
-	//////private area/////////
-
-
-	function findTiddlerInPage_ByTitle(title) {
-		var winWrapper = tcBrowser.winWrapper(content.document);
-		var i,tid,nodes = winWrapper.getElementById("storeArea").getElementsByTagName('div');
-		//try version 2.2 style store 
-		for(i=0; i<nodes.length; i++) 
-			if(title===nodes[i].getAttribute('title')) 
-				break;
-
-		if (i !== nodes.length) { 
-			tid= new tiddlerAPI.Tiddler(nodes[i]);
-			return tid;
-		}
-		//not found in a version 2.2 store, try 2.1 style
-		for(i=0; i<nodes.length; i++) 
-			if(title===nodes[i].getAttribute('tiddler')) 
-				break;
-				
-		if (i !== nodes.length) { 
-			tid= new tiddlerAPI.Tiddler( nodes[i]);
-			return tid;
-		}
-		return null; //not found
-	}
-
-	function findTiddlersInPage_ByTag(tags) {
-		var winWrapper = tcBrowser.winWrapper(content.document); 
-		var i,tid, nodes = winWrapper.getElementById("storeArea").getElementsByTagName('div');
-		var found=false;
-		var tag = tags.split(" ");
-
-		api.remoteTidArr= [];
-		for(i=0; i<nodes.length; i++) 
-			if (nodes[i].getAttribute("tags") != null) {
-				var nodetags=nodes[i].getAttribute("tags");
-				for (var l = 0; l < tag.length; l++) {
-					var tid = null;
-					if(nodetags.indexOf(tag[l]) !== -1) {
-						var nodetag = nodetags.split(" ");
-						for (var k = 0; k < nodetag.length; k++) {
-							//BJ FIXME tags can have form [[tag string]]
-							if (nodetag[k]==tag[l]) { 
-								found = true;
-								tid = new tiddlerAPI.Tiddler(nodes[i]);
-								api.remoteTidArr.push(tid.EncodedDiv());
-								break;//only copy tid once 
-							}
-						}
-					}
-					if (!!tid) break;//tag was matched
-				}
-			}
-
-		return found; 
-	}
 
 	return api;
 }());

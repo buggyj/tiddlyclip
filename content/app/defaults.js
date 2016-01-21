@@ -9,7 +9,8 @@
 	var defaultCategories = [
 		"|Tip|copy tids||defaultTip|tiddlers|",
 		"|Snip|copy||defaultSnip||",
-		"|Pin|Pin it||defaultPin||"
+		"|Pin|Pin it||defaultPin||",
+		"|Snap|screen shot||[[defaultSnap]]|snap|"
 	];
 
 	var defaultPrefs = {
