@@ -16,12 +16,13 @@ tiddlycut.CSserver.contentRequestsListener = function(messageEvent) {
 	//tiddlycut.log("enter bg listern",messageEvent.json.callbackToken);
 	var request = messageEvent.json.data;
 	var callback = messageEvent.data.callback;
+	var action = messageEvent.data.action;
 	tiddlycut.log("bg recv",request.id);
 	try {
         if (callback) {
 			tiddlycut.modules.browserOverlay.getcallback(callback)(request); return
 		}
-		if ('focusedtab' ==request.req) {
+		if ('focusedtab' == action) {
 			tiddlycut.log("focusedtab in win  ",tiddlycut.winN, request.id);
 			settiddlycutActive(request.istarget);//if the content contains a tc message box.
 			settiddlycutcur(request.id);//BJ use tiddlycut.modules.browserOverlay.setcur()?? maybe I put this to enable one global background??
@@ -33,8 +34,10 @@ tiddlycut.CSserver.contentRequestsListener = function(messageEvent) {
 			//and also recorded in the tab-dom to decide when a tabclose 
 			//causes a change to the context menu (removal of tw from the list)
 			tiddlycut.log("focusedtab fin in win  ",tiddlycut.winN, request.id,"target",request.istarget,request.loc,request.tit,request.twc,request.tw5);
+			//this is caused when the contextmenu to appear - so we have to append this now
+			tiddlycut.modules.browserOverlay.contextMenuClipAs();
 		};
-		if ('pageChanged' == request.req) {
+		if ('pageChanged' == action) {
 			tiddlycut.modules.browserOverlay.tabchange(request.id);
 			tiddlycut.log("pageChanged",request.id);
 		};	

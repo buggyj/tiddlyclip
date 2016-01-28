@@ -1,4 +1,8 @@
 tiddlycut.modules.tcBrowser= (function () {
+	
+    if(typeof tiddlycut.globaldock === 'undefined') var onemenu = false;
+	else var onemenu = tiddlycut.globaldock;
+	
 
 	var api = 
 	{
@@ -20,14 +24,16 @@ tiddlycut.modules.tcBrowser= (function () {
 	}
 	var parser = Components.classes["@mozilla.org/parserutils;1"].
 			getService(Components.interfaces.nsIParserUtils);  
-    var defaults;
+			
+	var local = onemenu?one.local:{vonImage:null, vonLink:null, imageUrl:null, vlinkURL:null, snapImage:"", selectedText:null, html:"", istwclassic:false, istw5:false, textselected:false};
+    
     var _strings_bundle_default;
+    
     var chrome, browseris;
 
 	function onLoad(browser, doc) {
 		browseris 	= browser;
-		chrome=doc;
-		defaults	= tiddlycut.modules.defaults;
+		chrome = doc;
 		_strings_bundle_default =
 				Components.classes['@mozilla.org/intl/stringbundle;1']
 				.getService(Components.interfaces.nsIStringBundleService)
@@ -37,7 +43,6 @@ tiddlycut.modules.tcBrowser= (function () {
 		return new XPCNativeWrapper(where);			
 	}
 
-    var vonImage, vonLink, vimageUrl, vlinkURL, snapImage = "", selectedText, html="", istwclassic=false, istw5=false, textselected=false;
     
 	function snap(size){ 
 		var tab = gBrowser.selectedTab;
@@ -52,17 +57,17 @@ tiddlycut.modules.tcBrowser= (function () {
 						win.innerHeight, "rgb(255,255,255)");
 		//Create a data url from the canvas
 		var data = thumbnail.toDataURL("image/png");
-		snapImage = data.substring(data.indexOf(',') + 1);
+		local.snapImage = data.substring(data.indexOf(',') + 1);
 	}
 	function setImageURL() {
-		imageUrl= gContextMenu.imageURL || gContextMenu.mediaURL;
+		local.imageUrl= gContextMenu.imageURL || gContextMenu.mediaURL;
 	}
 	function getImageURL() {
-		return imageUrl;
+		return local.imageUrl;
 	}
 	function getSnapImage() { //snap is not alway called so set to blank for this case.
-		var img = snapImage;
-		snapImage = "";
+		var img = local.snapImage;
+		local.snapImage = "";
 		return img;
 	}
 	function getLargestImgURL() { return null;//BJ fix 
@@ -79,44 +84,44 @@ tiddlycut.modules.tcBrowser= (function () {
 		return url;
 	}
 	function setOnImage(){
-		vonImage= gContextMenu.onImage;
+		local.vonImage= gContextMenu.onImage;
 	}
 	function onImage(){
-		return vonImage;
+		return local.vonImage;
 	}
 	function setOnLink(){
-		vonLink= gContextMenu.onLink;
+		local.vonLink= gContextMenu.onLink;
 	}
 	function onLink(){
-		return  vonLink;
+		return  local.vonLink;
 	}
 	function onLinkLocal(){
-		var local = /^file:/;
-		return local.test(vlinkURL);
+		var pattern = /^file:/;
+		return pattern.test(local.vlinkURL);
 	}
 	function onLinkRemote(){
-		var local = /^file:/;
-		return !local.test(vlinkURL);
+		var pattern = /^file:/;
+		return !pattern.test(local.vlinkURL);
 	}
 	function setlinkURL() {
-		vlinkURL= gContextMenu.linkURL;
+		local.vlinkURL= gContextMenu.linkURL;
 	}
 	function getlinkURL() {
-		return vlinkURL;
+		return local.vlinkURL;
 	}
 	function getSelectedAsText(){
-		return selectedText;
+		return local.selectedText;
 	}	
 	function setOnTwclassic(twclassic) {
-		istwclassic = twclassic;
+		local.istwclassic = twclassic;
 	}
 	function setOnTw5(tw5) {
-		istw5 = tw5;
+		local.istw5 = tw5;
 	}
 	function setDatafromCS( text, snap, ahtml, atwc, atw5) {
-		selectedText = text;
-		snapImage =snap;
-		html = ahtml
+		local.selectedText = text;
+		local.snapImage =snap;
+		local.html = ahtml
 		//tw5 = atw5;
 	}
 
@@ -204,21 +209,21 @@ tiddlycut.modules.tcBrowser= (function () {
 		return getClipboardString().length > 0;
 	}
 	function setHasSelectedText(){	
-		textselected = gContextMenu.isTextSelected;
+		local.textselected = gContextMenu.isTextSelected;
 	}
 	
 	// Check if there is any selected text.
 	function hasSelectedText(){	
-		return textselected;
+		return local.textselected;
 	}
 
 // these function are used to control display in the context menus so must be fired before popup occurs so must be executed when context menu appears
 	function isTiddlyWikiClassic() {
-		return istwclassic;
+		return local.istwclassic;
 	}
 
 	function isTiddlyWiki5() {
-		return istw5;
+		return local.istw5;
 	}
 	
  	function EnterTidNameDialog(title, tag, cancelled) {
@@ -233,7 +238,7 @@ tiddlycut.modules.tcBrowser= (function () {
 		//return document.getElementById("tiddlycut-strings").getString(name);
 
 		try {	
-		return		_strings_bundle_default.getString(name);
+		return	_strings_bundle_default.getString(name);
 	}
 	catch (e) { return "not known"; }
 				    
@@ -247,7 +252,7 @@ tiddlycut.modules.tcBrowser= (function () {
 	{
 		return(param.replace(/&/mg,"&amp;").replace(/</mg,"&lt;").replace(/>/mg,"&gt;").replace(/\"/mg,"&quot;"));
 	}
-	function getSelectedAsHtml(location,styles,safe) {return html}
+	function getSelectedAsHtml(location,styles,safe) {return local.html}
 	
 function  UserInputDialog(prompt, response) {
 		window.openDialog("chrome://tiddlycut/content/app/userInput.xul",

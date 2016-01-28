@@ -1,57 +1,42 @@
 tiddlycut.modules.tClip = (function () {
-	//api const must be defined before api structure (or else will be assigned null)
-
-	var SELECTMODES ={Clip:'Clip', Image:'Image', Text:'Text', Link:'Link', linkLocal:"linkLocal", linkRemote:"linkRemote", TWC:'TWC', TW5:'TW5'};
-	var ALLSELMODES =[SELECTMODES.Clip, SELECTMODES.Image, SELECTMODES.Text, SELECTMODES.Link, SELECTMODES.linkLocal, SELECTMODES.linkRemote, SELECTMODES.TWC, SELECTMODES.TW5];	
 	
-
+    if(typeof tiddlycut.globaldock === 'undefined') var onemenu = false;
+	else var onemenu = tiddlycut.globaldock;
+	
 	var api = 
 	{
 		onLoad:onLoad,				getSectionNames:getSectionNames,
 		getCategories:getCategories,			
 		hasMode:hasMode,			loadSectionFromFile:loadSectionFromFile, 	
-		hasAnyModes:hasAnyModes,	setClipConfig:setClipConfig,
-		SELECTMODES:SELECTMODES,	getCurentSection:getCurentSection,
-		ALLSELMODES:ALLSELMODES,	getModeBegining:getModeBegining,
+		setClipConfig:setClipConfig,	
+		getModeBegining:getModeBegining,
 		hasModeBegining:hasModeBegining	
 
 	};
-	var pageData, pref, tcBrowser,   defaults, browseris;
+	var pref, tcBrowser,   defaults, browseris;
 
 	function onLoad(browser) {
 		browseris	= browser;
-		pageData 	= tiddlycut.modules.pageData;
 		pref	 	= tiddlycut.modules.pref;
 		tcBrowser	= tiddlycut.modules.tcBrowser;
 		defaults	= tiddlycut.modules.defaults;
 	}
-	api.BeforeSave = {};
-	api.AfterSub = {};
 	
-	var activeCategories= {};
-	var sectionNames=[];
-    var currentsection;
+	var activeCategories= onemenu?one.activeCategories:{};
+	var sectionNames=onemenu?one.sectionNames:[];
+    
     var ClipConfig;
- 
-	// we are over or have highlighted an image(Image), 
-	// we have highlighted text(Text)
-    //SELECTMODES are ignored if Tiddler mode is set, - either text is select and a tiddler is 
-    //searched for, or a dialog box is shown.
-//////////public section/////////////////////
-
-	function hasAnyModes(sourcelist, targetlist){
-		for (var m in sourcelist)
-			for (var i = 0 ; i<targetlist.length; i++)
-				if (sourcelist[m]===targetlist[i]) return true;
-		return false;
+    
+ 	//overrides are for global contextmenu
+	var self = onemenu?one.self:{
+		ClipConfig:ClipConfig
 	}
-	var currentCat; 
-
-	function loadActiveSectionCategories(table, defaultRule) {
+//////////public section/////////////////////
+	function loadActiveSectionCategories(table) {
 		var categoryRows = table.split("\n");
 		var cat = {};
 		var tagsAndModes;
-		var pieces;;
+		var pieces;
 		for (var i=0; i<categoryRows.length; i++) {
 			cat = {rules:null,valid:true};
 			pieces = categoryRows[i].split("|");// form |Category|Tip|Tags|Rules Tid|Modes|
@@ -79,7 +64,7 @@ tiddlycut.modules.tClip = (function () {
 		var modes =[], tList = tagString.split(' ');
 		for (var i=0; i< tList.length; i++) {
 			modes[i] = tList[i].trim();
-		}pref
+		}
 		return modes;
 	}
 
@@ -102,10 +87,6 @@ tiddlycut.modules.tClip = (function () {
 			if (mode === cat.modes[i].substr(0,mode.length)) return cat.modes[i];
 	}
 //////////////////////////////////////		
-
-
-
-
 	function defaultCategories() {
 		var defaultcats  =defaults.getDefaultCategories();
 		for (var i= 0; i< defaultcats.length; i++) {
@@ -119,18 +100,15 @@ tiddlycut.modules.tClip = (function () {
 	function getSectionNames()	{ 
 		return sectionNames;
 	}
-	function getCurentSection()	{ 
-		return currentsection;
-	}
+
 	function loadSectionFromFile(activeSection) {
-		//sets currentsection
 		activeCategories= {};
         sectionNames=['Default'];
         var sectionStrgs;
 
 		//if (activeSection===0) defaultCategories();//load default rules defined by this program 
 
-		var content = ClipConfig;//where all sections are defined
+		var content = self.ClipConfig;//where all sections are defined
 		if (content != null) {
 			sectionStrgs = content.split('ᏜᏜᏜᏜ*['); //sections begin with a title, , followed by a table of categories
 			if(sectionStrgs.length>1) { //clip list format			 
@@ -143,7 +121,6 @@ tiddlycut.modules.tClip = (function () {
 				}	
 				//only load active categories 
 				loadActiveSectionCategories(sectionStrgs[activeSection].split('!/%%/\n')[1]);//strip of section name from first line
-				currentsection = activeSection;
 			} else { //straight text table
 				sectionStrgs = content.split('\n!'); //sections begin with a title, eg !mysection, followed by a table of categories
 				//the ! has not be removed by the split in the case of the first section
@@ -155,11 +132,9 @@ tiddlycut.modules.tClip = (function () {
 				}	
 				//only load active categories
 				loadActiveSectionCategories(sectionStrgs[activeSection].replace(/(^\|)*\n/,''));//strip of section name from first line
-				currentsection = activeSection;
 			}
 		}else {
 			defaultCategories();
-			currentsection=0;
 			//alert("config tiddler not found");
 		}
 	}
@@ -173,18 +148,12 @@ tiddlycut.modules.tClip = (function () {
 		} 
 	}
 
-    function setClipConfig(filen){
-		pref.initPrefs();
-		if (0==filen) { //disable
-			activeCategories={}; //no section so no categories
-			sectionNames=[];
-			tiddlycut.log("activeCategories set to {}");
-		} else {
-			ClipConfig = pref.ClipConfig[filen];
-			pref.loadOpts(filen);
-			tiddlycut.log("setclipconfig ",ClipConfig);
-		}
+    function setClipConfig(Config){
+			self.ClipConfig = Config;
+			tiddlycut.log("setclipconfig ",self.ClipConfig);
+
 	}
+	
 	function getFileStuff() {
         //BJ FIXME - remove redundent
 		return true;

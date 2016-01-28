@@ -38,8 +38,7 @@
 	}
 
 	function SetupVars(category,currentSection) {
-		var title={}, tag={}, editMode={}, cancelled={};
-			tiddlycut.log("setupvars ",category);
+		tiddlycut.log("setupvars ",category);
 		//expose parameters - used for userExtensions
 		api.data ={};
 		api.data.section  = tClip.getSectionNames()[currentSection];
@@ -87,7 +86,7 @@
 		if (tClip.hasModeBegining(tClip.getCategories()[category],"user") )  { 
 		    var userString = {value:''};
 		    var promptindex =tClip.getModeBegining(tClip.getCategories()[category],"user").split("user")[1];
-			tcBrowser.UserInputDialog(pref.getCharPref("tiddlycut."+promptindex),userString);
+			tcBrowser.UserInputDialog(pref.Get(promptindex),userString);
 			api.data["user"+promptindex]=userString.value;
 		}
 

@@ -13,8 +13,9 @@ if (typeof(tiddlycut.log) === 'undefined') {
 	};
 };
 
-//Components.utils.import("chrome://tiddlycut/content/ff/tabId.jsm",tiddlycut);//just a common numbering for tabs
-tiddlycut.tabN =Math.random();//tiddlycut.tiddlycutgettabN();
+Components.utils.import("chrome://tiddlycut/content/ff/tabId.jsm",tiddlycut);//just a common numbering for tabs
+//tiddlycut.tabN =Math.random();//
+tiddlycut.tabN = tiddlycut.tiddlycutgettabN();
 
 tiddlycut.log("cs" + tiddlycut.tabN);
 
@@ -24,6 +25,7 @@ tiddlycut.unload = (function() {
 
 }).bind(tiddlycut); 
 
+var docked = false;
 tiddlycut.docLoad = (function(doc) {
 	if (doc.defaultView.frameElement) return;
 	if (doc.nodeName != '#document') tiddlycut.log("in docload fail");
@@ -32,9 +34,12 @@ tiddlycut.docLoad = (function(doc) {
 
 		try { 	// if the tab is closing then the source of the message can be invalid
 				//- tabclose is watch for in background-server and sends this message when seen  
-			sendAsyncMessage('tcutrequest', {data:{req: 'pageChanged', id: this.tabN}}); 
-			//maybe we are docked
-			removeMessageListener('tcdock',tiddlycut.dock);
+			if (docked) {
+				sendAsyncMessage('tcutrequest', {action: 'pageChanged',data:{ id: this.tabN}}); 
+				//maybe we are docked
+				dock = false;
+				removeMessageListener('tcdock',tiddlycut.dock);
+			}
 			removeMessageListener('tcutpaste',tiddlycut.paste);		
 			removeMessageListener('tcuttids',tiddlycut.cuttids);
 			removeMessageListener('tcut',tiddlycut.cut);
@@ -51,15 +56,15 @@ tiddlycut.contextListener = (function(e) {
 	tiddlycut.log('contextmenu',tiddlycut.tabN, content.location.href);
 	var messageBox = content.document.getElementById("tiddlyclip-message-box");
 	if(messageBox) {	//this is a tw file in the 	
-		//BJ HACK - really we should only add paste listens to docked tws not all of them with the tc plugin
-		addMessageListener('tcutpaste',tiddlycut.paste);//paste is the only persistant listener - all the rest are one shot.
+
 		addMessageListener('tcdock',tiddlycut.dock);
 	}
 	addMessageListener('tchlight',tiddlycut.hlight);
 	addMessageListener('tcuttids',tiddlycut.cuttids);
 	addMessageListener('tcut',tiddlycut.cut);
-	sendAsyncMessage('tcutrequest', {data:
-		{req: 'focusedtab', istarget:!!messageBox, id: tiddlycut.tabN, 
+	sendAsyncMessage('tcutrequest', {
+		action: 'focusedtab', 
+		data:{istarget:!!messageBox, id: tiddlycut.tabN, 
 			loc: content.location.href, tit: content.document.title, twc:isTiddlyWikiClassic(), tw5:isTiddlyWiki5()
 	}});
 	tiddlycut.log('contextmenu sent',tiddlycut.tabN);
@@ -328,7 +333,7 @@ tiddlycut.cuttids = (function(messageEvent) {
 			if (!tids) content.alert("tiddler not found");											
 			sendAsyncMessage('tcutrequest', 
 				{callback: callback,
-				 data:{req: 'cuttidrespond', id: tiddlycut.tabN, category:rcvd.category, text: getSelectedAsText(), 
+				data:{ id: tiddlycut.tabN, category:rcvd.category, text: getSelectedAsText(), 
 					tids:tids
 			}});	
 			this.log("cuttids responded",this.tabN,findTiddlerInPage_ByTitle(rcvd.title));
@@ -357,7 +362,7 @@ tiddlycut.cut = (function(messageEvent) {
 			this.log("cut found",this.tabN);
 			sendAsyncMessage('tcutrequest', 
 				{callback: callback,
-				 data:{req: 'cutrespond', id: tiddlycut.tabN, category:rcvd.category, text: getSelectedAsText(), 
+				 data:{id: tiddlycut.tabN, category:rcvd.category, text: getSelectedAsText(), 
 					snap: rcvd.doSnap?snap(rcvd.snapSize):"",html:getSelectedAsHtml()
 			}});	
 			this.log("cut responded",this.tabN);
@@ -462,9 +467,13 @@ tiddlycut.dock = (function(messageEvent) {
 			this.log("dock not this ",this.tabN," yours ",rcvd.tid);
 		}else {
 			this.log("dock found",this.tabN);
+					//BJ HACK - really we should only add paste listens to docked tws not all of them with the tc plugin
+		    addMessageListener('tcutpaste',tiddlycut.paste);//paste is the only persistant listener - all the rest are one shot.
+		    docked = true;
 			sendAsyncMessage('tcutrequest', 
 				{callback: callback,
-				 data:{req: 'dockrespond', config:findTiddlerInPage_ByTitle("TiddlyClipConfig")}});	
+				 data:{config:findTiddlerInPage_ByTitle("TiddlyClipConfig"),opts:findTiddlerInPage_ByTitle(rcvd.opttid)
+			}});	
 			this.log("dock responded",this.tabN,findTiddlerInPage_ByTitle("TiddlyClipConfig"));
 			removeMessageListener('tcut',tiddlycut.cut);// remove listern  - one off request
 			removeMessageListener('tcuttids',tiddlycut.cuttids);

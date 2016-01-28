@@ -45,7 +45,30 @@
 		}
 		return (doc.location.protocol === "file:") && generator;
 	}
-	
+
+	function extractToJson(node) {//based on tw5 boot
+		var htmlDecode = function(s) {
+				return s.toString().replace(/&lt;/mg,"<").replace(/&nbsp;/mg,"\xA0").replace(/&gt;/mg,">").replace(/&quot;/mg,"\"").replace(/&amp;/mg,"&");
+			};
+		var e = node.firstChild;
+		while(e && e.nodeName.toLowerCase() !== "pre") {
+			e = e.nextSibling;
+		}
+		var title = node.getAttribute ? node.getAttribute("title") : null;
+		if(e && title) {
+			var attrs = node.attributes,
+				tiddler = {
+					text: htmlDecode(e.innerHTML)
+				};
+			for(var i=attrs.length-1; i >= 0; i--) {
+				tiddler[attrs[i].name] = attrs[i].value;
+			}
+			return JSON.stringify(tiddler);
+		} else {
+			return "";
+		}
+	}
+
 	function findTiddlerInPage_ByTitle(title) {
 		var winWrapper = document;
 		var i,tid,nodes = winWrapper.getElementById("storeArea").getElementsByTagName('div');
@@ -55,7 +78,7 @@
 				break;
 
 		if (i !== nodes.length) { 
-			tid= htmlthis(nodes[i],true,window.location.href);
+			tid= extractToJson(nodes[i]);
 			return tid;
 		}
 		//not found in a version 2.2 store, try 2.1 style
@@ -64,7 +87,7 @@
 				break;
 				
 		if (i !== nodes.length) { 
-			tid= htmlthis(nodes[i],true,window.location.href);
+			tid= extractToJson(nodes[i]);
 			return tid;
 		}
 		return null; //not found
@@ -78,7 +101,7 @@
 				
 				if(nodes[i].getAttribute("tags").indexOf(tag) !== -1) {
 					found = true;
-					tid = htmlthis(nodes[i],true,window.location.href);
+					tid = extractToJson(nodes[i]);
 					remoteTidArr.push(tid); 
 				}
 			}	
@@ -178,7 +201,7 @@
 					tiddlycut.log("actiondock cs");
 					injectMessageBox(document);
 					var docked = true;
-					sendResponse({ url:window.location.href, config:findTiddlerInPage_ByTitle("TiddlyClipConfig")});
+					sendResponse({title:document.title, url:window.location.href, config:findTiddlerInPage_ByTitle("TiddlyClipConfig"),opts:findTiddlerInPage_ByTitle(request.data.opttid)});
 				}
 		});
 		//callback for cut

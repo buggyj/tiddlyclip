@@ -1,6 +1,6 @@
 // wrapper for firefox bootstrap
 
-
+const prefsb = "extensions.tiddly-cut.";
 const Cu = Components.utils;
 Cu.import('resource://gre/modules/Services.jsm');
 
@@ -11,7 +11,12 @@ function loadIntoWindow(window) {
 	if (!window.document.getElementById('appcontent')) return;
 	window.tiddlycut={};
 	window.tiddlycut.modules = {};
+	
+var prefs = Services.prefs.getBranch(prefsb);
 
+window.tiddlycut.globaldock= prefs.getBoolPref("globaldock");
+
+	   
     var lograw=function(str){
 		Components.classes["@mozilla.org/consoleservice;1"].
            getService(Components.interfaces.nsIConsoleService).logStringMessage("tc: "+str);
@@ -31,9 +36,11 @@ function loadIntoWindow(window) {
 
 	"ff/background-server.js"//listens for content scripts -starts on defintion
 	];
-
+	//a common object override for all windows
+    Components.utils.import("chrome://tiddlycut/content/ff/winOne.jsm",window);
+    //a common numbering for windows
 	Components.utils.import("chrome://tiddlycut/content/ff/winN.jsm",window);
-	//a common numbering for windows
+	
 	window.tiddlycut.winN =window.tiddlycutgetwinN();
 	for (var i = 0; i < scripts.length; ++i) {
 		Services.scriptloader.loadSubScript('chrome://tiddlycut/content/' +

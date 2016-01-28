@@ -4,9 +4,13 @@
     <Description about="urn:mozilla:install-manifest">
         <em:type>2</em:type> <!-- 2 : Extension -->
         <em:id>buggyjeftidclip@gmail.com</em:id>  
-        <em:version>0.0.19</em:version>
+        <em:version>0.0.10</em:version>
         <em:name>tiddlyclip</em:name>
+        <em:bootstrap>true</em:bootstrap>
+        <em:multiprocessCompatible>true</em:multiprocessCompatible>
+          <em:optionsURL>chrome://tiddlycut/content/options.xul</em:optionsURL>
         <em:description>clip web content to tiddlywiki</em:description>
+        <em:optionsType>2</em:optionsType>
         <em:creator>buggyj</em:creator>
         <em:iconURL>chrome://tiddlycut/skin/icon48.png</em:iconURL>
 		<em:bootstrap>true</em:bootstrap>
@@ -15,7 +19,7 @@
                 <!-- Firefox -->
                  <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
                 <em:minVersion>20.0</em:minVersion>
-                <em:maxVersion>42.0</em:maxVersion>
+                <em:maxVersion>43.0</em:maxVersion>
             </Description>
         </em:targetApplication>
         		<!-- Android -->

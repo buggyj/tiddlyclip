@@ -2,20 +2,23 @@ if (!tiddlycut)
 	var tiddlycut = {};
 if (!tiddlycut.modules)
 	tiddlycut.modules = {};
+	
+	
 tiddlycut.modules.pref = (function ()
 {
-	 var Map ={},
-	 Global ={editMode:false,tabtot:0,filechoiceclip:0},
+	
+    if(typeof tiddlycut.globaldock === 'undefined') var onemenu = false;
+	else var onemenu = tiddlycut.globaldock;
+	
+	 var Map =onemenu?one.Map:{},
 	  Types = {"boolean" : "Bool", "string" : "Char", "number" : "Int"},
 	 
 		  Get = function (prefname) {
-			if (prefname === 'editMode' || prefname === 'tabtot' || prefname === 'filechoiceclip') return Global[prefname];
 			return Map[prefname];
 		 },
 		 
 		  Set = function (prefname,val) {
-			if (prefname === 'editMode' || prefname === 'tabtot' || prefname === 'filechoiceclip') Global[prefname]=val;			  
-			else Map[prefname]=val;
+			Map[prefname]=val;
 
 		 },
 		 
@@ -28,9 +31,9 @@ tiddlycut.modules.pref = (function ()
 			}					
 		},
 		
-		loadOpts = function(num) {
+		loadOpts = function(ClipOpts) {
 			//load additional prefs from targetTW
-			var pieces = pref.ClipOpts[num];
+			var pieces =ClipOpts;
 			if (!pieces) {
 			var defs = defaults.getTWPrefs();
 			for (var i in defs) 
@@ -51,71 +54,24 @@ tiddlycut.modules.pref = (function ()
 		 };
 		 
 
-	var tcBrowser, defaults, pageData, browseris, ClipConfig = [], ClipOpts = [];
+	var defaults,  browseris, ClipConfig = [], ClipOpts = [];
 	
 	var api = 
 	{
-		onLoad:onLoad,	getBoolPref:getBoolPref, 	getCharPref:getCharPref, 		
-		Get:Get,		getFileNames:getFileNames, 	setBoolPref:setBoolPref, 
-		Set:Set,		SetPrefs:SetPrefs,			ClipConfig:ClipConfig,
-		initPrefs:initPrefs, loadOpts:loadOpts,		ClipOpts:ClipOpts
+		onLoad:onLoad,	 		
+		Get:Get,	 
+		Set:Set,
+		loadOpts:loadOpts
 	}
 
 
 	function onLoad(browser) {
 		browseris 	= browser;
-		tcBrowser	= tiddlycut.modules.tcBrowser;
 		defaults	= tiddlycut.modules.defaults;
-		pageData	= tiddlycut.modules.pageData;
 		initPrefs();
 	}
-
-	function SetPrefs(){
-			//tcBrowser.SetPrefsScreen();
-	}
-	
-	function getBoolPref(prefString) {
-		var prefStringPart = prefString.split(".");
-		if (prefStringPart.length ==1) {		
-			return Get( prefStringPart[0]);
-		}else {
-			return Get( prefStringPart[1]);
-		};
-	}
-	
-	function getCharPref(prefString) {
-		var prefStringPart = prefString.split(".");
-		if (prefStringPart.length ==1) {		
-			return Get( prefStringPart[0]);
-		}else {
-			return Get( prefStringPart[1]);
-		};
-	}
-	
-	function setCharPref(prefString,prefVal) {
-		var prefStringPart = prefString.split(".");
-		if (prefStringPart.length ==1) {		
-			Set( prefStringPart[0],prefVal);
-		}else {
-		    Set( prefStringPart[1],prefVal);
-		};
-	}
-	
-	function setBoolPref(prefString,prefVal) {
-		var prefStringPart = prefString.split(".");
-		if (prefStringPart.length ==1) {		
-			Set( prefStringPart[0],prefVal);
-		}else {
-		 Set( prefStringPart[1],prefVal);
-		};
-	}
 	
 
-	function SetFirstPrefElements(element, index, array) {
-
-		Map[element] = 		Map[element+SetFirstPrefElements.num];
-	}
-	function getFileNames() {}
 	return api;
 }());
 

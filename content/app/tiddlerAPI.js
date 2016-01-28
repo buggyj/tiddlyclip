@@ -18,7 +18,7 @@ tiddlycut.modules.tiddlerAPI = (function () {
 			this.title='';
 			this.body ='';
 			this.tags ='';
-			this.modifier = pref.getCharPref("tiddlycut.txtUserName")||'none';
+			this.modifier = pref.Get("txtUserName")||'none';
 			this.modified = (new  Date()).toJSON().replace(/(.*)\-(.*)\-(.*)[tT](.*)\:(.*)\:(.*)\.(.*)[zZ]/,"$1$2$3$4$5");
 			//JSON dates have the same format as the ISO-8601 standard: YYYY-MM-DDTHH:mm:ss.sssZ
 			this.created = this.modified;
