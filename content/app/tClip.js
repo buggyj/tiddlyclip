@@ -109,7 +109,7 @@ tiddlycut.modules.tClip = (function () {
 		//if (activeSection===0) defaultCategories();//load default rules defined by this program 
 
 		var content = self.ClipConfig;//where all sections are defined
-		if (content != null) {
+		if (content) {
 			sectionStrgs = content.split('ᏜᏜᏜᏜ*['); //sections begin with a title, , followed by a table of categories
 			if(sectionStrgs.length>1) { //clip list format			 
 				sectionStrgs.shift();

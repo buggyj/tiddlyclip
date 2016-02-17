@@ -7,10 +7,10 @@
 		getTWPrefs:getTWPrefs,
 	}
 	var defaultCategories = [
-		"|Tip|copy tids||defaultTip|tiddlers|",
+		"|Tid|copy tids||defaultTid|tiddlers|",
 		"|Snip|copy||defaultSnip||",
 		"|Pin|Pin it||defaultPin||",
-		"|Snap|screen shot||[[defaultSnap]]|snap|"
+		"|Snap|screen shot||defaultSnap|snap|"
 	];
 
 	var defaultPrefs = {
