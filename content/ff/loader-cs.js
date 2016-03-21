@@ -330,7 +330,10 @@ tiddlycut.cuttids = (function(messageEvent) {
 			var tids = rcvd.useSelectTitle	?findTiddlerInPage_ByTitle(getSelectedAsText())
 											:rcvd.title	?findTiddlerInPage_ByTitle(rcvd.title)
 														:findTiddlersInPage_ByTag(rcvd.tag);
-			if (!tids) content.alert("tiddler not found");											
+			if (!tids) {
+				content.alert("tiddler was not found");	
+				return;
+			}										
 			sendAsyncMessage('tcutrequest', 
 				{callback: callback,
 				data:{ id: tiddlycut.tabN, category:rcvd.category, text: getSelectedAsText(), 
