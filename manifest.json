@@ -23,11 +23,12 @@
 		"16" : "skin/icon16.png",
 		"48" : "skin/icon-48.png"
 	},
-	"name" : "tiddlyclip",
+	"name" : "tiddlyclip2",
 	"permissions" : [
 		"tabs", "<all_urls>",
 		"contextMenus",
-		"notifications"
+		"notifications",
+ 		"clipboardRead"
 	],
 
 	"version" : "0.0.8"

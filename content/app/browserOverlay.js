@@ -332,7 +332,9 @@ tiddlycut.modules.browserOverlay = (function ()
         //record tab id in 'tab dom' used when we hear tab closed events to see if we need to respond - 
         gBrowser.selectedTab.setAttribute("tctabid",gettiddlycutcur()); //BJ change modus opos to one global collection of tabs?
         //load config ***** move to framescript and pass back as param to dock()
-		ClipConfig[tot] = new tiddlerAPI.Tiddler(configtid).body;//tClip.getTidContents("TiddlyClipConfig");
+		var configtid = new tiddlerAPI.Tiddler(configtid).body;//tClip.getTidContents("TiddlyClipConfig");
+		if (config != null) ClipConfig[tot] = configtid.body;
+		else ClipConfig[tot] = null;
 		tiddlycut.log("config",ClipConfig[tot]);
 		var opts=new tiddlerAPI.Tiddler(optid).body;//optstid;//tClip.getTidContents(pref.Get("ConfigOptsTiddler"));
 		// *****

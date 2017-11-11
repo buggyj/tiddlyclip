@@ -341,22 +341,61 @@ tiddlycut.modules.browserOverlay = (function ()
 				}
 			);
 	}
-	
+	var curtw; // loop from 0 to tabtot-1
 	function GoChrome(category, tidlist, sourcetab)
 	{
-		tiddlycut.log("go1");
+
+			var cat = parseInt(category); 
+			if (!isNaN(cat)) {dosends(category, tidlist, sourcetab); return};
+			
+		//assume default cats give time sec. zero means stop
+		//walk each docked tw and send a new tid with current time
+		tiddlycut.log("go1------------");
 		if (false == pageData.SetupVars(category,currentsection,sourcetab)) return; //sets mode - determines what is copied
 				tiddlycut.log("go2");
 		pageData.SetTidlist(tidlist);
 				tiddlycut.log("go3");
-		id = tabid[filechoiceclip];
+		//tabtot is the number docked	
+		id = tabid[filechoiceclip];	
+		//id = tabid[++curtw];
+		// if (curtw=tabtot) curtw = 0;
+		
 		//send kick to content script
 		tiddlycut.log("sending paste",id);
 		chrome.tabs.sendMessage(id,
 		{ action: 'paste', data:{category:category, pageData:JSON.stringify(pageData),currentsection:currentsection}});
 		tiddlycut.log("sent paste");	
 	}
+	var curt=0; // loop from 0 to tabtot-1
+	var count=0;
+	var idtime;
+	function dosends(category, tidlist, sourcetab)
+	{
+			//assume default cats give time sec. zero means stop
+			//walk each docked tw and send a new tid with current time
+			tiddlycut.log("xgo1");
+			if (idtime) clearInterval(idtime);
+			var cat = parseInt(category);
+			
+			pageData.SetupVars(category,currentsection,sourcetab);
+							pageData.data.pageTitle= (new Date()).toISOString().replace(/[^0-9]/g, "");
+			var id = tabid[filechoiceclip];	tiddlycut.log("filechoiceclip"+filechoiceclip);
+			//var id = tabid[curtw++];
+			//if (curtw=tabtot) curtw = 0;
+			idtime = setInterval(function(){tiddlycut.log("Interval reached");
+				//send kick to content script
+				//tiddlycut.log("xsending paste",id);
+				pageData.data.pageRef =  "testing saves ";
+				pageData.data.category =  "Snip";
 
+				pageData.data.text = 	++count;
+				for (var ii = 1; ii < tabtot+1; ii++){tiddlycut.log("xsent paste"+tabid[ii]);
+				chrome.tabs.sendMessage(tabid[ii],
+				{ action: 'paste', data:{category:"Snip", pageData:JSON.stringify(pageData),currentsection:currentsection}});
+					}
+			}, cat);
+
+	}
 	function $(param) {
 		return document.getElementById(param);
 	}
