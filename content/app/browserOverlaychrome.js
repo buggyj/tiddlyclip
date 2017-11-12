@@ -257,6 +257,7 @@ tiddlycut.modules.browserOverlay = (function ()
 		else ClipConfig[tot] = null;
 		//pref.Set('ClipConfig'+tot,configtid.body);
 	    //pref.Set('ClipOpts'+tot,????????);//BJ fixme needs to be got when getting config??
+	    changeFile(tabtot);	    
 		createFilesPopups();
 	};
 	function injectMessageBox(doc) {
