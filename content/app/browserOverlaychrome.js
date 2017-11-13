@@ -122,6 +122,7 @@ tiddlycut.modules.browserOverlay = (function ()
 		createFilesPopups();
 	}
     var mytabs=[];
+    var separate;
 	function createFilesPopups()
 		{
 			/*;
@@ -139,6 +140,7 @@ tiddlycut.modules.browserOverlay = (function ()
 		for(var m = 1; m <mytabs.length ;m++){//tiddlycut.log("m",m); 
 			chrome.contextMenus.remove(mytabs[m])
 		};
+		if (separate)chrome.contextMenus.remove(separate);
 		mytabs=[];
 		for(var m = 1; m < tabtot+1;m++) {
 			n++;
@@ -175,7 +177,7 @@ tiddlycut.modules.browserOverlay = (function ()
 								onclick: select
 							});			
 		}
-		var id = chrome.contextMenus.create({"type" : "separator"});
+		separate = chrome.contextMenus.create({"type" : "separator"});
         if (tabtot>0)
 		for(var m = 0; m <secName.length;m++) {
 			n++;
@@ -203,6 +205,7 @@ tiddlycut.modules.browserOverlay = (function ()
 		
 	}
 	var mytabscats=[];
+	var separator ;
 	function createCategoryPopups()
 	{
 		var n=0;
@@ -211,6 +214,7 @@ tiddlycut.modules.browserOverlay = (function ()
 		for(var m = 1; m <mytabscats.length ;m++){//tiddlycut.log("m",m); 
 			chrome.contextMenus.remove(mytabscats[m])
 		};
+		if (separator)chrome.contextMenus.remove(separator);
 		if (tabtot>0) {
 		mytabscats=[];
 
@@ -229,7 +233,8 @@ tiddlycut.modules.browserOverlay = (function ()
 								onclick: catsel
 							});
 		}
-		var id = chrome.contextMenus.create({"type" : "separator"});
+		
+		 separator = chrome.contextMenus.create({"type" : "separator"});
 	}
 
 	}
