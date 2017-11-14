@@ -124,11 +124,9 @@
 	function getSelectedAsHtml(location){
 		var aDiv=getHtml();
 		if (!!aDiv) 
-			if (false) //maybe have a config parmeter for this //BJ!! need a sanitizer for chrome
-				return parser.sanitize(htmlthis(aDiv,null,location),0);//0 is the flags
-			else
-				return htmlthis(aDiv,null,location);
-		else return null;
+			return htmlthis(aDiv,null,location);
+		else 
+			return null;
 	}
 	
 	var htmlthis =( //TODO I can dd a switch to download and save local version of the 'src' files

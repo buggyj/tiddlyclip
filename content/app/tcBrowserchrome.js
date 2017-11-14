@@ -179,15 +179,8 @@ chrome.tabs.get(sourcetab, function(tab){
 	{
 		return(param.replace(/&/mg,"&amp;").replace(/</mg,"&lt;").replace(/>/mg,"&gt;").replace(/\"/mg,"&quot;"));
 	}
-	function getSelectedAsHtml(location,styles,safe){
+	function getSelectedAsHtml(){
 				return html; //the getting of html is done by the content script asynchronously BUT sanitizing should be done here
-		var aDiv=getHtml(styles);
-		if (!!aDiv) 
-			if (false) 
-				return parser.sanitize(htmlthis(aDiv,null,location,styles),0).replace (/([\s|\S]*)\<body\>([\s|\S]*)\<\/body\>([\s|\S]*)/,"$2");
-			else
-				return htmlthis(aDiv,null,location,styles);
-		else return null;
 	}
 	
 	function  UserInputDialog(prompt, response) {
