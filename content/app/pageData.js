@@ -83,13 +83,14 @@
         //////////end of remote data struct //////////////////
         
 		//execute any user defined extensions
+		/* update for ff57 */
 		if (tClip.hasModeBegining(tClip.getCategories()[category],"user") )  { 
 		    var userString = {value:''};
 		    var promptindex =tClip.getModeBegining(tClip.getCategories()[category],"user").split("user")[1];
-			tcBrowser.UserInputDialog(pref.Get(promptindex),userString);
-			api.data["user"+promptindex]=userString.value;
+			//tcBrowser.UserInputDialog(pref.Get(promptindex),userString);
+			api.data["user"+promptindex]=tcBrowser.getusrstring();
 		}
-
+		
 		for (var userExtends in api.userExtensions) {
 
 			api.userExtensions[userExtends]();

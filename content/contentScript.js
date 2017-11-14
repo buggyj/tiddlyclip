@@ -176,7 +176,9 @@
 			return (l?" ":"") + k.join(" ");
 	  }
 	})();
-
+	function  UserInputDialog(prompt) {
+						return window.prompt(prompt);
+	}
 	function injectMessageBox(doc) {
 		// Inject the message box
 		var messageBox = doc.getElementById("tiddlyclip-message-box");
@@ -212,7 +214,7 @@
 					tiddlycut.log("cut  content cs");
 					remoteTidArr  = [''];
 					sendResponse({ url:window.location.href, html:getSelectedAsHtml(window.location.href), 
-						title:document.title, twc:isTiddlyWikiClassic()||false, tw5:isTiddlyWiki5()});
+						title:document.title, twc:isTiddlyWikiClassic()||false, tw5:isTiddlyWiki5(), response: (request.prompt?UserInputDialog(request.prompt):null)});
 				}
 		});
 	   chrome.runtime.onMessage.addListener(
@@ -222,7 +224,7 @@
 					tiddlycut.log("cutTid  content cs");
 
 					sendResponse({ url:window.location.href, tids:cutTids(), title:document.title, 
-						twc:isTiddlyWikiClassic()||false, tw5:isTiddlyWiki5()});
+						twc:isTiddlyWikiClassic()||false, tw5:isTiddlyWiki5(),response: (request.prompt?UserInputDialog(request.prompt):null)});
 				}
 		});
 		//callback for paste

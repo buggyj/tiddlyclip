@@ -283,8 +283,13 @@ tiddlycut.modules.browserOverlay = (function ()
 	}
 	function pushData(category, info, tab) //chrome only
 	{
+		var promptindex;
 		tcBrowser.setDataFromBrowser(info, tab) //enter data from chrome menu onclick;
 		//request data from content script
+		//execute any user defined extensions
+		if (tClip.hasModeBegining(tClip.getCategories()[category],"user") )  { 
+		    promptindex =tClip.getModeBegining(tClip.getCategories()[category],"user").split("user")[1];
+		} else promptindex = null;
 		var currentCat=category; //remember here for returning callback to pick it up
 		tiddlycut.log("inpusdata id",tab.id);
 		if (!tClip.hasMode(tClip.getCategories()[category],"tiddlers") ) {
@@ -306,10 +311,10 @@ tiddlycut.modules.browserOverlay = (function ()
 					tcBrowser.setSnapImage(dataURL);
 					chrome.tabs.sendMessage(tab.id,
 						{
-							action : 'cut'
+							action : 'cut', prompt:(promptindex?pref.Get(promptindex):null)
 						}, function (source)
 						{ 
-							tcBrowser.setDatafromCS( source.url, source.html, source.title, source.twc, source.tw5); //add data to tcbrowser object -retrived later
+							tcBrowser.setDatafromCS( source.url, source.html, source.title, source.twc, source.tw5, source.response); //add data to tcbrowser object -retrived later
 							tiddlycut.log ("currentCat",currentCat);
 							GoChrome(currentCat, null, tab.id);
 						}
@@ -325,11 +330,11 @@ tiddlycut.modules.browserOverlay = (function ()
 			}	
 			chrome.tabs.sendMessage(tab.id,
 				{
-					action : 'cut'
+					action : 'cut',prompt:(promptindex?pref.Get(promptindex):null)
 				}, function (source)
 				{ 
 					tiddlycut.log ("currentCat",currentCat,"tab.id",tab.id);
-					tcBrowser.setDatafromCS( source.url, source.html, source.title, source.twc, source.tw5); //add data to tcbrowser object -retrived later
+					tcBrowser.setDatafromCS( source.url, source.html, source.title, source.twc, source.tw5, source.response); //add data to tcbrowser object -retrived later
 
 					GoChrome(currentCat, null, tab.id);
 				}
@@ -338,10 +343,10 @@ tiddlycut.modules.browserOverlay = (function ()
 		else
 			chrome.tabs.sendMessage(tab.id,
 				{
-					action : 'cutTid'
+					action : 'cutTid', prompt:(promptindex?pref.Get(promptindex):null)
 				}, function (source)
 				{
-					tcBrowser.setDatafromCS( source.url, null, source.title, source.twc, source.tw5); //add data to tcbrowser object -retrived later
+					tcBrowser.setDatafromCS( source.url, null, source.title, source.twc, source.tw5,source.response); //add data to tcbrowser object -retrived later
 					tiddlycut.log ("cuttid reply tids",source.tids);
 					GoChrome(currentCat, source.tids, tab.id);
 				}
