@@ -3,6 +3,13 @@
 	"web_accessible_resources": [
 		"content/resources/css/*.css"
 	],
+
+	"applications": {
+		"gecko": {
+			"id": "buggyjeftidclip@gmail.com",
+			"strict_min_version": "57.0"
+		}
+	},
 	"background" : {
 		"page" : "content/background.html"
 	},
@@ -18,7 +25,7 @@
       ],
 		"run_at" : "document_start"
 	} ],
-	"description" : "A context menu extension for tiddlywiki",
+	"description" : "clip web content to tiddlywiki",
 	"icons" : {
 		"16" : "skin/clip16.png",
 		"48" : "skin/clip48.png"
@@ -30,5 +37,5 @@
 		"notifications"
 	],
 
-	"version" : "0.0.8"
+	"version" : "0.1.0"
 }

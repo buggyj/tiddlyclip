@@ -1,6 +1,0 @@
-<?xml version="1.0"?>
-<vbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-  <setting pref="extensions.tiddly-cut.globaldock" type="bool" title="global docking">
-toggle docking to context menu, shared/unshared across windows
-  </setting>
-</vbox>
