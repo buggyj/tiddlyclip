@@ -67,9 +67,9 @@
 		var safety=true;
 		/*  The parser does not appear to work in content script - maybe move parsing here and only pass the 'keep styles to content script'
 		    if (tClip.hasMode(tClip.getCategories()[category],"keepstyle") ) styles = true;
-		    if (tClip.hasMode(tClip.getCategories()[category],"safetyoff") ) safety = false;
 		    */
-		api.data.web  = tcBrowser.getSelectedAsHtml(locale,true,false);
+		if (tClip.hasMode(tClip.getCategories()[category],"dirty") ) safety = false;
+		api.data.web  = tcBrowser.getSelectedAsHtml(safety);
 
 		// these are the structures for hold an array of tiddlers from a remote tw
 		// that are to to be pasted into the local tw

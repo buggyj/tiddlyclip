@@ -179,8 +179,8 @@ chrome.tabs.get(sourcetab, function(tab){
 	{
 		return(param.replace(/&/mg,"&amp;").replace(/</mg,"&lt;").replace(/>/mg,"&gt;").replace(/\"/mg,"&quot;"));
 	}
-	function getSelectedAsHtml(){
-				return html; //the getting of html is done by the content script asynchronously BUT sanitizing should be done here
+	function getSelectedAsHtml(clean){
+				return  clean?DOMPurify.sanitize(html):html; //the getting of html is done by the content script asynchronously BUT sanitizing should be done here
 	}
 	
 	function  UserInputDialog(prompt, response) {
