@@ -212,7 +212,11 @@
 			  function(request, sender, sendResponse) {
 				if (request.action == 'actiondock') {
 					// first stage send back url
-					tiddlycut.log("actiondock in cs");
+					tiddlycut.log("actiondock in cs");				
+					if(!isTiddlyWikiClassic() && !isTiddlyWiki5()) {
+						sendResponse({title:null});
+						return;
+					}
 					injectMessageBox(document);tiddlycut.log("actiondock out cs");
 					var docked = true;
 					sendResponse({title:document.title, url:window.location.href, config:findTiddlerInPage_ByTitle("TiddlyClipConfig"),opts:findTiddlerInPage_ByTitle(request.data.opttid)});

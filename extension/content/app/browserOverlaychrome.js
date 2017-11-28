@@ -53,6 +53,7 @@ tiddlycut.modules.browserOverlay = (function ()
 				action : 'actiondock', data:{opttid:pref.Get("ConfigOptsTiddler")}
 			}, function (source)
 			{
+				if (!source.title) return;
 				dockRegister(tab.id, source.url, source.config, source.title, source.opts);
 				console.log("item dock " + source.config);
 			}
