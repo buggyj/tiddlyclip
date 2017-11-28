@@ -1,11 +1,8 @@
 'use strict';
 (function () {
 
-	var api = 
-	{
-	    docLoad:docLoad
-	};
-	var remoteTidArr  = [''];
+
+	var remoteTidArr  = [''], install;
 	
 	function getHtml()
 	{
@@ -185,6 +182,23 @@
 			messageBox.id = "tiddlyclip-message-box";
 			messageBox.style.display = "none";
 			doc.body.appendChild(messageBox);
+			//just for debug
+			messageBox["data-install"] = "1";
+			install = 1;
+			tiddlycut.log ("install:" + install);
+		}
+		else {
+			//just of debug
+			if (messageBox["data-install"]) {
+				install = parseInt (messageBox["data-install"])+1;
+				messageBox["data-install"] = install;
+				tiddlycut.log ("install:" + install);
+			} else {
+				install = "1";
+				messageBox["data-install"] = install;
+				tiddlycut.log ("install:" + install);
+			}
+			
 		}
 	};
     var docked= false;
@@ -198,8 +212,8 @@
 			  function(request, sender, sendResponse) {
 				if (request.action == 'actiondock') {
 					// first stage send back url
-					tiddlycut.log("actiondock cs");
-					injectMessageBox(document);
+					tiddlycut.log("actiondock in cs");
+					injectMessageBox(document);tiddlycut.log("actiondock out cs");
 					var docked = true;
 					sendResponse({title:document.title, url:window.location.href, config:findTiddlerInPage_ByTitle("TiddlyClipConfig"),opts:findTiddlerInPage_ByTitle(request.data.opttid)});
 				}
@@ -288,9 +302,6 @@
 		}
 		return remoteTidArr;//no error
 	}//end func
-//window.onbeforeunload = function() { if (docked) {alert("I'm going dooooon");}};
-window.addEventListener('DOMContentLoaded', function() {
-		docLoad(document);
-}, false);
+docLoad(document);
 
 }());

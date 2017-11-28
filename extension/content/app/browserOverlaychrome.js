@@ -2,6 +2,24 @@ if (!tiddlycut)
 	var tiddlycut = {};
 if (!tiddlycut.modules)
 	tiddlycut.modules = {};
+	
+chrome.runtime.onInstalled.addListener(function(details){console.log ("oninstall "+details.reason)
+    if(details.reason == "install" ||details.reason == "update"){ 
+  chrome.windows.getAll({'populate': true}, function(windows) {
+    for (var i = 0; i < windows.length; i++) {
+      var tabs = windows[i].tabs;
+      for (var j = 0; j < tabs.length; j++) {console.log ("loadcs "+j);
+        chrome.tabs.executeScript(
+            tabs[j].id,
+            {file: 'content/util/logsimple.js', allFrames: false});
+        chrome.tabs.executeScript(
+            tabs[j].id,
+            {file: 'content/contentScript.js', allFrames: false});
+      }
+    }
+  });
+ }});
+	
 tiddlycut.modules.browserOverlay = (function ()
 {
 	var adaptions = {};
