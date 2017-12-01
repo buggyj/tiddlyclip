@@ -12,7 +12,8 @@ tiddlycut.modules.tcBrowser= (function () {
 	    getSelectedAsHtml:getSelectedAsHtml,createDiv:createDiv,				getSnapImage:getSnapImage,
 	    setDatafromCS:setDatafromCS,		UserInputDialog:UserInputDialog,	setDataFromBrowser:setDataFromBrowser,
 		getlinkURL:getlinkURL,				onLinkLocal:onLinkLocal,			onLinkRemote:onLinkRemote,
-		isTiddlyWikiClassic:isTiddlyWikiClassic, isTiddlyWiki5:isTiddlyWiki5,	getusrstring: getusrstring
+		isTiddlyWikiClassic:isTiddlyWikiClassic, isTiddlyWiki5:isTiddlyWiki5,	getusrstring: getusrstring,
+		getNote:getNote,					setNote:setNote
 	}
 
     var convert,defaults;
@@ -29,7 +30,7 @@ tiddlycut.modules.tcBrowser= (function () {
 		return thechrome; //BJ FIXME not sure if this is correct		
 	}
     //variables to store non-persistance broswer data  - set by call otherwise
-    var onImage=false, onLink=false, image, linkUrl, selectionText, url, html ,title, twc=false, snapImage = "", usrstring;
+    var onImage=false, onLink=false, image, linkUrl, selectionText, url, html ,title, twc=false, snapImage = "", usrstring, note = "";
     
 	function snap(size,sourcetab, callback){ //async in chrome
 
@@ -59,6 +60,10 @@ chrome.tabs.get(sourcetab, function(tab){
 
 	});
 }
+
+
+
+
     function setDataFromBrowser(info, tab) {
 		onImage = (info.mediaType==="image");
 		if (onImage)	imageUrl = info.srcUrl;
@@ -134,6 +139,16 @@ chrome.tabs.get(sourcetab, function(tab){
 	function getusrstring()
 	{
 		return usrstring;
+	}
+
+	function getNote()
+	{
+		return note;
+	}
+
+	function setNote (data){
+		if (data === undefined) note = "undefined";
+		else note = data;
 	}
 
 	function hasCopiedText() {

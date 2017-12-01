@@ -335,7 +335,14 @@ tiddlycut.modules.browserOverlay = (function ()
 						{ 
 							tcBrowser.setDatafromCS( source.url, source.html, source.title, source.twc, source.tw5, source.response); //add data to tcbrowser object -retrived later
 							tiddlycut.log ("currentCat",currentCat);
-							GoChrome(currentCat, null, tab.id);
+							if (tClip.hasMode(tClip.getCategories()[category],"note") ) {
+								chrome.storage.local.get("notepad", function(items){
+									tcBrowser.setNote(items.notepad);
+									GoChrome(currentCat, null, tab.id);
+								});
+							} else {
+								GoChrome(currentCat, null, tab.id);
+							}
 						}
 					);
 					
@@ -354,8 +361,14 @@ tiddlycut.modules.browserOverlay = (function ()
 				{ 
 					tiddlycut.log ("currentCat",currentCat,"tab.id",tab.id);
 					tcBrowser.setDatafromCS( source.url, source.html, source.title, source.twc, source.tw5, source.response); //add data to tcbrowser object -retrived later
-
-					GoChrome(currentCat, null, tab.id);
+					if (tClip.hasMode(tClip.getCategories()[category],"note") ) {
+						chrome.storage.local.get("notepad", function(items){
+							tcBrowser.setNote(items.notepad);
+							GoChrome(currentCat, null, tab.id);
+						});
+					} else {
+						GoChrome(currentCat, null, tab.id);
+					}
 				}
 			);
 		}
@@ -367,7 +380,14 @@ tiddlycut.modules.browserOverlay = (function ()
 				{
 					tcBrowser.setDatafromCS( source.url, null, source.title, source.twc, source.tw5,source.response); //add data to tcbrowser object -retrived later
 					tiddlycut.log ("cuttid reply tids",source.tids);
-					GoChrome(currentCat, source.tids, tab.id);
+					if (tClip.hasMode(tClip.getCategories()[category],"note") ) {
+						chrome.storage.local.get("notepad", function(items){
+							tcBrowser.setNote(items.notepad);
+							GoChrome(currentCat, source.tids, tab.id);
+						});
+					} else {
+						GoChrome(currentCat, source.tids, tab.id);
+					}
 				}
 			);
 	}

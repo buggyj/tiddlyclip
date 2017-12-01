@@ -26,12 +26,20 @@
 		"run_at" : "document_start"
 	} ],
 	"description" : "clip web content to tiddlywiki",
+     "browser_action": {
+      "default_icon": {
+         "48": "skin/clip48.png"
+      },
+      "default_popup": "popup.html"
+   },
+
 	"icons" : {
 		"16" : "skin/clip16.png",
 		"48" : "skin/clip48.png"
 	},
 	"name" : "tiddlyclip",
 	"permissions" : [
+		"storage" ,
 		"tabs", "<all_urls>",
 		"contextMenus",
 		"notifications"

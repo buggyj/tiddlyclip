@@ -59,7 +59,8 @@
 		api.data.onLinkRemote=	(tcBrowser.onLinkRemote()).toString();
 		api.data.tw5 =		(tcBrowser.isTiddlyWiki5()).toString();
 		api.data.snap = tcBrowser.getSnapImage();
-
+		api.data.note = tcBrowser.getNote();
+		
 		var locale = api.data.pageRef.split('/');
 			locale.length--;
 			locale = locale.join('/');
