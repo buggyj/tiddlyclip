@@ -66,6 +66,37 @@
 		}
 	}
 
+
+//--------------------------------------hlight-------------------------------------------
+var hlight = function() {
+	tiddlycut.log("hlight recieved");
+	//var rcvd = messageEvent.json.data;
+	try {
+		var range, sel = getSelection();
+		if (sel.getRangeAt) {
+			range = sel.getRangeAt(0);
+		}
+		document.designMode = "on";
+		//restore selection of text
+		if (range) {
+			sel.removeAllRanges();
+			sel.addRange(range);
+		} 
+		//content.setTimeout('document.designMode = "on"',1000);
+		//here I should also add my own class and then use this in the application ".tchighlight"
+		document.execCommand("backcolor", false, "#ffd700");
+		document.execCommand("styleWithCSS",false,"false");
+		document.execCommand("forecolor",false,"#fe0d0c");
+
+		document.designMode = 'Off'; 
+		return;
+
+	} catch (e) {
+		tiddlycut.log('callback error:', e);
+		return;
+	}
+}
+
 	function findTiddlerInPage_ByTitle(title) {
 		var winWrapper = document;
 		var i,tid,nodes = winWrapper.getElementById("storeArea").getElementsByTagName('div');
@@ -241,6 +272,15 @@
 
 					sendResponse({ url:window.location.href, tids:cutTids(), title:document.title, 
 						twc:isTiddlyWikiClassic()||false, tw5:isTiddlyWiki5(),response: (request.prompt?UserInputDialog(request.prompt):null)});
+				}
+		});
+	   chrome.runtime.onMessage.addListener(
+			  function(request, sender, sendResponse) {
+				if (request.action == 'highlight') {
+					// first stage send back url
+					tiddlycut.log("highlight  content cs");
+					hlight();
+					sendResponse({ });
 				}
 		});
 		//callback for paste

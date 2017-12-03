@@ -311,6 +311,22 @@ tiddlycut.modules.browserOverlay = (function ()
 		} else promptindex = null;
 		var currentCat=category; //remember here for returning callback to pick it up
 		tiddlycut.log("inpusdata id",tab.id);
+		
+		//-----highlight control------
+		if (tClip.hasModeBegining(tClip.getCategories()[category],"highlight") ) {
+			
+			chrome.tabs.sendMessage(tab.id,
+				{
+					action : 'highlight'
+				}, 
+				function (source){});
+	
+
+			tiddlycut.log("sent hlight request");
+
+			return;
+		}
+		
 		if (!tClip.hasMode(tClip.getCategories()[category],"tiddlers") ) {
 			if (tClip.hasModeBegining(	tClip.getCategories()[category],"snap") )  { 
 				//if any text is selected temporarly remove this while making the snap
