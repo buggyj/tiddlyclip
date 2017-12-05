@@ -32,7 +32,7 @@ tiddlycut.modules.tcBrowser= (function () {
     //variables to store non-persistance broswer data  - set by call otherwise
     var onImage=false, onLink=false, image, linkUrl, selectionText, url, html ,title, twc=false, snapImage = "", usrstring, note = "";
     
-	function snap(size,sourcetab, callback){ //async in chrome
+	function snap(size,sourcetab, callback,xx0,yy0,wdt,ht){ //async in chrome
 
 		var thumbnail = window.document.createElementNS("http://www.w3.org/1999/xhtml", "canvas");
 		var ctx = thumbnail.getContext("2d");
@@ -40,7 +40,9 @@ tiddlycut.modules.tcBrowser= (function () {
 
 //-------------------------------------			
 chrome.tabs.get(sourcetab, function(tab){
-	var h = tab.height, w = tab.width;
+	chrome.tabs.getZoom( function (zoomed){
+	var h = ht*zoomed||tab.height, w = wdt*zoomed||tab.width, x0 = xx0*zoomed||0, y0 = yy0*zoomed||0;
+		
 	thumbnail.width = w * size;
 	thumbnail.height = h * size;
 	ctx.scale(size, size);
@@ -48,14 +50,15 @@ chrome.tabs.get(sourcetab, function(tab){
                 if (dataURI) {
                     var image = new Image();
                     image.onload = function() {
-                        ctx.drawImage(image,0, 0, w, h);
+                        ctx.drawImage(image,x0,y0,w,h,0, 0, w, h);
                         //Create a data url from the canvas
                         var data = thumbnail.toDataURL("image/png");
                         callback(data.substring(data.indexOf(',') + 1));
                     };
                     image.src = dataURI;
                 }
-            });		
+            });	
+       })     	
 //-----------------------------	
 
 	});

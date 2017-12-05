@@ -19,7 +19,9 @@ chrome.runtime.onInstalled.addListener(function(details){console.log ("oninstall
     }
   });
  }});
-	
+
+
+
 tiddlycut.modules.browserOverlay = (function ()
 {
 	var adaptions = {};
@@ -79,7 +81,25 @@ tiddlycut.modules.browserOverlay = (function ()
 		}
 
 	}
-
+	chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
+		console.log("tiddlyclipbg: got request: "+msg.action);
+		if (msg.action == "xhairsOn" || msg.action == "xhairsCancel") {
+			chrome.tabs.query({
+				active: true,
+				currentWindow: true
+				}, function(tabs) {
+					var tab = tabs[0];
+					chrome.tabs.sendMessage(tab.id,
+					{
+						action : msg.action
+					}, 
+					function (source){});
+					tiddlycut.log("sent xhairs request");
+				}
+			);
+			return;
+		}
+	});
 	chrome.tabs.onUpdated.addListener(tabchange);
 	chrome.tabs.onRemoved.addListener(tabchange);
 	function tabchange(tabId) {
@@ -300,6 +320,9 @@ tiddlycut.modules.browserOverlay = (function ()
 		}
 		return NaN;
 	}
+	
+
+	
 	function pushData(category, info, tab) //chrome only
 	{
 		var promptindex;
@@ -326,6 +349,21 @@ tiddlycut.modules.browserOverlay = (function ()
 
 			return;
 		}
+
+		//-----xhairs------
+		if (tClip.hasMode(tClip.getCategories()[category],"xhairs") ) {
+			
+			chrome.tabs.sendMessage(tab.id,
+				{
+					action : 'xhairs'
+				}, 
+				function (source){});
+	
+
+			tiddlycut.log("sent xhairs request");
+
+			return;
+		}
 		
 		if (!tClip.hasMode(tClip.getCategories()[category],"tiddlers") ) {
 			if (tClip.hasModeBegining(	tClip.getCategories()[category],"snap") )  { 
@@ -342,27 +380,31 @@ tiddlycut.modules.browserOverlay = (function ()
 				//------make the snap--------
 				var size=makepercent(tClip.getModeBegining(tClip.getCategories()[category],"snap").split("snap")[1]);
 				if (isNaN(size)) size =1;
-				tcBrowser.snap(size,tab.id, function (dataURL) { 
-					tcBrowser.setSnapImage(dataURL);
+				
 					chrome.tabs.sendMessage(tab.id,
 						{
 							action : 'cut', prompt:(promptindex?pref.Get(promptindex):null)
 						}, function (source)
 						{ 
-							tcBrowser.setDatafromCS( source.url, source.html, source.title, source.twc, source.tw5, source.response); //add data to tcbrowser object -retrived later
+							tcBrowser.setDatafromCS( source.url, source.html, source.title, source.twc, source.tw5, source.response, source.coords); //add data to tcbrowser object -retrived later
 							tiddlycut.log ("currentCat",currentCat);
-							if (tClip.hasMode(tClip.getCategories()[category],"note") ) {
-								chrome.storage.local.get("notepad", function(items){
-									tcBrowser.setNote(items.notepad);
+							var coords  = source.coords||{x0:null,y0:null,wdt:null,ht:null};
+							tcBrowser.snap(size,tab.id, function (dataURL) { 
+								tcBrowser.setSnapImage(dataURL);
+								if (tClip.hasMode(tClip.getCategories()[category],"note") ) {
+									chrome.storage.local.get("notepad", function(items){
+										tcBrowser.setNote(items.notepad);
+										GoChrome(currentCat, null, tab.id);
+									});
+								} else {
 									GoChrome(currentCat, null, tab.id);
-								});
-							} else {
-								GoChrome(currentCat, null, tab.id);
 							}
+							},coords.x0,coords.y0,coords.wdt,coords.ht);
+							
 						}
 					);
 					
-				});
+				
 				//re-apply selected text (if any)
 				/*if (range) {
 					sel.addRange(range);

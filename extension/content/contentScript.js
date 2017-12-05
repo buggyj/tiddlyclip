@@ -97,6 +97,147 @@ var hlight = function() {
 	}
 }
 
+
+//------------------------------------xhairs----------------------------------------------
+var xhairs = (function() {
+function setcss (el, styles) {
+var i, style=el.getAttribute("style")||"";	
+	
+	for (i in styles) style +=i+":"+styles[i]+";";
+	el.setAttribute("style", style);
+}
+
+var xoff= true, movex = 0, movey = 0, startx, starty, startWidth, startHeight, width, height;
+
+
+function curser(el) {
+    var cH = el.querySelector('#crosshair-h'),
+        cV = el.querySelector('#crosshair-v'),
+        cHstyle,cVstyle;
+ 
+
+  el.onmousemove = function(e){
+  cHstyle = cH.style;
+  cVstyle = cV.style;
+  cHstyle.top = e.clientY+"px";
+  cVstyle.left = e.clientX+"px";
+  movex = e.clientX;
+  movey = e.clientY
+  
+}  
+
+el.addEventListener('mousedown', init);
+  function init(e){
+  if (e.which != "1") return;
+  el.removeEventListener('mousedown', init, false);
+  console.log (e.clientY+":"+e.clientX);
+  starty = e.clientY;
+  startx = e.clientX;
+  var boxcss = { width: "10px", height: "10px", "box-shadow":"0 0 5px rgb(100,100,100)", position:"absolute", left: startx+"px", top: starty+"px", cursor: "se-resize"}
+  	setcss(box, boxcss); 
+    //el.appendChild(outer);
+    //var resizable = { background: "cyan", position: "absolute" ,width: "10px", height: "10px",right: -(e.clientX)+"px", bottom: -(e.clientY)+"px"}
+    //setcss(outer, resizable); 
+    if (!box.parent) el.appendChild(box);
+    initDrag(e);
+};
+
+
+
+function initDrag(e) {
+   startx = e.clientX;
+   starty = e.clientY;
+   startWidth = 1;//parseInt(document.defaultView.getComputedStyle(p).width, 10);
+   startHeight = 1;//parseInt(document.defaultView.getComputedStyle(p).height, 10);
+   document.documentElement.addEventListener('mousemove', doDrag, false);
+   document.documentElement.addEventListener('mouseup', stopDrag, false);
+}
+function doDrag(e) {
+   width = startWidth + e.clientX - startx;
+   height = startHeight + e.clientY - starty;
+   box.style.width = width + 'px';
+   box.style.height = height + 'px';
+}
+
+function stopDrag(e) {
+    document.documentElement.removeEventListener('mousemove', doDrag, false);    document.documentElement.removeEventListener('mouseup', stopDrag, false);
+    //el.addEventListener('mousedown', init);
+    xhairsOff();
+}
+}
+
+
+var styles = {
+	  height: "100%",
+	  width: "100%",
+	  top: "0",
+	  left: "0",
+	  position: "fixed",
+	  background: "rgba(99, 99, 99, 0.07)",
+	  "z-index": "16777271",
+	  margin: "0"
+	};
+	
+var xhairh = {
+    width:"100%",
+    height:"2px",
+    "margin-top":"-1px"
+}
+
+var xhairv = {
+    height:"100%",
+    width:"2px",
+    "margin-left":"-1px"
+}
+
+var xhair = {    
+    position:"fixed",
+    "background-color":"rgba(100,100,100,0.5)",
+    "box-shadow":"0 0 5px rgb(100,100,100)",
+    "pointer-events":"none"
+}
+var div = document.createElement('div'),diva = document.createElement('div'),
+	divb = document.createElement('div'),box = document.createElement('div');
+var On = function () {
+	setcss(div, styles);
+	div.id ="basexhair";
+	setcss(diva, xhair);
+	setcss(diva, xhairh);  
+	diva.id ="crosshair-h";
+	div.appendChild(diva);
+	setcss(divb, xhair);
+	setcss(divb, xhairv);
+	divb.id ="crosshair-v";
+	div.appendChild(divb); 
+    document.body.appendChild(div);       
+    curser(div);   
+    xoff = false;
+}
+var Remove = function () {
+	//if (xoff) return;
+	xoff = true;
+	xhairsOff();
+	div.removeChild( box );
+	div.parentNode.removeChild( div );
+}
+
+var xhairsOff = function () {
+	if (diva.parentNode) div.removeChild( diva );
+	if (divb.parentNode) div.removeChild( divb );
+}
+
+var Coords = function() {
+	if (xoff) return null;
+	else {
+		xoff = true;
+		Remove();
+		return {x0:startx, y0:starty, wdt:width, ht:height};
+	}
+}
+
+return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove};  
+})();                
+/////////////////////////// get tiddler ///////////////////////////////                
 	function findTiddlerInPage_ByTitle(title) {
 		var winWrapper = document;
 		var i,tid,nodes = winWrapper.getElementById("storeArea").getElementsByTagName('div');
@@ -261,7 +402,8 @@ var hlight = function() {
 					tiddlycut.log("cut  content cs");
 					remoteTidArr  = [''];
 					sendResponse({ url:window.location.href, html:getSelectedAsHtml(window.location.href), 
-						title:document.title, twc:isTiddlyWikiClassic()||false, tw5:isTiddlyWiki5(), response: (request.prompt?UserInputDialog(request.prompt):null)});
+						title:document.title, twc:isTiddlyWikiClassic()||false, tw5:isTiddlyWiki5(), response: (request.prompt?UserInputDialog(request.prompt):null),
+						coords:xhairs.Coords()});
 				}
 		});
 	   chrome.runtime.onMessage.addListener(
@@ -280,6 +422,20 @@ var hlight = function() {
 					// first stage send back url
 					tiddlycut.log("highlight  content cs");
 					hlight();
+					sendResponse({ });
+				}
+		});
+	   chrome.runtime.onMessage.addListener(
+			  function(request, sender, sendResponse) {
+				tiddlycut.log("cs:action="+request.action);
+				if (request.action == 'xhairsOn') {
+					xhairs.On();
+					sendResponse({ });
+				} else if(request.action == 'xhairsOff') {
+					xhairs.xhairsOff();
+					sendResponse({ });
+				} else if(request.action == 'xhairsCancel') {
+					xhairs.Remove();
 					sendResponse({ });
 				}
 		});

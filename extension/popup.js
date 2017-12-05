@@ -4,7 +4,12 @@ document.addEventListener('DOMContentLoaded', function () {
     textarea.value="";
 	chrome.storage.local.set({'notepad': ""}, function() {});
   });
-
+document.querySelector('#xhairson').addEventListener('click', function() {
+    chrome.runtime.sendMessage({action:"xhairsOn"});close();
+  });
+  document.querySelector('#xhairsoff').addEventListener('click', function() {
+    chrome.runtime.sendMessage({action:"xhairsCancel"});close();
+  });
 main();
 
 
