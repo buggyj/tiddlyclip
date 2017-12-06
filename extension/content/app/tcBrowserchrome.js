@@ -36,36 +36,31 @@ tiddlycut.modules.tcBrowser= (function () {
 
 		var thumbnail = window.document.createElementNS("http://www.w3.org/1999/xhtml", "canvas");
 		var ctx = thumbnail.getContext("2d");
-//-------------------------------------
-
-//-------------------------------------			
-chrome.tabs.get(sourcetab, function(tab){
-	chrome.tabs.getZoom( function (zoomed){
-	var h = ht*zoomed||tab.height, w = wdt*zoomed||tab.width, x0 = xx0*zoomed||0, y0 = yy0*zoomed||0;
 		
-	thumbnail.width = w * size;
-	thumbnail.height = h * size;
-	ctx.scale(size, size);
-          chrome.tabs.captureVisibleTab(null, {format: 'png', quality: 100}, function(dataURI) {
-                if (dataURI) {
-                    var image = new Image();
-                    image.onload = function() {
-                        ctx.drawImage(image,x0,y0,w,h,0, 0, w, h);
-                        //Create a data url from the canvas
-                        var data = thumbnail.toDataURL("image/png");
-                        callback(data.substring(data.indexOf(',') + 1));
-                    };
-                    image.src = dataURI;
-                }
-            });	
-       })     	
-//-----------------------------	
+		chrome.tabs.get(sourcetab, function(tab){
+			chrome.tabs.getZoom( function (zoomed){
+			var h = ht*zoomed||tab.height, w = wdt*zoomed||tab.width, x0 = xx0*zoomed||0, y0 = yy0*zoomed||0;
+				
+			thumbnail.width = w * size;
+			thumbnail.height = h * size;
+			ctx.scale(size, size);
+				  chrome.tabs.captureVisibleTab(null, {format: 'png', quality: 100}, function(dataURI) {
+						if (dataURI) {
+							var image = new Image();
+							image.onload = function() {
+								ctx.drawImage(image,x0,y0,w,h,0, 0, w, h);
+								//Create a data url from the canvas
+								var data = thumbnail.toDataURL("image/png");
+								callback(data.substring(data.indexOf(',') + 1));
+							};
+							image.src = dataURI;
+						}
+					});	
+			   })     	
+		//-----------------------------	
 
-	});
+		});
 }
-
-
-
 
     function setDataFromBrowser(info, tab) {
 		onImage = (info.mediaType==="image");

@@ -431,9 +431,6 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove};
 				if (request.action == 'xhairsOn') {
 					xhairs.On();
 					sendResponse({ });
-				} else if(request.action == 'xhairsOff') {
-					xhairs.xhairsOff();
-					sendResponse({ });
 				} else if(request.action == 'xhairsCancel') {
 					xhairs.Remove();
 					sendResponse({ });

@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
 document.querySelector('#xhairson').addEventListener('click', function() {
     chrome.runtime.sendMessage({action:"xhairsOn"});close();
   });
-  document.querySelector('#xhairsoff').addEventListener('click', function() {
+  document.querySelector('#xhairscancel').addEventListener('click', function() {
     chrome.runtime.sendMessage({action:"xhairsCancel"});close();
   });
 main();
