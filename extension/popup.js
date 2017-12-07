@@ -4,12 +4,25 @@ document.addEventListener('DOMContentLoaded', function () {
     textarea.value="";
 	chrome.storage.local.set({'notepad': ""}, function() {});
   });
-document.querySelector('#xhairson').addEventListener('click', function() {
+   document.querySelector('#xhairson').addEventListener('click', function() {
     chrome.runtime.sendMessage({action:"xhairsOn"});close();
   });
   document.querySelector('#xhairscancel').addEventListener('click', function() {
     chrome.runtime.sendMessage({action:"xhairsCancel"});close();
   });
+  document.querySelector('#red').addEventListener('click', function() {
+    chrome.runtime.sendMessage({action:"red"});close();
+  });
+   document.querySelector('#blue').addEventListener('click', function() {
+    chrome.runtime.sendMessage({action:"lightblue"});close();
+  });
+   document.querySelector('#green').addEventListener('click', function() {
+    chrome.runtime.sendMessage({action:"lightgreen"});close();
+  });
+   document.querySelector('#yellow').addEventListener('click', function() {
+    chrome.runtime.sendMessage({action:"yellow"});close();
+  });
+  
 main();
 
 

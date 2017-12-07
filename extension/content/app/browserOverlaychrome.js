@@ -83,18 +83,19 @@ tiddlycut.modules.browserOverlay = (function ()
 	}
 	chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
 		console.log("tiddlyclipbg: got request: "+msg.action);
-		if (msg.action == "xhairsOn" || msg.action == "xhairsCancel") {
+		if (true) {
 			chrome.tabs.query({
 				active: true,
 				currentWindow: true
 				}, function(tabs) {
+					tiddlycut.log("going to send "+msg.action+"  request");
 					var tab = tabs[0];
 					chrome.tabs.sendMessage(tab.id,
 					{
 						action : msg.action
 					}, 
 					function (source){});
-					tiddlycut.log("sent xhairs request");
+					tiddlycut.log("sent "+msg.action+" request");
 				}
 			);
 			return;

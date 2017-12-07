@@ -68,9 +68,12 @@
 
 
 //--------------------------------------hlight-------------------------------------------
-var hlight = function() {
+var hlight = function(color) {
+	var backcolor;
 	tiddlycut.log("hlight recieved");
 	//var rcvd = messageEvent.json.data;
+	if (!color) {backcolor = "#ffd700"}
+	else backcolor = color;
 	try {
 		var range, sel = getSelection();
 		if (sel.getRangeAt) {
@@ -83,10 +86,9 @@ var hlight = function() {
 			sel.addRange(range);
 		} 
 		//content.setTimeout('document.designMode = "on"',1000);
-		//here I should also add my own class and then use this in the application ".tchighlight"
-		document.execCommand("backcolor", false, "#ffd700");
+		
+		document.execCommand("backcolor", false, backcolor);
 		document.execCommand("styleWithCSS",false,"false");
-		document.execCommand("forecolor",false,"#fe0d0c");
 
 		document.designMode = 'Off'; 
 		return;
@@ -421,7 +423,17 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove};
 				if (request.action == 'highlight') {
 					// first stage send back url
 					tiddlycut.log("highlight  content cs");
-					hlight();
+					hlight(null);
+					sendResponse({ });
+				}
+		});
+	   chrome.runtime.onMessage.addListener(
+			  function(request, sender, sendResponse) {
+				if (request.action == 'red'||request.action == 'lightblue'||
+					request.action == 'lightgreen'||request.action == 'yellow') {
+					// first stage send back url
+					tiddlycut.log("highlight  content cs");
+					hlight(request.action);
 					sendResponse({ });
 				}
 		});
@@ -434,7 +446,7 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove};
 				} else if(request.action == 'xhairsCancel') {
 					xhairs.Remove();
 					sendResponse({ });
-				}
+				} 
 		});
 		//callback for paste
 	   chrome.runtime.onMessage.addListener(
