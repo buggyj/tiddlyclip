@@ -1,9 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-  document.querySelector('#clear').addEventListener('click', function() {
-    var textarea = document.getElementById("inputarea");
-    textarea.value="";
-	chrome.storage.local.set({'notepad': ""}, function() {});
-  });
+
    document.querySelector('#xhairson').addEventListener('click', function() {
     chrome.runtime.sendMessage({action:"xhairsOn"});close();
   });
