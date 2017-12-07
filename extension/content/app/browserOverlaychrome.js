@@ -396,6 +396,7 @@ tiddlycut.modules.browserOverlay = (function ()
 									chrome.storage.local.get("notepad", function(items){
 										tcBrowser.setNote(items.notepad);
 										GoChrome(currentCat, null, tab.id);
+										chrome.storage.local.set({'notepad': ""}, function() {console.log("bg: rm note")});
 									});
 								} else {
 									GoChrome(currentCat, null, tab.id);
@@ -424,6 +425,7 @@ tiddlycut.modules.browserOverlay = (function ()
 						chrome.storage.local.get("notepad", function(items){
 							tcBrowser.setNote(items.notepad);
 							GoChrome(currentCat, null, tab.id);
+							chrome.storage.local.set({'notepad': ""}, function() {console.log("bg: rm note")});							
 						});
 					} else {
 						GoChrome(currentCat, null, tab.id);
@@ -443,6 +445,7 @@ tiddlycut.modules.browserOverlay = (function ()
 						chrome.storage.local.get("notepad", function(items){
 							tcBrowser.setNote(items.notepad);
 							GoChrome(currentCat, source.tids, tab.id);
+							chrome.storage.local.set({'notepad': ""}, function() {console.log("bg: rm note")});
 						});
 					} else {
 						GoChrome(currentCat, source.tids, tab.id);
