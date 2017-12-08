@@ -13,7 +13,8 @@ tiddlycut.modules.tcBrowser= (function () {
 	    setDatafromCS:setDatafromCS,		UserInputDialog:UserInputDialog,	setDataFromBrowser:setDataFromBrowser,
 		getlinkURL:getlinkURL,				onLinkLocal:onLinkLocal,			onLinkRemote:onLinkRemote,
 		isTiddlyWikiClassic:isTiddlyWikiClassic, isTiddlyWiki5:isTiddlyWiki5,	getusrstring: getusrstring,
-		getNote:getNote,					setNote:setNote
+		getNote:getNote,					setNote:setNote,					getExtraTags:getExtraTags,
+		setExtraTags:setExtraTags
 	}
 
     var convert,defaults;
@@ -30,7 +31,8 @@ tiddlycut.modules.tcBrowser= (function () {
 		return thechrome; //BJ FIXME not sure if this is correct		
 	}
     //variables to store non-persistance broswer data  - set by call otherwise
-    var onImage=false, onLink=false, image, linkUrl, selectionText, url, html ,title, twc=false, snapImage = "", usrstring, note = "";
+    var onImage=false, onLink=false, image, linkUrl, selectionText, url, html ,title, 
+		twc=false, snapImage = "", usrstring, note = "",extraTags = "";
     
 	function snap(size,sourcetab, callback,xx0,yy0,wdt,ht){ //async in chrome
 
@@ -147,6 +149,24 @@ tiddlycut.modules.tcBrowser= (function () {
 	function setNote (data){
 		if (data === undefined) note = "undefined";
 		else note = data;
+	}
+
+	function getExtraTags()
+	{
+		return extraTags;
+	}
+
+	function setExtraTags(tags)
+	{
+		var first = true,space =/ /;
+		extraTags = "";
+		for (var ii in tags) if (tags[ii]) {
+			if (!first) extraTags += ' ';
+			else first = false;
+			//if (space.test(ii)) extraTags += '[['+ii+']]';
+			//else 
+			extraTags += ii;
+		}
 	}
 
 	function hasCopiedText() {

@@ -196,18 +196,29 @@ tiddlycut.modules.browserOverlay = (function ()
 			if (pref.Get("menuShowTitle") == "true") { 
 				fileLoc =  wikititle[m];
 			} else {
-				fileLoc  = wikifile[+m];
+				fileLoc  = wikifile[m];
 				tiddlycut.log('wikifile'+m,fileLoc);
 				if (fileLoc.substr(fileLoc.length-1) =='/') fileLoc = fileLoc.substr(0,fileLoc.length-1);
 				var startPos = fileLoc.lastIndexOf("/")+1;
 				if ((fileLoc.length - startPos)> 4) fileLoc =fileLoc.substr(startPos);
 		    }
+
              //fileLoc= fileLoc.replace(/([\s\S]*\/)/," "); //strip dir
              //if (fileLoc ==='') fileLoc  = pref.Get("wikifile"+m);
             //fileLoc= fileLoc.replace(/([\s\S]*\/)/," "); //strip dir
 			// Set the new menu item's label
-			if (m == filechoiceclip)
+			if (m == filechoiceclip) {
 				title=" "+m+"*"+fileLoc; //so we can see which section we are currently using
+				var tags = null, taglist = {};
+				tags=pref.Get("tags");
+				if (tags) {
+					tags = tags.split(/\s*,\s*/);
+					for (var nn = 0; nn < tags.length; nn++) {
+						taglist[tags[nn]] = false;
+					}				
+				}
+				chrome.storage.local.set({'tags': taglist}, function() {console.log("bg: set from taglist")});
+			}
 			else
 				title=" "+m+" "+fileLoc;
 			//tiddlycut.log("filename is", pref.Get("wikifile"+m));
@@ -392,15 +403,18 @@ tiddlycut.modules.browserOverlay = (function ()
 							var coords  = source.coords||{x0:null,y0:null,wdt:null,ht:null};
 							tcBrowser.snap(size,tab.id, function (dataURL) { 
 								tcBrowser.setSnapImage(dataURL);
-								if (tClip.hasMode(tClip.getCategories()[category],"note") ) {
-									chrome.storage.local.get("notepad", function(items){
-										tcBrowser.setNote(items.notepad);
+								chrome.storage.local.get({tags:{}}, function(items){
+									tcBrowser.setExtraTags(items.tags);
+									if (tClip.hasMode(tClip.getCategories()[category],"note") ) {
+										chrome.storage.local.get("notepad", function(items){
+											tcBrowser.setNote(items.notepad);
+											GoChrome(currentCat, null, tab.id);
+											chrome.storage.local.set({'notepad': ""}, function() {console.log("bg: rm note")});
+										});
+									} else {
 										GoChrome(currentCat, null, tab.id);
-										chrome.storage.local.set({'notepad': ""}, function() {console.log("bg: rm note")});
-									});
-								} else {
-									GoChrome(currentCat, null, tab.id);
-							}
+									}
+								})
 							},coords.x0,coords.y0,coords.wdt,coords.ht);
 							
 						}
@@ -421,15 +435,18 @@ tiddlycut.modules.browserOverlay = (function ()
 				{ 
 					tiddlycut.log ("currentCat",currentCat,"tab.id",tab.id);
 					tcBrowser.setDatafromCS( source.url, source.html, source.title, source.twc, source.tw5, source.response); //add data to tcbrowser object -retrived later
-					if (tClip.hasMode(tClip.getCategories()[category],"note") ) {
-						chrome.storage.local.get("notepad", function(items){
-							tcBrowser.setNote(items.notepad);
+					chrome.storage.local.get({tags:{}}, function(items){
+						tcBrowser.setExtraTags(items.tags);
+						if (tClip.hasMode(tClip.getCategories()[category],"note") ) {
+							chrome.storage.local.get("notepad", function(items){
+								tcBrowser.setNote(items.notepad);
+								GoChrome(currentCat, null, tab.id);
+								chrome.storage.local.set({'notepad': ""}, function() {console.log("bg: rm note")});							
+							});
+						} else {
 							GoChrome(currentCat, null, tab.id);
-							chrome.storage.local.set({'notepad': ""}, function() {console.log("bg: rm note")});							
-						});
-					} else {
-						GoChrome(currentCat, null, tab.id);
-					}
+						}
+					})
 				}
 			);
 		}

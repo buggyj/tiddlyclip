@@ -33,11 +33,10 @@ tiddlycut.modules.pref = (function ()
 		
 		loadOpts = function(ClipOpts) {
 			//load additional prefs from targetTW
+			
 			var pieces =ClipOpts;
+			initPrefs();
 			if (!pieces) {
-			var defs = defaults.getTWPrefs();
-			for (var i in defs) 
-				Map[i] = defs[i];
 			return;
 			}
 

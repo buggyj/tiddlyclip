@@ -18,8 +18,20 @@ document.addEventListener('DOMContentLoaded', function () {
    document.querySelector('#yellow').addEventListener('click', function() {
     chrome.runtime.sendMessage({action:"yellow"});close();
   });
-  
+    
 main();
+
+function clicked (tag){
+	chrome.storage.local.get({tags:{}}, function(items){
+		//alert("is "+tag);
+		//alert(document.querySelector("#tags"+tag).checked);
+		items.tags[tag] = document.querySelector("#tags"+tag).checked;
+		
+		chrome.storage.local.set({
+			tags:items.tags
+		  });
+	});
+}
 
 
 function keypressed(){
@@ -29,10 +41,31 @@ function keypressed(){
 }
 function main(){
 	var textarea = document.getElementById("inputarea");
-	chrome.storage.local.get("notepad", function(items){
-	var text = items.notepad;
+	chrome.storage.local.get({notepad:"", tags:{}}, function(items){
+		var text = items.notepad, i, html = "", closehtml = "", aretags=false;
 		if(text != undefined){textarea.value=text;}
 		else {textarea.value="";}
+		
+		html = '<table><tr>';
+		closehtml = '</tr></table>';
+		
+		for (i in items.tags) {
+			aretags = true;
+			html += '<td>'+i+'<input type="checkbox" id="tags'+i+'" ></td>';
+		}	
+		if (aretags) {
+			html += closehtml;//alert(html)
+			if (html !=="") {
+				document.querySelector('#fortags').innerHTML = html;
+			} 
+
+			for (i in items.tags) {
+				document.querySelector('#tags'+i).checked = items.tags[i];
+				(function (j) {
+					document.querySelector('#tags'+i).onchange = function(e){clicked(j);}
+				})(i);
+			}
+		}
 	});
 	textarea.onkeyup = function(){keypressed();}
 	
