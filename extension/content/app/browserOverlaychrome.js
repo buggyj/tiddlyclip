@@ -79,8 +79,11 @@ tiddlycut.modules.browserOverlay = (function ()
 
 			api.adaptions[method]();
 		}
-
+		
+    chrome.storage.local.set({'tags': {}}, function() {console.log("bg: reset taglist")});
 	}
+	
+	
 	chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
 		console.log("tiddlyclipbg: got request: "+msg.action);
 		if (true) {
@@ -124,6 +127,8 @@ tiddlycut.modules.browserOverlay = (function ()
 				ClipOpts[tab] = ClipOpts[tab+1];
 			}
 			tabtot = tot-1;
+			
+			if (tabtot === 0) chrome.storage.local.set({'tags': {}}, function() {console.log("bg: reset taglist")});
 			
 			if (i == filechoiceclip) filechoiceclip = 0;
 			else if (i <filechoiceclip) filechoiceclip--;

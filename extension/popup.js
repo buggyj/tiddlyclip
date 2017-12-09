@@ -42,16 +42,19 @@ function keypressed(){
 function main(){
 	var textarea = document.getElementById("inputarea");
 	chrome.storage.local.get({notepad:"", tags:{}}, function(items){
-		var text = items.notepad, i, html = "", closehtml = "", aretags=false;
+		var text = items.notepad, i,j=0, html = "", closehtml = "", aretags=false;
 		if(text != undefined){textarea.value=text;}
 		else {textarea.value="";}
 		
-		html = '<table><tr>';
+		html = '<table><tr><td>Extra tags: </td>';
 		closehtml = '</tr></table>';
 		
 		for (i in items.tags) {
 			aretags = true;
-			html += '<td>'+i+'<input type="checkbox" id="tags'+i+'" ></td>';
+			j++;
+			if (j === 5) html += '<tr></tr>';
+			if (j === 11) html += '<tr></tr>';
+			html += '<td align="right">'+i+'<input type="checkbox" id="tags'+i+'" ></td>';
 		}	
 		if (aretags) {
 			html += closehtml;//alert(html)
