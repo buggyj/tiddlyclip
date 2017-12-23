@@ -101,6 +101,7 @@ var hlight = function(color) {
 
 
 //------------------------------------xhairs----------------------------------------------
+var range, sel;
 var xhairs = (function() {
 function setcss (el, styles) {
 var i, style=el.getAttribute("style")||"";	
@@ -128,8 +129,21 @@ function curser(el) {
   
 }  
 
+sel = getSelection();
+				try{
+					if (sel.getRangeAt) {
+						range = sel.getRangeAt(0);
+					}
+					if (range) {				
+						sel.removeAllRanges();
+					} 
+				} catch(e) {range=null;} 
 el.addEventListener('mousedown', init);
   function init(e){
+	  			//if any text is selected temporarly remove this while making the snap
+				
+				
+				//------make the snap--------
   if (e.which != "1") return;
   el.removeEventListener('mousedown', init, false);
   console.log (e.clientY+":"+e.clientX);
@@ -165,6 +179,7 @@ function stopDrag(e) {
     document.documentElement.removeEventListener('mousemove', doDrag, false);    document.documentElement.removeEventListener('mouseup', stopDrag, false);
     //el.addEventListener('mousedown', init);
     xhairsOff();
+
 }
 }
 
@@ -219,13 +234,21 @@ var Remove = function () {
 	//if (xoff) return;
 	xoff = true;
 	xhairsOff();
-	div.removeChild( box );
-	div.parentNode.removeChild( div );
+	if (box.parentNode) div.removeChild( box );
+	if (div.parentNode) div.parentNode.removeChild( div );    				//re-apply selected text (if any)
+
 }
 
 var xhairsOff = function () {
 	if (diva.parentNode) div.removeChild( diva );
 	if (divb.parentNode) div.removeChild( divb );
+}
+
+var restorescreen = function () {
+				if (range) {				
+					sel.removeAllRanges();
+					sel.addRange(range);
+				} 
 }
 
 var Coords = function() {
@@ -237,7 +260,7 @@ var Coords = function() {
 	}
 }
 
-return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove};  
+return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:restorescreen};  
 })();                
 /////////////////////////// get tiddler ///////////////////////////////                
 	function findTiddlerInPage_ByTitle(title) {
@@ -420,6 +443,15 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove};
 		});
 	   chrome.runtime.onMessage.addListener(
 			  function(request, sender, sendResponse) {
+				if (request.action == 'restorescreen') {
+					// first stage send back url
+					tiddlycut.log("restorescreen  content cs");
+					xhairs.restorescreen();
+					sendResponse({ });
+				}
+		});
+	   chrome.runtime.onMessage.addListener(
+			  function(request, sender, sendResponse) {
 				if (request.action == 'highlight') {
 					// first stage send back url
 					tiddlycut.log("highlight  content cs");
@@ -445,6 +477,7 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove};
 					sendResponse({ });
 				} else if(request.action == 'xhairsCancel') {
 					xhairs.Remove();
+					xhairs.restorescreen();
 					sendResponse({ });
 				} 
 		});

@@ -407,19 +407,25 @@ tiddlycut.modules.browserOverlay = (function ()
 							tiddlycut.log ("currentCat",currentCat);
 							var coords  = source.coords||{x0:null,y0:null,wdt:null,ht:null};
 							tcBrowser.snap(size,tab.id, function (dataURL) { 
-								tcBrowser.setSnapImage(dataURL);
-								chrome.storage.local.get({tags:{}}, function(items){
-									tcBrowser.setExtraTags(items.tags);
-									if (tClip.hasMode(tClip.getCategories()[category],"note") ) {
-										chrome.storage.local.get("notepad", function(items){
-											tcBrowser.setNote(items.notepad);
-											GoChrome(currentCat, null, tab.id);
-											chrome.storage.local.set({'notepad': ""}, function() {console.log("bg: rm note")});
-										});
-									} else {
-										GoChrome(currentCat, null, tab.id);
-									}
-								})
+								chrome.tabs.sendMessage(tab.id,
+								{
+									action : 'restorescreen'
+								}, function (source)
+								{ 
+										tcBrowser.setSnapImage(dataURL);
+										chrome.storage.local.get({tags:{}}, function(items){
+											tcBrowser.setExtraTags(items.tags);
+											if (tClip.hasMode(tClip.getCategories()[category],"note") ) {
+												chrome.storage.local.get("notepad", function(items){
+													tcBrowser.setNote(items.notepad);
+													GoChrome(currentCat, null, tab.id);
+													chrome.storage.local.set({'notepad': ""}, function() {console.log("bg: rm note")});
+												});
+											} else {
+												GoChrome(currentCat, null, tab.id);
+											}
+										})
+								});
 							},coords.x0,coords.y0,coords.wdt,coords.ht);
 							
 						}
