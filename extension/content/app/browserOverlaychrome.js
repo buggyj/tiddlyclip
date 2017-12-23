@@ -80,7 +80,7 @@ tiddlycut.modules.browserOverlay = (function ()
 			api.adaptions[method]();
 		}
 		
-    chrome.storage.local.set({'tags': {}}, function() {console.log("bg: reset taglist")});
+    chrome.storage.local.set({'tags': {},'flags': {}}, function() {console.log("bg: reset taglist")});
 	}
 	
 	
@@ -128,7 +128,7 @@ tiddlycut.modules.browserOverlay = (function ()
 			}
 			tabtot = tot-1;
 			
-			if (tabtot === 0) chrome.storage.local.set({'tags': {}}, function() {console.log("bg: reset taglist")});
+			if (tabtot === 0) chrome.storage.local.set({'tags': {},'flags': {}}, function() {console.log("bg: reset taglist")});
 			
 			if (i == filechoiceclip) filechoiceclip = 0;
 			else if (i <filechoiceclip) filechoiceclip--;
@@ -214,7 +214,7 @@ tiddlycut.modules.browserOverlay = (function ()
 			// Set the new menu item's label
 			if (m == filechoiceclip) {
 				title=" "+m+"*"+fileLoc; //so we can see which section we are currently using
-				var tags = null, taglist = {};
+				var tags = null,flag = null,flaglist = {}, taglist = {};
 				tags=pref.Get("tags");
 				if (tags) {
 					tags = tags.split(/\s*,\s*/);
@@ -222,7 +222,14 @@ tiddlycut.modules.browserOverlay = (function ()
 						taglist[tags[nn]] = false;
 					}				
 				}
-				chrome.storage.local.set({'tags': taglist}, function() {console.log("bg: set from taglist")});
+				flags=pref.Get("flags");
+				if (flags) {
+					flags = flags.split(/\s*,\s*/);
+					for (var nn = 0; nn < flags.length; nn++) {
+						flaglist[flags[nn]] = false;
+					}				
+				}				
+				chrome.storage.local.set({'tags': taglist,'flags': flaglist}, function() {console.log("bg: set from taglist")});
 			}
 			else
 				title=" "+m+" "+fileLoc;
@@ -343,7 +350,7 @@ tiddlycut.modules.browserOverlay = (function ()
 	function pushData(category, info, tab) //chrome only
 	{
 		var promptindex;
-		tcBrowser.setDataFromBrowser(info, tab) //enter data from chrome menu onclick;
+		tcBrowser.setDataFromBrowser(info, tab); //enter data from chrome menu onclick;
 		//request data from content script
 		//execute any user defined extensions
 		if (tClip.hasModeBegining(tClip.getCategories()[category],"user") )  { 
@@ -413,8 +420,8 @@ tiddlycut.modules.browserOverlay = (function ()
 								}, function (source)
 								{ 
 										tcBrowser.setSnapImage(dataURL);
-										chrome.storage.local.get({tags:{}}, function(items){
-											tcBrowser.setExtraTags(items.tags);
+										chrome.storage.local.get({tags:{},flags:{}}, function(items){
+											tcBrowser.setExtraTags(items.tags,items.flags);
 											if (tClip.hasMode(tClip.getCategories()[category],"note") ) {
 												chrome.storage.local.get("notepad", function(items){
 													tcBrowser.setNote(items.notepad);
@@ -446,8 +453,8 @@ tiddlycut.modules.browserOverlay = (function ()
 				{ 
 					tiddlycut.log ("currentCat",currentCat,"tab.id",tab.id);
 					tcBrowser.setDatafromCS( source.url, source.html, source.title, source.twc, source.tw5, source.response); //add data to tcbrowser object -retrived later
-					chrome.storage.local.get({tags:{}}, function(items){
-						tcBrowser.setExtraTags(items.tags);
+					chrome.storage.local.get({tags:{},flags:{}}, function(items){
+						tcBrowser.setExtraTags(items.tags,items.flags);
 						if (tClip.hasMode(tClip.getCategories()[category],"note") ) {
 							chrome.storage.local.get("notepad", function(items){
 								tcBrowser.setNote(items.notepad);

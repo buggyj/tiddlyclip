@@ -32,8 +32,15 @@ function clicked (tag){
 		  });
 	});
 }
-
-
+function fclicked (flag){
+	chrome.storage.local.get({flags:{}}, function(items){
+		items.flags[flag] = document.querySelector("#flags"+flag).checked;
+		
+		chrome.storage.local.set({
+			flags:items.flags
+		  });
+	});
+}
 function keypressed(){
 	var textarea = document.getElementById("inputarea");
 	chrome.storage.local.set({'notepad': textarea.value}, function() {});
@@ -41,8 +48,8 @@ function keypressed(){
 }
 function main(){
 	var textarea = document.getElementById("inputarea");
-	chrome.storage.local.get({notepad:"", tags:{}}, function(items){
-		var text = items.notepad, i,j=0, html = "", closehtml = "", aretags=false;
+	chrome.storage.local.get({notepad:"", tags:{},flags:{}}, function(items){
+		var text = items.notepad, i,j=0, html = "", closehtml = "", aretags=false,areflags=false;
 		if(text != undefined){textarea.value=text;}
 		else {textarea.value="";}
 		
@@ -66,6 +73,29 @@ function main(){
 				document.querySelector('#tags'+i).checked = items.tags[i];
 				(function (j) {
 					document.querySelector('#tags'+i).onchange = function(e){clicked(j);}
+				})(i);
+			}
+		}
+		html = '<table><tr><td>flags: </td>';
+		j = 0;
+		for (i in items.flags) {
+			areflags = true;
+			j++;
+			if (j === 5) html += '<tr></tr>';
+			if (j === 11) html += '<tr></tr>';
+			html += '<td align="right">'+i+'<input type="checkbox" id="flags'+i+'" ></td>';
+		}	
+		
+		if (areflags) {
+			html += closehtml;
+			if (html !=="") {
+				document.querySelector('#forflags').innerHTML = html;
+			} 
+
+			for (i in items.flags) {
+				document.querySelector('#flags'+i).checked = items.flags[i];
+				(function (j) {
+					document.querySelector('#flags'+i).onchange = function(e){fclicked(j);}
 				})(i);
 			}
 		}

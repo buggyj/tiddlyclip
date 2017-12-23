@@ -38,6 +38,7 @@
 	}
 
 	function SetupVars(category,currentSection) {
+		var i;
 		tiddlycut.log("setupvars ",category);
 		//expose parameters - used for userExtensions
 		api.data ={};
@@ -61,6 +62,10 @@
 		api.data.snap = tcBrowser.getSnapImage();
 		api.data.note = tcBrowser.getNote();
 		api.data.extraTags = tcBrowser.getExtraTags();	
+		var extraFlags = tcBrowser.getExtraFlags();	
+		for (var ii in extraFlags) {
+			api.data[ii] = extraFlags[ii]?"true":"false";
+		}
 		var locale = api.data.pageRef.split('/');
 			locale.length--;
 			locale = locale.join('/');
