@@ -453,6 +453,7 @@ tiddlycut.modules.browserOverlay = (function ()
 				{ 
 					tiddlycut.log ("currentCat",currentCat,"tab.id",tab.id);
 					tcBrowser.setDatafromCS( source.url, source.html, source.title, source.twc, source.tw5, source.response); //add data to tcbrowser object -retrived later
+					tcBrowser.setSnapImage("");//clear image
 					chrome.storage.local.get({tags:{},flags:{}}, function(items){
 						tcBrowser.setExtraTags(items.tags,items.flags);
 						if (tClip.hasMode(tClip.getCategories()[category],"note") ) {
