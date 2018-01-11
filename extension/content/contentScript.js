@@ -40,7 +40,7 @@
 				generator = true;
 			}
 		}
-		return (doc.location.protocol === "file:") && generator;
+		return generator;
 	}
 
 	function extractToJson(node) {//based on tw5 boot
