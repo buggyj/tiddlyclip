@@ -383,6 +383,8 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 			messageBox["data-install"] = "1";
 			install = 1;
 			tiddlycut.log ("install:" + install);
+			// Attach the event handler to the message box
+			
 		}
 		else {
 			//just of debug
@@ -397,6 +399,22 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 			}
 			
 		}
+		messageBox.addEventListener("tc-send-event",function(event) {
+				
+				// Get the details from the message
+				var message = event.target,
+				 msg = {};
+				
+				msg.txt = message.getAttribute("data-text");
+				msg.action = message.getAttribute("data-action");
+				tiddlycut.log ("got show" + msg.action );
+				message.parentNode.removeChild(message);
+				// Save the file
+
+				chrome.runtime.sendMessage(msg,function() {});
+				return false;
+			},false);
+		
 	};
     var docked= false;
 	function docLoad(doc) {
@@ -447,6 +465,15 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 					// first stage send back url
 					tiddlycut.log("restorescreen  content cs");
 					xhairs.restorescreen();
+					sendResponse({ });
+				}
+		});
+	   chrome.runtime.onMessage.addListener(
+			  function(request, sender, sendResponse) {
+				if (request.action == 'alert') {
+					// first stage send back url
+					tiddlycut.log("alert:"+request.txt);
+					alert(request.txt);
 					sendResponse({ });
 				}
 		});

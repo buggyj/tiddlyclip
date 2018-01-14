@@ -94,9 +94,7 @@ tiddlycut.modules.browserOverlay = (function ()
 					tiddlycut.log("going to send "+msg.action+"  request");
 					var tab = tabs[0];
 					chrome.tabs.sendMessage(tab.id,
-					{
-						action : msg.action
-					}, 
+					msg, 
 					function (source){});
 					tiddlycut.log("sent "+msg.action+" request");
 				}
