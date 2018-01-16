@@ -406,6 +406,8 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 				 msg = {};
 				
 				msg.txt = message.getAttribute("data-text");
+				msg.aux = message.getAttribute("data-aux");
+				msg.extra = message.getAttribute("data-extra");
 				msg.action = message.getAttribute("data-action");
 				tiddlycut.log ("got show" + msg.action );
 				message.parentNode.removeChild(message);
@@ -472,8 +474,8 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 			  function(request, sender, sendResponse) {
 				if (request.action == 'alert') {
 					// first stage send back url
-					tiddlycut.log("alert:"+request.txt);
-					alert(request.txt);
+					tiddlycut.log("alert:"+request.txt+request.aux+request.extra);
+					alert(request.txt+request.aux+request.extra);
 					sendResponse({ });
 				}
 		});
