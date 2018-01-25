@@ -86,7 +86,11 @@ tiddlycut.modules.browserOverlay = (function ()
 	
 	chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
 		console.log("tiddlyclipbg: got request: "+msg.action);
-		if (true) {
+		if (msg.action == "dock") {
+			dockRegister(sender.tab.id, msg.url, msg.txt, msg.aux, msg.extra);
+			console.log ("got dock")
+		}
+		else {
 			chrome.tabs.query({
 				active: true,
 				currentWindow: true
@@ -304,7 +308,7 @@ tiddlycut.modules.browserOverlay = (function ()
 		//ignore duplicate docks
 		var tot = tabtot;
 		for (var i=1; i < tabtot+1; i++) 
-					if (id == tabid[i]) return;
+					if (id == tabid[i]) tabchange(id);//remove old verision
 
 		tiddlycut.log("docked ",url);
 		tot = tabtot + 1;
@@ -319,8 +323,15 @@ tiddlycut.modules.browserOverlay = (function ()
 		wikifile[tot]=url; console.log('wikifile'+tot,url);//BJ
 		wikititle[tot] = title;
 		tabid[tot]=id;
-		if (config != null) ClipConfig[tot] = configtid.body;
-		else ClipConfig[tot] = null;
+		if (config != null) {
+			ClipConfig[tot] = configtid.body;
+			tiddlycut.log("--config-- ok");
+		}
+		else {
+			ClipConfig[tot] = null;
+			tiddlycut.log("--config-- null");
+		}
+		
 		//pref.Set('ClipConfig'+tot,configtid.body);
 	    //pref.Set('ClipOpts'+tot,????????);//BJ fixme needs to be got when getting config??
 	    changeFile(tabtot);	    

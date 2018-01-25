@@ -409,6 +409,7 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 				msg.aux = message.getAttribute("data-aux");
 				msg.extra = message.getAttribute("data-extra");
 				msg.action = message.getAttribute("data-action");
+				msg.url = window.location.href;
 				tiddlycut.log ("got show" + msg.action );
 				message.parentNode.removeChild(message);
 				// Save the file
