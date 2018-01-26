@@ -54,7 +54,12 @@ tiddlycut.modules.browserOverlay = (function ()
 			{
 				action : 'actiondock', data:{opttid:pref.Get("ConfigOptsTiddler")}
 			}, function (source)
-			{
+			{			
+				if (!source) {
+					console.log("an error occured that suggests that you need to check the 'allow access to fileurl' option");
+					alert ("an error occured that suggests that you need to check the 'allow access to fileurl' option - see chrome://extensions/");
+					return;
+				}				
 				if (!source.title) return;
 				dockRegister(tab.id, source.url, source.config, source.title, source.opts);
 				console.log("item dock " + source.config);
