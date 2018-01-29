@@ -92,7 +92,7 @@ tiddlycut.modules.browserOverlay = (function ()
 	chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
 		console.log("tiddlyclipbg: got request: "+msg.action);
 		if (msg.action == "dock") {
-			dockRegister(sender.tab.id, msg.url, msg.txt, msg.aux, msg.extra);
+			dockRegister(sender.tab.id, msg.url, msg.txt, msg.extra, msg.aux);
 			console.log ("got dock")
 		}
 		else {
