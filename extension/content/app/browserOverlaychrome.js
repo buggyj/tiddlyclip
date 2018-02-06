@@ -434,6 +434,12 @@ tiddlycut.modules.browserOverlay = (function ()
 						}, function (source)
 						{ 
 							tcBrowser.setDatafromCS( source.url, source.html, source.title, source.twc, source.tw5, source.response, source.coords); //add data to tcbrowser object -retrived later
+							var pasteText = document.querySelector("#output");
+							pasteText.contentEditable = true;
+							pasteText.focus();
+							pasteText.value = '';
+							tiddlycut.log(document.execCommand("paste")+"--"+pasteText.value);
+							tcBrowser.setClipboardString(pasteText.value);
 							tiddlycut.log ("currentCat",currentCat);
 							var coords  = source.coords||{x0:null,y0:null,wdt:null,ht:null};
 							tcBrowser.snap(size,tab.id, function (dataURL) { 
@@ -476,6 +482,12 @@ tiddlycut.modules.browserOverlay = (function ()
 				{ 
 					tiddlycut.log ("currentCat",currentCat,"tab.id",tab.id);
 					tcBrowser.setDatafromCS( source.url, source.html, source.title, source.twc, source.tw5, source.response); //add data to tcbrowser object -retrived later
+					var pasteText = document.querySelector("#output");
+					pasteText.contentEditable = true;
+					pasteText.focus();
+					pasteText.value = '';
+					tiddlycut.log(document.execCommand("paste")+"--"+pasteText.value);
+					tcBrowser.setClipboardString(pasteText.value);
 					tcBrowser.setSnapImage("");//clear image
 					chrome.storage.local.get({tags:{},flags:{}}, function(items){
 						tcBrowser.setExtraTags(items.tags,items.flags);

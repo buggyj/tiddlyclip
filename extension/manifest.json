@@ -42,7 +42,8 @@
 		"storage" ,
 		"tabs", "<all_urls>",
 		"contextMenus",
-		"notifications"
+		"notifications",
+		"clipboardRead"
 	],
 
 	"version" : "0.1.2",

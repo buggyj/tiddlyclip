@@ -14,7 +14,7 @@ tiddlycut.modules.tcBrowser= (function () {
 		getlinkURL:getlinkURL,				onLinkLocal:onLinkLocal,			onLinkRemote:onLinkRemote,
 		isTiddlyWikiClassic:isTiddlyWikiClassic, isTiddlyWiki5:isTiddlyWiki5,	getusrstring: getusrstring,
 		getNote:getNote,					setNote:setNote,					getExtraTags:getExtraTags,
-		setExtraTags:setExtraTags,			getExtraFlags:getExtraFlags
+		setExtraTags:setExtraTags,			getExtraFlags:getExtraFlags,		setClipboardString:setClipboardString
 	}
 
     var convert,defaults;
@@ -31,7 +31,7 @@ tiddlycut.modules.tcBrowser= (function () {
 		return thechrome; //BJ FIXME not sure if this is correct		
 	}
     //variables to store non-persistance broswer data  - set by call otherwise
-    var onImage=false, onLink=false, image, linkUrl, selectionText, url, html ,title, 
+    var onImage=false, onLink=false, image, linkUrl, selectionText, url, html ,title,clipBoardString, 
 		twc=false, snapImage = "", usrstring, note = "",extraTags = "",extraFlags = [];
     
 	function snap(size,sourcetab, callback,xx0,yy0,wdt,ht){ //async in chrome
@@ -119,12 +119,13 @@ tiddlycut.modules.tcBrowser= (function () {
     function createDiv(){
 		return document.createElement("div");
 	}
-			
+	function setClipboardString(text){
+		clipBoardString=text;
+	}		
 	// Returns plain text from clipboard if any, or ''.
 	function getClipboardString()
-	{
-		var text = '';
-		return text;
+	{	
+		return clipBoardString||"";
 	}
 	function getPageTitle() {
 		return tiddlyLinkEncode(title);
