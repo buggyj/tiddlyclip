@@ -45,5 +45,6 @@
 		"notifications"
 	],
 
-	"version" : "0.1.2"
+	"version" : "0.1.2",
+	"web_accessible_resources": ["/beep.mp3"]
 }

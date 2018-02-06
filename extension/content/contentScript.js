@@ -482,6 +482,14 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 		});
 	   chrome.runtime.onMessage.addListener(
 			  function(request, sender, sendResponse) {
+				if (request.action == 'beep') {
+					tiddlycut.log("beep:");
+					new Audio(chrome.extension.getURL('beep.mp3')).play();
+					sendResponse({ });
+				}
+		});
+	   chrome.runtime.onMessage.addListener(
+			  function(request, sender, sendResponse) {
 				if (request.action == 'highlight') {
 					// first stage send back url
 					tiddlycut.log("highlight  content cs");

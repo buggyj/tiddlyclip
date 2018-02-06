@@ -95,6 +95,15 @@ tiddlycut.modules.browserOverlay = (function ()
 			dockRegister(sender.tab.id, msg.url, msg.txt, msg.extra, msg.aux);
 			console.log ("got dock")
 		}
+		else if (msg.action == "notify") {
+			chrome.notifications.create({
+				  "type": "basic",
+				  "title": msg.txt,
+				  "message": msg.aux,
+				  "iconUrl":"../skin/clip48.png"
+			});
+			console.log ("got notify"+msg.txt+"-"+msg.aux);
+		}
 		else {
 			chrome.tabs.query({
 				active: true,
