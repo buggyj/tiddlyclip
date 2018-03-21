@@ -411,7 +411,7 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 				msg.action = message.getAttribute("data-action");
 				msg.url = window.location.href;
 				tiddlycut.log ("got show" + msg.action );
-				message.parentNode.removeChild(message);
+				//event.currentTarget.parentNode.removeChild(message);
 				// Save the file
 
 				chrome.runtime.sendMessage(msg,function() {});

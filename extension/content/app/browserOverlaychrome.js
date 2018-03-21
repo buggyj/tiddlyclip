@@ -121,15 +121,21 @@ tiddlycut.modules.browserOverlay = (function ()
 		}
 	});
 	chrome.tabs.onUpdated.addListener(tabchange);
-	chrome.tabs.onRemoved.addListener(tabchange);
-	function tabchange(tabId) {
-		tiddlycut.log("**tabchanged**",tabId);
-		var i, tab, found, tot = tabtot;
+	chrome.tabs.onRemoved.addListener(tabclose);
+	function tabclose(tabId,changeInfo) {tabchange(tabId,changeInfo,"close")}
+	function tabchange(tabId,changeInfo,type) {
+		var type=type||"other";
+		var i, tab, found=false, tot = tabtot;
+		
 		for (i = 1; i < tot+1;i++) {
 			if (tabid[i] == tabId) {found = true; break;};
 		}
-
-		if (found) { //remove and bubble down those that follow
+		if (!found) return; 
+		
+		tiddlycut.log("**tabchanged**"+tabId+JSON.stringify(changeInfo)+" type: "+tabId+JSON.stringify(type));
+		
+		if (typeof type !== "string" && (!changeInfo || changeInfo.status !== "complete")) return;//not a reload 
+			//remove and bubble down those that follow
 			if (i == filechoiceclip) {
 				if (i < tot) changeFile(i+1);
 				else changeFile(i-1);
@@ -150,7 +156,7 @@ tiddlycut.modules.browserOverlay = (function ()
 			else if (i <filechoiceclip) filechoiceclip--;
 			tiddlycut.log("choice n",filechoiceclip);
 			createFilesPopups();
-		}	
+	
 	}
 	function setSelectModes(){
 		tcBrowser.setOnImage();
@@ -322,7 +328,7 @@ tiddlycut.modules.browserOverlay = (function ()
 		//ignore duplicate docks
 		var tot = tabtot;
 		for (var i=1; i < tabtot+1; i++) 
-					if (id == tabid[i]) tabchange(id);//remove old verision
+					if (id == tabid[i]) tabchange(id,null,"redocking");//remove old verision
 
 		tiddlycut.log("docked ",url);
 		tot = tabtot + 1;
