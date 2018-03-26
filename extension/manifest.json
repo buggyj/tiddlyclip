@@ -1,7 +1,8 @@
 {
 	"manifest_version": 2,
 	"web_accessible_resources": [
-		"content/resources/css/*.css"
+		"content/resources/css/*.css",
+		"/beep.mp3"
 	],
 
 	"applications": {
@@ -46,6 +47,5 @@
 		"clipboardRead"
 	],
 
-	"version" : "0.1.2",
-	"web_accessible_resources": ["/beep.mp3"]
+	"version" : "0.1.2"
 }
