@@ -72,7 +72,7 @@ var hlight = function(color) {
 	var backcolor;
 	tiddlycut.log("hlight recieved");
 	//var rcvd = messageEvent.json.data;
-	if (!color) {backcolor = "#ffd700"}
+	if (!color) {backcolor = "#fedcba"}
 	else backcolor = color;
 	try {
 		var range, sel = getSelection();
