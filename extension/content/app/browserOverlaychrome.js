@@ -71,7 +71,7 @@ tiddlycut.modules.browserOverlay = (function ()
 		var id = chrome.contextMenus.create(
 			{
 				"title" : "dock here",
-				"contexts" : ["page","selection"],
+				"contexts":["all"],
 				"onclick" : dock
 			}
 		);
