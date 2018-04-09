@@ -104,7 +104,7 @@ tiddlycut.modules.tClip = (function () {
 	function loadSectionFromFile(activeSection) {
 		activeCategories= {};
         sectionNames=['Default'];
-        var sectionStrgs;
+        var sectionStrgs, catIsNotSet = true;
 
 		//if (activeSection===0) defaultCategories();//load default rules defined by this program 
 
@@ -128,10 +128,16 @@ tiddlycut.modules.tClip = (function () {
 				//remember all section names - used to allow the user to see sections and change which is active
 				for (var  j =0; j< sectionStrgs.length;  j++) { 
 					
-							sectionNames[j] = sectionStrgs[j].split('\n')[0];//first line is name
+					sectionNames[j] = sectionStrgs[j].split('\n')[0];//first line is name
+					if ( j >= activeSection && catIsNotSet && sectionStrgs[j].indexOf('|') !== -1) {
+						// assumes that '|' means there is a def table otherwise move to next sections def table
+						//only load active categories
+						loadActiveSectionCategories(sectionStrgs[j].replace(/(^\|)*\n/,''));//strip of section name from first line
+						catIsNotSet = false;
+					}
+							
 				}	
-				//only load active categories
-				loadActiveSectionCategories(sectionStrgs[activeSection].replace(/(^\|)*\n/,''));//strip of section name from first line
+
 			}
 		}else {
 			defaultCategories();
