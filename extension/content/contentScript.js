@@ -67,6 +67,35 @@
 	}
 
 
+//--------------------------------------select-------------------------------------------
+var select = function(color) {
+	var backcolor;
+	tiddlycut.log("select recieved");
+	//var rcvd = messageEvent.json.data;
+
+	try {
+
+		var selection = getSelection();
+		var node = selection.anchorNode;
+		selection.removeAllRanges();
+		node = node.parentNode.parentNode;
+
+		if (node){
+			var range = document.createRange();
+			range.selectNodeContents(node);
+			selection.addRange(range);
+
+		  }
+
+		return;
+
+	} catch (e) {
+		tiddlycut.log('callback error:', e);
+		return;
+	}
+}
+
+
 //--------------------------------------hlight-------------------------------------------
 var hlight = function(color) {
 	var backcolor;
@@ -499,6 +528,15 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 		});
 	   chrome.runtime.onMessage.addListener(
 			  function(request, sender, sendResponse) {
+				if (request.action == 'select') {
+					// first stage send back url
+					tiddlycut.log("select cs");
+					select(null);
+					sendResponse({ });
+				}
+		});
+	   chrome.runtime.onMessage.addListener(
+			  function(request, sender, sendResponse) {
 				if (request.action == 'red'||request.action == 'lightblue'||
 					request.action == 'lightgreen'||request.action == 'yellow') {
 					// first stage send back url
@@ -507,6 +545,7 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 					sendResponse({ });
 				}
 		});
+
 	   chrome.runtime.onMessage.addListener(
 			  function(request, sender, sendResponse) {
 				tiddlycut.log("cs:action="+request.action);

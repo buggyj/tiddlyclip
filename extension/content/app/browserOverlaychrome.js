@@ -403,6 +403,20 @@ tiddlycut.modules.browserOverlay = (function ()
 			return;
 		}
 
+		//-----select control------
+		if (tClip.hasModeBegining(tClip.getCategories()[category],"select") ) {
+			
+			chrome.tabs.sendMessage(tab.id,
+				{
+					action : 'select'
+				}, 
+				function (source){});
+	
+
+			tiddlycut.log("sent select request");
+
+			return;
+		}
 		//-----xhairs------
 		if (tClip.hasMode(tClip.getCategories()[category],"xhairs") ) {
 			
