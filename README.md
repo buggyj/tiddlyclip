@@ -3,7 +3,7 @@ tiddlyclip -  webcontent clipper
 
 ## Getting started (firefox from v57)
 Click this link to start installing.
-https://github.com/buggyj/tiddlyclip/releases/download/0.1.1/tiddlyclip-0.1.1-an.fx.xpi
+https://github.com/buggyj/tiddlyclip/releases/download/0.1.2/tiddlyclip-0.1.2-an.fx.xpi
 
 ## Getting started (chrome)
 Install by downloading (goto the release https://github.com/buggyj/tiddlyclip/releases and download by click the 'source code' zip link) and unzipping (e.g. in a directory called savemedia). 
