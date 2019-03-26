@@ -374,7 +374,26 @@ tiddlycut.modules.browserOverlay = (function ()
 		return NaN;
 	}
 	
-
+	
+	function bjSendMessage  (tabid,params,callback)	{	
+		chrome.tabs.sendMessage(tabid, params, function (source) { 
+			if(chrome.runtime.lastError)  {
+                //Failed to send 
+                tiddlycut.log("SEND REQUEST FAIL for tab");
+                chrome.tabs.query({
+					active: true,
+					currentWindow: true
+					}, function(tabs) {
+						var tab = tabs[0], source = { url:tab.url, tids:null, title:tab.title, 
+							twc:false, tw5:false,response:null};
+						
+						callback(source);
+					}
+				);
+            }
+            else callback(source);
+		});	
+	}
 	
 	function pushData(category, info, tab) //chrome only
 	{
@@ -448,7 +467,7 @@ tiddlycut.modules.browserOverlay = (function ()
 				var size=makepercent(tClip.getModeBegining(tClip.getCategories()[category],"snap").split("snap")[1]);
 				if (isNaN(size)) size =1;
 				
-					chrome.tabs.sendMessage(tab.id,
+					bjSendMessage(tab.id,
 						{
 							action : 'cut', prompt:(promptindex?pref.Get(promptindex):null)
 						}, function (source)
@@ -495,7 +514,7 @@ tiddlycut.modules.browserOverlay = (function ()
 				*/
 				return;
 			}	
-			chrome.tabs.sendMessage(tab.id,
+			bjSendMessage(tab.id,
 				{
 					action : 'cut',prompt:(promptindex?pref.Get(promptindex):null)
 				}, function (source)
