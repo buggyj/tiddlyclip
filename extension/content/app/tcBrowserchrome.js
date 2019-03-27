@@ -148,7 +148,7 @@ tiddlycut.modules.tcBrowser= (function () {
 	}
 
 	function setNote (data){
-		if (data === undefined) note = "undefined";
+		if (!data) note = null;
 		else note = data;
 	}
 

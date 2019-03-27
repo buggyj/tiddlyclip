@@ -103,6 +103,9 @@ tiddlycut.modules.browserOverlay = (function ()
 				  "iconUrl":"../skin/clip48.png"
 			});
 			console.log ("got notify"+msg.txt+"-"+msg.aux);
+		}else if (msg.action == "bgbeep") {
+			new Audio(chrome.extension.getURL('beep.mp3')).play();
+			console.log ("got bgbeep");
 		}
 		else {
 			chrome.tabs.query({
@@ -534,7 +537,7 @@ tiddlycut.modules.browserOverlay = (function ()
 							chrome.storage.local.get("notepad", function(items){
 								tcBrowser.setNote(items.notepad);
 								GoChrome(currentCat, null, tab.id);
-								chrome.storage.local.set({'notepad': ""}, function() {console.log("bg: rm note")});							
+								chrome.storage.local.set({'notepad': null}, function() {console.log("bg: rm note")});							
 							});
 						} else {
 							GoChrome(currentCat, null, tab.id);
@@ -555,7 +558,7 @@ tiddlycut.modules.browserOverlay = (function ()
 						chrome.storage.local.get("notepad", function(items){
 							tcBrowser.setNote(items.notepad);
 							GoChrome(currentCat, source.tids, tab.id);
-							chrome.storage.local.set({'notepad': ""}, function() {console.log("bg: rm note")});
+							chrome.storage.local.set({'notepad': null}, function() {console.log("bg: rm note")});
 						});
 					} else {
 						GoChrome(currentCat, source.tids, tab.id);

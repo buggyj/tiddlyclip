@@ -50,7 +50,7 @@ function main(){
 	var textarea = document.getElementById("inputarea");
 	chrome.storage.local.get({notepad:"", tags:{},flags:{}}, function(items){
 		var text = items.notepad, i,j=0, html = "", closehtml = "", aretags=false,areflags=false;
-		if(text != undefined){textarea.value=text;}
+		if(!!text ){textarea.value=text;}
 		else {textarea.value="";}
 		
 		html = '<table><tr><td>Extra tags: </td>';
