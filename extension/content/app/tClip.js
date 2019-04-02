@@ -110,35 +110,22 @@ tiddlycut.modules.tClip = (function () {
 
 		var content = self.ClipConfig;//where all sections are defined
 		if (content) {
-			sectionStrgs = content.split('ᏜᏜᏜᏜ*['); //sections begin with a title, , followed by a table of categories
-			if(sectionStrgs.length>1) { //clip list format			 
-				sectionStrgs.shift();
-				//remember all section names - used to allow the user to see sections and change which is active
-				for (var  j =0; j< sectionStrgs.length;  j++) {
-							var temp =(sectionStrgs[j].split(']\n')[0]).split('-');
-							temp.shift();
-							sectionNames[j] = temp.join('-');
-				}	
-				//only load active categories 
-				loadActiveSectionCategories(sectionStrgs[activeSection].split('!/%%/\n')[1]);//strip of section name from first line
-			} else { //straight text table
-				sectionStrgs = content.split('\n!'); //sections begin with a title, eg !mysection, followed by a table of categories
-				//the ! has not be removed by the split in the case of the first section
-				sectionStrgs[0] = sectionStrgs[0].substr(1);
-				//remember all section names - used to allow the user to see sections and change which is active
-				for (var  j =0; j< sectionStrgs.length;  j++) { 
-					
-					sectionNames[j] = sectionStrgs[j].split('\n')[0];//first line is name
-					if ( j >= activeSection && catIsNotSet && sectionStrgs[j].indexOf('|') !== -1) {
-						// assumes that '|' means there is a def table otherwise move to next sections def table
-						//only load active categories
-						loadActiveSectionCategories(sectionStrgs[j].replace(/(^\|)*\n/,''));//strip of section name from first line
-						catIsNotSet = false;
-					}
-							
-				}	
+			sectionStrgs = content.split('\n!'); //sections begin with a title, eg !mysection, followed by a table of categories
+			//the ! has not be removed by the split in the case of the first section
+			sectionStrgs[0] = sectionStrgs[0].substr(1);
+			//remember all section names - used to allow the user to see sections and change which is active
+			for (var  j =0; j< sectionStrgs.length;  j++) { 
+				
+				sectionNames[j] = sectionStrgs[j].split('\n')[0];//first line is name
+				if ( j >= activeSection && catIsNotSet && sectionStrgs[j].indexOf('|') !== -1) {
+					// assumes that '|' means there is a def table otherwise move to next sections def table
+					//only load active categories
+					loadActiveSectionCategories(sectionStrgs[j].replace(/(^\|)*\n/,''));//strip of section name from first line
+					catIsNotSet = false;
+				}
+						
+			}	
 
-			}
 		}else {
 			defaultCategories();
 			//alert("config tiddler not found");

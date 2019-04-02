@@ -92,7 +92,7 @@ tiddlycut.modules.browserOverlay = (function ()
 	chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
 		console.log("tiddlyclipbg: got request: "+msg.action);
 		if (msg.action == "dock") {
-			dockRegister(sender.tab.id, msg.url, msg.txt, msg.extra, msg.aux);
+			dockRegister(sender.tab.id, msg.url, msg.txt, msg.extra, msg.aux, true );//redock true
 			console.log ("got dock")
 		}
 		else if (msg.action == "notify") {
@@ -126,7 +126,7 @@ tiddlycut.modules.browserOverlay = (function ()
 	chrome.tabs.onUpdated.addListener(tabchange);
 	chrome.tabs.onRemoved.addListener(tabclose);
 	function tabclose(tabId,changeInfo) {tabchange(tabId,changeInfo,"close")}
-	function tabchange(tabId,changeInfo,type) {
+	function tabchange(tabId,changeInfo,type,redock) {
 		var type=type||"other";
 		var i, tab, found=false, tot = tabtot;
 		
@@ -139,11 +139,7 @@ tiddlycut.modules.browserOverlay = (function ()
 		
 		if (typeof type !== "string" && (!changeInfo || changeInfo.status !== "complete")) return;//not a reload 
 			//remove and bubble down those that follow
-			if (i == filechoiceclip) {
-				if (i < tot) changeFile(i+1);
-				else changeFile(i-1);
-				//self.selectedSection = 0;
-			}
+
 			for (tab = i; tab <tot; tab++) { 
 				tabid[tab] = tabid[tab+1];
 				wikifile[tab] = wikifile[tab + 1];
@@ -151,8 +147,13 @@ tiddlycut.modules.browserOverlay = (function ()
 				ClipConfig[tab] = ClipConfig[tab+1];
 				ClipOpts[tab] = ClipOpts[tab+1];
 			}
-			tabtot = tot-1;
 			
+			tabtot = tot-1;
+			if (i == filechoiceclip) {
+				if (i < tot) changeFile(i,redock);
+				else changeFile(i-1,redock);
+				//self.selectedSection = 0;
+			}
 			if (tabtot === 0) chrome.storage.local.set({'tags': {},'flags': {}}, function() {console.log("bg: reset taglist")});
 			
 			if (i == filechoiceclip) filechoiceclip = 0;
@@ -183,13 +184,30 @@ tiddlycut.modules.browserOverlay = (function ()
 		tClip.loadSectionFromFile(n);//TODO what about tClip.defaultCategories()?
 		createFilesPopups();
 	}
-	function changeFile(file) {
+	
+	function sendsysmsg  (tab, section, cat, data) {
+		var sdata = {data:data};
+		chrome.tabs.sendMessage(tab,
+		{ action: 'paste', data:{category:cat, pageData:JSON.stringify(sdata),currentsection:section}});
+	}
+	
+	function changeFile(file, redock) {
+		
+		var data = {section:'__sys__', wikifile:wikifile[file],wikititle:wikititle[file],category:'refocused'};
+		console.log("changeFile redock is:"+redock+ " filechoiceclip:"+filechoiceclip );
+		if (!redock) {
+			for (i = 1; i < tabtot+1;i++) {
+				sendsysmsg(tabid[i],0, 'refocused',  data);		
+			}
+			console.log('sent refocus msg');
+		}
 		filechoiceclip = file;
 		pref.loadOpts(ClipOpts[file]);
 		tClip.setClipConfig(ClipConfig[file]);
 		currentsection = 0;//bj added after compared with browserOverlay.js
 		tClip.loadSectionFromFile(0); //load default section
 		createFilesPopups();
+		
 	}
     var mytabs=[];
     var separate;
@@ -327,12 +345,14 @@ tiddlycut.modules.browserOverlay = (function ()
 
 	}
 
-	function dockRegister(id, url, config, title, optid) {
+	function dockRegister(id, url, config, title, optid, redock) {
 		//ignore duplicate docks
-		var tot = tabtot;
+		var tot = tabtot, filechoiceclipold = filechoiceclip, redock = redock;
 		for (var i=1; i < tabtot+1; i++) 
-					if (id == tabid[i]) tabchange(id,null,"redocking");//remove old verision
-
+					if (id == tabid[i]){ tabchange(id,null,"redocking",true);//remove old verision - true means redocking
+						redock = true;
+						if (i !== filechoiceclipold) {redock = false}//this will focus the tw so need to send a dock notification out 
+					}
 		tiddlycut.log("docked ",url);
 		tot = tabtot + 1;
 		tabtot = tot;
@@ -357,7 +377,7 @@ tiddlycut.modules.browserOverlay = (function ()
 		
 		//pref.Set('ClipConfig'+tot,configtid.body);
 	    //pref.Set('ClipOpts'+tot,????????);//BJ fixme needs to be got when getting config??
-	    changeFile(tabtot);	    
+	    changeFile(tabtot, redock);	    
 		createFilesPopups();
 	};
 	function injectMessageBox(doc) {
