@@ -449,6 +449,25 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 		
 	};
     var docked= false;
+    
+    function dynamicDockRqst (){
+						// Find the message box element
+		var messageBox = document.getElementById("tiddlyclip-message-box");
+		if(messageBox) {
+			// Create the message element and put it in the message box
+			var message = document.createElement("div");
+			message.setAttribute("data-tiddlyclip-category",'dock');
+			message.setAttribute("data-tiddlyclip-pageData",JSON.stringify({data:{section:'__sysdock__', category:'dock'}}));
+			message.setAttribute("data-tiddlyclip-currentsection",0);
+			messageBox.appendChild(message);
+			tiddlycut.log("dynamicDockRqst ");
+			// Create and dispatch the custom event to the extension
+			var event = document.createEvent("Events");
+			event.initEvent("tiddlyclip-save-file",true,false);
+			message.dispatchEvent(event);
+			tiddlycut.log("paste event sent");
+		}
+	}
 	function docLoad(doc) {
 	//	if (doc.nodeName != '#document')
 	//		return;
@@ -466,7 +485,10 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 					}
 					injectMessageBox(document);tiddlycut.log("actiondock out cs");
 					var docked = true;
+					//here we need to send a dock request to tw if tw5, and have it respond with the alternative config and opts - maybe with a zero delay
+					
 					sendResponse({title:document.title, url:window.location.href, config:findTiddlerInPage_ByTitle("TiddlyClipConfig"),opts:findTiddlerInPage_ByTitle(request.data.opttid)});
+					window.setTimeout(function(){dynamicDockRqst();},10);								 
 				}
 		});
 		//callback for cut
