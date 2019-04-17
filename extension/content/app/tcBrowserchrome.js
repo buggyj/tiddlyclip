@@ -14,7 +14,8 @@ tiddlycut.modules.tcBrowser= (function () {
 		getlinkURL:getlinkURL,				onLinkLocal:onLinkLocal,			onLinkRemote:onLinkRemote,
 		isTiddlyWikiClassic:isTiddlyWikiClassic, isTiddlyWiki5:isTiddlyWiki5,	getusrstring: getusrstring,
 		getNote:getNote,					setNote:setNote,					getExtraTags:getExtraTags,
-		setExtraTags:setExtraTags,			getExtraFlags:getExtraFlags,		setClipboardString:setClipboardString
+		setExtraTags:setExtraTags,			getExtraFlags:getExtraFlags,		setClipboardString:setClipboardString,
+		getcptext:getcptext
 	}
 
     var convert,defaults;
@@ -32,7 +33,7 @@ tiddlycut.modules.tcBrowser= (function () {
 	}
     //variables to store non-persistance broswer data  - set by call otherwise
     var onImage=false, onLink=false, image, linkUrl, selectionText, url, html ,title,clipBoardString, 
-		twc=false, snapImage = "", usrstring, note = "",extraTags = "",extraFlags = [];
+		twc=false, snapImage = "", usrstring = null, note= null, extraTags = "",extraFlags = [], cptext = null;
     
 	function snap(size,sourcetab, callback,xx0,yy0,wdt,ht){ //async in chrome
 
@@ -162,7 +163,12 @@ tiddlycut.modules.tcBrowser= (function () {
 		return extraFlags;
 	}
 	
-	function setExtraTags(tags,flags)
+	function getcptext()
+	{
+		return cptext;
+	}
+	
+	function setExtraTags(tags,flags,cptxt)
 	{
 		var first = true,space =/ /;
 		extraTags = "";
@@ -179,6 +185,7 @@ tiddlycut.modules.tcBrowser= (function () {
 		for (var ii in flags) {
 			extraFlags[ii] = flags[ii];
 		}
+		cptext = cptxt;
 	}
 
 	function hasCopiedText() {

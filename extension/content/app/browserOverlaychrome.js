@@ -36,6 +36,8 @@ tiddlycut.modules.browserOverlay = (function ()
 	
 	var filechoiceclip = 0, tabtot = 0;
 	
+	var resetflags, resettags;
+	
 	
 	var tClip, tcBrowser, pref;
 	var docu, browseris;
@@ -271,7 +273,9 @@ tiddlycut.modules.browserOverlay = (function ()
 					for (var nn = 0; nn < flags.length; nn++) {
 						flaglist[flags[nn]] = false;
 					}				
-				}				
+				}		
+				resettags = taglist; //for resetting after aclip to empty boxes in the popup	
+				resetflags =flaglist
 				chrome.storage.local.set({'tags': taglist,'flags': flaglist}, function() {console.log("bg: set from taglist")});
 			}
 			else
@@ -400,7 +404,7 @@ tiddlycut.modules.browserOverlay = (function ()
 	
 	function bjSendMessage  (tabid,params,callback)	{	
 		chrome.tabs.sendMessage(tabid, params, function (source) { 
-			if(chrome.runtime.lastError)  {
+			if(chrome.runtime.lastError || !source)  {
                 //Failed to send 
                 tiddlycut.log("SEND REQUEST FAIL for tab");
                 chrome.tabs.query({
@@ -459,6 +463,20 @@ tiddlycut.modules.browserOverlay = (function ()
 
 			return;
 		}
+		//-----cptext control------
+		if (tClip.hasModeBegining(tClip.getCategories()[category],"cptext") ) {
+			
+			chrome.storage.local.set({'cptext': info.selectionText}, function() {console.log("bg: add cptext")});
+
+			return;
+		}
+		//-----text2note control------
+		if (tClip.hasModeBegining(tClip.getCategories()[category],"text2note") ) {
+			chrome.storage.local.get("notepad", function(items){
+				chrome.storage.local.set({'notepad': items.notepad + "\n\n" + info.selectionText}, function() {console.log("bg: add text2note")});
+			})
+			return;
+		}
 		//-----xhairs------
 		if (tClip.hasMode(tClip.getCategories()[category],"xhairs") ) {
 			
@@ -511,8 +529,8 @@ tiddlycut.modules.browserOverlay = (function ()
 								}, function (source)
 								{ 
 										tcBrowser.setSnapImage(dataURL);
-										chrome.storage.local.get({tags:{},flags:{}}, function(items){
-											tcBrowser.setExtraTags(items.tags,items.flags);
+										chrome.storage.local.get({tags:{},flags:{},cptext:''}, function(items){
+											tcBrowser.setExtraTags(items.tags,items.flags,items.cptext);
 											if (tClip.hasMode(tClip.getCategories()[category],"note") ) {
 												chrome.storage.local.get("notepad", function(items){
 													tcBrowser.setNote(items.notepad);
@@ -522,6 +540,7 @@ tiddlycut.modules.browserOverlay = (function ()
 											} else {
 												GoChrome(currentCat, null, tab.id);
 											}
+											chrome.storage.local.set({'tags': resettags,'flags': resetflags, cptext:null}, function() {console.log("bg: reset tags etc")});
 										})
 								});
 							},coords.x0,coords.y0,coords.wdt,coords.ht);
@@ -551,8 +570,8 @@ tiddlycut.modules.browserOverlay = (function ()
 					tiddlycut.log(document.execCommand("paste")+"--"+pasteText.value);
 					tcBrowser.setClipboardString(pasteText.value);
 					tcBrowser.setSnapImage("");//clear image
-					chrome.storage.local.get({tags:{},flags:{}}, function(items){
-						tcBrowser.setExtraTags(items.tags,items.flags);
+					chrome.storage.local.get({tags:{},flags:{},cptext:''}, function(items){
+						tcBrowser.setExtraTags(items.tags,items.flags,items.cptext);
 						if (tClip.hasMode(tClip.getCategories()[category],"note") ) {
 							chrome.storage.local.get("notepad", function(items){
 								tcBrowser.setNote(items.notepad);
@@ -562,6 +581,7 @@ tiddlycut.modules.browserOverlay = (function ()
 						} else {
 							GoChrome(currentCat, null, tab.id);
 						}
+					chrome.storage.local.set({'tags': resettags,'flags': resetflags, cptext:null}, function() {console.log("bg: reset tags etc")});
 					})
 				}
 			);

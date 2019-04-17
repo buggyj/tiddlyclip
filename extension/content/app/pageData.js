@@ -62,6 +62,7 @@
 		api.data.snap = tcBrowser.getSnapImage();
 		api.data.note = tcBrowser.getNote();
 		api.data.extraTags = tcBrowser.getExtraTags();	
+		api.data.cptext = tcBrowser.getcptext();
 		var extraFlags = tcBrowser.getExtraFlags();	
 		for (var ii in extraFlags) {
 			api.data[ii] = extraFlags[ii]?"true":"false";
