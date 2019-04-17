@@ -294,7 +294,9 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 /////////////////////////// get tiddler ///////////////////////////////                
 	function findTiddlerInPage_ByTitle(title) {
 		var winWrapper = document;
-		var i,tid,nodes = winWrapper.getElementById("storeArea").getElementsByTagName('div');
+		var i,tid,nodes, store= document.getElementById("storeArea");
+		if (store) 	nodes = store.getElementsByTagName('div');
+		else nodes = [];
 		//try version 2.2 style store 
 		for(i=0; i<nodes.length; i++) 
 			if(title===nodes[i].getAttribute('title')) 
@@ -316,7 +318,9 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 		return null; //not found
 	}
 	function findTiddlersInPage_ByTag(tag) {
-		var i,tid, nodes = document.getElementById("storeArea").getElementsByTagName('div');
+		var i,tid,nodes, store= document.getElementById("storeArea");
+		if (store) 	nodes = store.getElementsByTagName('div');
+		else nodes = [];
 		var found=false;
 		remoteTidArr= [];
 		for(i=0; i<nodes.length; i++) 
