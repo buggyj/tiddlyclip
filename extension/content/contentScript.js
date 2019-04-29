@@ -404,6 +404,7 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 	function  UserInputDialog(prompt) {
 						return window.prompt(prompt);
 	}
+	var handler = null;
 	function injectMessageBox(doc) {
 		// Inject the message box
 		var messageBox = doc.getElementById("tiddlyclip-message-box");
@@ -432,7 +433,8 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 			}
 			
 		}
-		messageBox.addEventListener("tc-send-event",function(event) {
+		messageBox.removeEventListener("tc-send-event",handler);
+		messageBox.addEventListener("tc-send-event",handler = function(event) {
 				
 				// Get the details from the message
 				var message = event.target,
@@ -446,7 +448,7 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 				tiddlycut.log ("got show" + msg.action );
 				//event.currentTarget.parentNode.removeChild(message);
 				// Save the file
-
+				message.parentNode.removeChild(message);
 				chrome.runtime.sendMessage(msg,function() {});
 				return false;
 			},false);
