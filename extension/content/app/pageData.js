@@ -61,7 +61,7 @@
 		api.data.tw5 =		(tcBrowser.isTiddlyWiki5()).toString();
 		api.data.snap = tcBrowser.getSnapImage();
 		api.data.note = tcBrowser.getNote();
-		api.data.extraTags = tcBrowser.getExtraTags();	
+		if (tcBrowser.getExtraTags()) api.data.extraTags = tcBrowser.getExtraTags();
 		api.data.cptext = tcBrowser.getcptext();
 		var extraFlags = tcBrowser.getExtraFlags();	
 		for (var ii in extraFlags) {
