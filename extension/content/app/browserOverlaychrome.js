@@ -500,7 +500,8 @@ tiddlycut.modules.browserOverlay = (function ()
 		//-----text2note control------
 		if (tClip.hasModeBegining(tClip.getCategories()[category],"text2note") ) {
 			chrome.storage.local.get("notepad", function(items){
-				chrome.storage.local.set({'notepad': items.notepad + "\n\n" + info.selectionText}, function() {console.log("bg: add text2note")});
+                var text = ((items.notepad!=null) && (items.notepad!=""))?items.notepad + "\n\n":"";
+				chrome.storage.local.set({'notepad': text + info.selectionText}, function() {console.log("bg: add text2note")});
 			})
 			return;
 		}
