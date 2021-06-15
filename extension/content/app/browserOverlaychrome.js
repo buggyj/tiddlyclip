@@ -8,14 +8,18 @@ chrome.runtime.onInstalled.addListener(function(details){console.log ("oninstall
   chrome.windows.getAll({'populate': true}, function(windows) {
     for (var i = 0; i < windows.length; i++) {
       var tabs = windows[i].tabs;
-      for (var j = 0; j < tabs.length; j++) {console.log ("loadcs "+j);
-        chrome.tabs.executeScript(
-            tabs[j].id,
-            {file: 'content/util/logsimple.js', allFrames: false});
-        chrome.tabs.executeScript(
-            tabs[j].id,
-            {file: 'content/contentScript.js', allFrames: false});
-      }
+      for (var j = 0; j < tabs.length; j++) {
+            console.log ("loadcs "+j);
+            try {
+                chrome.tabs.executeScript(
+                    tabs[j].id,
+                    {file: 'content/util/logsimple.js', allFrames: false});
+                chrome.tabs.executeScript(
+                    tabs[j].id,
+                    {file: 'content/contentScript.js', allFrames: false});
+            }
+            catch (err) {console.log ("cs refused at url "+tabs[j].url)};
+        }
     }
   });
  }});
@@ -127,15 +131,38 @@ tiddlycut.modules.browserOverlay = (function ()
 	});
 	chrome.tabs.onUpdated.addListener(tabchange);
 	chrome.tabs.onRemoved.addListener(tabclose);
+ 
+    
+    function checkduplicate(tabs, tabId, url, active){
+        for(let tab of tabs){
+            if(url == tab.url && tab.id != tabId){
+                chrome.windows.update(tab.windowId, {focused:true});
+                chrome.tabs.update(tab.id,{active:active});
+                chrome.tabs.remove(tabId);
+            }
+        }
+    }
 	function tabclose(tabId,changeInfo) {tabchange(tabId,changeInfo,"close")}
-	function tabchange(tabId,changeInfo,type,redock) {
-		var type=type||"other";
+	function tabchange(tabId,changeInfo,typeOrginal,redock) {
+		var type=typeOrginal||"other";
 		var i, tab, found=false, tot = tabtot;
 		
 		for (i = 1; i < tot+1;i++) {
 			if (tabid[i] == tabId) {found = true; break;};
 		}
-		if (!found) return; 
+        
+		if (!found) {
+            chrome.storage.local.get({nodups:false}, function(items){
+                if (false==items.nodups) return;
+                chrome.tabs.query({
+                    
+                },function(tabs)  {
+                    checkduplicate(tabs, tabId, changeInfo.url, typeOrginal.active);
+                });
+                return;
+            }); 
+            return;
+        }
 		
 		tiddlycut.log("**tabchanged**"+tabId+JSON.stringify(changeInfo)+" type: "+tabId+JSON.stringify(type));
 		

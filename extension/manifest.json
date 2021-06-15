@@ -38,6 +38,10 @@
 		"16" : "skin/clip16.png",
 		"48" : "skin/clip48.png"
 	},
+    "options_ui": {
+    "page": "options.html",
+    "chrome_style": true
+  },
 	"name" : "tiddlyclip",
 	"permissions" : [
 		"storage" ,
@@ -47,5 +51,5 @@
 		"clipboardRead"
 	],
 
-	"version" : "0.1.5"
+	"version" : "0.1.6"
 }
