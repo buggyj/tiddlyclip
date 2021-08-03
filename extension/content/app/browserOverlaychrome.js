@@ -543,9 +543,8 @@ tiddlycut.modules.browserOverlay = (function ()
 						{ 
 							tcBrowser.setDatafromCS( source.url, source.html, source.title, source.twc, source.tw5, source.response, source.coords); //add data to tcbrowser object -retrived later
 							var pasteText = document.querySelector("#output");
-							pasteText.contentEditable = true;
-							pasteText.focus();
-							pasteText.value = '';
+                            pasteText.value = '';
+                            pasteText.select();
 							tiddlycut.log(document.execCommand("paste")+"--"+pasteText.value);
 							tcBrowser.setClipboardString(pasteText.value);
 							tiddlycut.log ("currentCat",currentCat);
@@ -592,9 +591,8 @@ tiddlycut.modules.browserOverlay = (function ()
 					tiddlycut.log ("currentCat",currentCat,"tab.id",tab.id);
 					tcBrowser.setDatafromCS( source.url, source.html, source.title, source.twc, source.tw5, source.response); //add data to tcbrowser object -retrived later
 					var pasteText = document.querySelector("#output");
-					pasteText.contentEditable = true;
-					pasteText.focus();
 					pasteText.value = '';
+                    pasteText.select();
 					tiddlycut.log(document.execCommand("paste")+"--"+pasteText.value);
 					tcBrowser.setClipboardString(pasteText.value);
 					tcBrowser.setSnapImage("");//clear image
