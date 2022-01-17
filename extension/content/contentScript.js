@@ -3,6 +3,8 @@
 
 
 	var remoteTidArr  = [''], install;
+	var callbacks = {};
+	callbacks["cuttids"] = null;
 	
 	function getHtml()
 	{
@@ -334,6 +336,20 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 			}	
 		return found; 
 	}
+	
+	function getTiddlersAsJson(tiddlers) {
+	var TidArr=[];
+	for(var t=0;t<tiddlers.length; t++) {
+		var tiddler = tiddlers[t];
+		if(tiddler) {
+			TidArr.push(JSON.stringify(tiddler));
+		}
+	}
+	return (TidArr);//found
+};
+	
+	
+	
 	function log(str){
 		console.log(str);
     }
@@ -444,11 +460,14 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 				msg.aux = message.getAttribute("data-aux");
 				msg.extra = message.getAttribute("data-extra");
 				msg.action = message.getAttribute("data-action");
+				msg.version = message.getAttribute("data-version");
 				msg.url = window.location.href;
+				if (msg.action === "dock" && msg.version) messageBox["cutsenabled"] = true;
 				tiddlycut.log ("got show" + msg.action );
 				//event.currentTarget.parentNode.removeChild(message);
 				// Save the file
 				message.parentNode.removeChild(message);
+				if (msg.action in callbacks) {callbacks[msg.action](msg);return false;}
 				chrome.runtime.sendMessage(msg,function() {});
 				return false;
 			},false);
@@ -478,7 +497,10 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 	//	if (doc.nodeName != '#document')
 	//		return;
 		//addEventListener('contextmenu', function (e) {tiddlycut.log("cm",e)});
-
+		var cutsenabled = function () {
+			var mbox= document.getElementById("tiddlyclip-message-box");
+			return ((!!mbox) && mbox.cutsenabled);
+		}
 		//callback for dock
 	   chrome.runtime.onMessage.addListener(
 			  function(request, sender, sendResponse) {
@@ -511,13 +533,34 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 		});
 	   chrome.runtime.onMessage.addListener(
 			  function(request, sender, sendResponse) {
-				if (request.action == 'cutTid') {
-					// first stage send back url
-					tiddlycut.log("cutTid  content cs");
+				//here we need to check that the tiddlywiki is open for cuts - in the new interactive way.
+				if (request.action == 'cutTid')
+					if (cutsenabled()){
+					
+						// first stage send back url
+						tiddlycut.log("cutTid dynamic content cs");
+						if (!!callbacks["cuttids"]) {//already a pending cut
+							sendResponse({ url:window.location.href, tids:null, title:document.title, 
+							twc:isTiddlyWikiClassic()||false, tw5:isTiddlyWiki5(),response: (request.prompt?UserInputDialog(request.prompt):null)});
+							return;
+						}
+						callbacks["cuttids"]= function (x){
+							var resp = { url:window.location.href, tids:null, title:document.title, 
+							twc:isTiddlyWikiClassic()||false, tw5:isTiddlyWiki5(),response: (request.prompt?UserInputDialog(request.prompt):null)};
+							tiddlycut.log("cuttids callback  "+x.txt);
+							resp.tids = getTiddlersAsJson(JSON.parse(x.txt));
+							sendResponse(resp);
+							callbacks["cuttids"] = null;
+						}
+						cutTidsDynamic();
+						return true;
+					} 
+					else  {
+						tiddlycut.log("cutTid  content cs");
 
-					sendResponse({ url:window.location.href, tids:cutTids(), title:document.title, 
-						twc:isTiddlyWikiClassic()||false, tw5:isTiddlyWiki5(),response: (request.prompt?UserInputDialog(request.prompt):null)});
-				}
+						sendResponse({ url:window.location.href, tids:cutTids(), title:document.title, 
+							twc:isTiddlyWikiClassic()||false, tw5:isTiddlyWiki5(),response: (request.prompt?UserInputDialog(request.prompt):null)});
+					}
 		});
 	   chrome.runtime.onMessage.addListener(
 			  function(request, sender, sendResponse) {
@@ -615,6 +658,41 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 		if (!content)
 			return;
 	};
+
+	function filterRqst (name){
+						// Find the message box element
+		var messageBox = document.getElementById("tiddlyclip-message-box");
+		if(messageBox) {
+			// Create the message element and put it in the message box
+			var message = document.createElement("div");
+			message.setAttribute("data-tiddlyclip-category",'tcfltreq');
+			message.setAttribute("data-tiddlyclip-pageData",JSON.stringify({data:{section:'__sys__',callback:"cuttids",name:name,category:'tcfltreq'}}));
+			message.setAttribute("data-tiddlyclip-currentsection",0);
+			messageBox.appendChild(message);
+			tiddlycut.log("tcfltreq ");
+			// Create and dispatch the custom event to the extension
+			var event = document.createEvent("Events");
+			event.initEvent("tiddlyclip-save-file",true,false);
+			message.dispatchEvent(event);
+			tiddlycut.log("paste event sent");
+		}
+	}
+	function cutTidsDynamic() {
+		var title={}, tag={}, cancelled={};
+			var text =getSelectionText();
+			if (text!='') {
+				filterRqst("[title["+text+"]]");
+			} else {
+				//put up a window for the user to enter the name and tag
+				//of tiddlers then find matching tids in this page
+				//tcBrowser.EnterTidNameDialog (title, tag, cancelled);
+				var key = window.prompt('Enter tag');
+				tag.value =key;
+				filterRqst("[tag["+key+"]]");
+			return;	
+		}
+		return remoteTidArr;//no error
+	}//end func
 	function cutTids() {
 		var title={}, tag={}, cancelled={};
 			var text =getSelectionText();
