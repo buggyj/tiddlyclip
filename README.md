@@ -12,6 +12,6 @@ Then in chrome navigate to chrome://extensions/ and click 'load unpacked extensi
 Note that chome will ask you to disable the 'developer mode' extensions each time you start the browser (but not with linux), as the extension was not loaded from the Chrome Web Store.
 
 ## Getting the plugin
-It is also neccessary to install the tiddlywiki plugin can be located from the plugins repository (see the readme):
+It is also neccessary to install the tiddlywiki plugin: it can be located from the plugins repository (see the readme):
 
 https://github.com/buggyj/tiddlyclip-plugin
