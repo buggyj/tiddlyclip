@@ -61,7 +61,10 @@ tiddlycut.modules.tiddlerAPI = (function () {
 		for (var i = 0; i<this.attribs.length; i++){
 				tiddler += ' '+ this.attribs[i] + '="' +tcBrowser.htmlEncode(this[this.attribs[i]])+'"';
 		}
-		tiddler += 	">\n<pre>" + tcBrowser.htmlEncode(this.body) + "</pre>\n</div>";
+		if (this.body)
+		   tiddler += 	">\n<pre>" + tcBrowser.htmlEncode(this.body) + "</pre>\n</div>";
+		else 
+		   tiddler += 	">\n<\n</div>";
 		return tiddler;
 	}
 	
