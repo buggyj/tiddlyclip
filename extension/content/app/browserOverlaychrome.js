@@ -448,7 +448,6 @@ tiddlycut.modules.browserOverlay = (function ()
             else callback(source);
 		});	
 	}
-	
 	function pushData(category, info, tab) //chrome only
 	{
 		var promptindex;
@@ -542,11 +541,38 @@ tiddlycut.modules.browserOverlay = (function ()
 						}, function (source)
 						{ 
 							tcBrowser.setDatafromCS( source.url, source.html, source.title, source.twc, source.tw5, source.response, source.coords); //add data to tcbrowser object -retrived later
-							var pasteText = document.querySelector("#output");
-                            pasteText.value = '';
-                            pasteText.select();
-							tiddlycut.log(document.execCommand("paste")+"--"+pasteText.value);
-							tcBrowser.setClipboardString(pasteText.value);
+					try {
+					var pasteText = document.querySelector("#output");
+					pasteText.addEventListener('paste', function paste (e) {
+						e.preventDefault();
+						pasteText.removeEventListener("paste", paste, false);console.log("remove handle");
+						tcBrowser.setClipboardString("");
+						tcBrowser.setCBImage("");
+						tcBrowser.setClipboardHtml("");
+						for (const item of e.clipboardData.items) {
+							console.log("clipbrd num items:"+e.clipboardData.items.length);
+					 
+							if (item.type.indexOf("image") === 0)
+							{
+								var blob = item.getAsFile();
+								var reader = new FileReader();
+								reader.onload = function(event) {
+									 tcBrowser.setCBImage(event.target.result.substring(22));
+								};
+								
+								reader.readAsDataURL(blob);
+							} else {
+								tiddlycut.log("pasting clip image no image");
+								if (e.clipboardData.types.indexOf('text/html') > -1)
+									tcBrowser.setClipboardHtml(e.clipboardData.getData('text/html'));
+								if (e.clipboardData.types.indexOf('text/plain') > -1)
+									tcBrowser.setClipboardString(e.clipboardData.getData('text/plain'));						
+							}
+						}
+					});
+					pasteText.select();
+					tiddlycut.log("paste is image "+document.execCommand("paste"));
+				} catch (e) {tiddlycut.log(e);tcBrowser.setSnapImage("");}
 							tiddlycut.log ("currentCat",currentCat);
 							var coords  = source.coords||{x0:null,y0:null,wdt:null,ht:null};
 							tcBrowser.snap(size,tab.id, function (dataURL) { 
@@ -590,12 +616,39 @@ tiddlycut.modules.browserOverlay = (function ()
 				{ 
 					tiddlycut.log ("currentCat",currentCat,"tab.id",tab.id);
 					tcBrowser.setDatafromCS( source.url, source.html, source.title, source.twc, source.tw5, source.response); //add data to tcbrowser object -retrived later
+					try {
 					var pasteText = document.querySelector("#output");
-					pasteText.value = '';
+					pasteText.addEventListener('paste', function paste (e) {
+						e.preventDefault();
+						pasteText.removeEventListener("paste", paste, false);console.log("remove handle");
+						tcBrowser.setClipboardString("");
+						tcBrowser.setCBImage("");
+						tcBrowser.setClipboardHtml("");
+						for (const item of e.clipboardData.items) {
+							console.log("clipbrd num items:"+e.clipboardData.items.length);
+					 
+							if (item.type.indexOf("image") === 0)
+							{
+								var blob = item.getAsFile();
+								var reader = new FileReader();
+								reader.onload = function(event) {
+									 tcBrowser.setCBImage(event.target.result.substring(22));
+								};
+								
+								reader.readAsDataURL(blob);
+							} else {
+								tiddlycut.log("pasting clip image no image");
+								if (e.clipboardData.types.indexOf('text/html') > -1)
+									tcBrowser.setClipboardHtml(e.clipboardData.getData('text/html'));
+								if (e.clipboardData.types.indexOf('text/plain') > -1)
+									tcBrowser.setClipboardString(e.clipboardData.getData('text/plain'));						
+							}
+						}
+					});
                     pasteText.select();
-					tiddlycut.log(document.execCommand("paste")+"--"+pasteText.value);
-					tcBrowser.setClipboardString(pasteText.value);
-					tcBrowser.setSnapImage("");//clear image
+					tiddlycut.log("paste is text "+document.execCommand("paste"));
+				} catch (e) {tiddlycut.log(e);tcBrowser.setSnapImage("");}
+					tcBrowser.setSnapImage("");
 					chrome.storage.local.get({tags:{},flags:{},cptext:''}, function(items){
 						tcBrowser.setExtraTags(items.tags,items.flags,items.cptext);
 						if (tClip.hasMode(tClip.getCategories()[category],"note") ) {

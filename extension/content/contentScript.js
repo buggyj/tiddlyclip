@@ -9,16 +9,14 @@
 	function getHtml()
 	{
 		var focusedWindow = window;
-		var selection = focusedWindow.getSelection();
-		var range;	
-		try {
-			range = selection.getRangeAt(0);
-			var documentFragment = range.cloneContents();
-			var mydiv = document.createElement("div");
-			mydiv.appendChild(documentFragment);
-			return mydiv;
+		var selection = focusedWindow.getSelection();	
+		var mydiv = document.createElement("div");
+		if (!selection ||selection.rangeCount < 1) return null;
+		for (let i = 0; i < selection.rangeCount; i++) {
+			mydiv.appendChild(selection.getRangeAt(i).cloneContents());
 		}
-		catch(e) { return null; }//if there is not selected
+		return mydiv;
+
 	}
 	
 	function isTiddlyWikiClassic() {

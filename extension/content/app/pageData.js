@@ -48,6 +48,10 @@
 		api.data.pageRef =  tcBrowser.getPageRef();  //replaces  %PageRef%
 		api.data.text = 	tcBrowser.getSelectedAsText()||"";
 		api.data.clip = 	tcBrowser.getClipboardString()||"";
+		
+		if (tClip.hasMode(tClip.getCategories()[category],"dirty") ) api.data.cliphtml = tcBrowser.getClipboardHtml()||"";
+		else api.data.cliphtml = DOMPurify.sanitize(tcBrowser.getClipboardHtml())||"";
+		
 		api.data.imageURL=	unescape(tcBrowser.getImageURL());
 		api.data.largestImgURL=	unescape(tcBrowser.getLargestImgURL())||"";
 		api.data.hasText=	(tcBrowser.hasSelectedText()).toString();
@@ -60,6 +64,7 @@
 		api.data.onLinkRemote=	(tcBrowser.onLinkRemote()).toString();
 		api.data.tw5 =		(tcBrowser.isTiddlyWiki5()).toString();
 		api.data.snap = tcBrowser.getSnapImage();
+		api.data.clipsnap = tcBrowser.getCBImage();
 		api.data.note = tcBrowser.getNote();
 		if (tcBrowser.getExtraTags()) api.data.extraTags = tcBrowser.getExtraTags();
 		api.data.cptext = tcBrowser.getcptext();

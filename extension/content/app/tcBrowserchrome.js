@@ -15,7 +15,8 @@ tiddlycut.modules.tcBrowser= (function () {
 		isTiddlyWikiClassic:isTiddlyWikiClassic, isTiddlyWiki5:isTiddlyWiki5,	getusrstring: getusrstring,
 		getNote:getNote,					setNote:setNote,					getExtraTags:getExtraTags,
 		setExtraTags:setExtraTags,			getExtraFlags:getExtraFlags,		setClipboardString:setClipboardString,
-		getcptext:getcptext
+		getcptext:getcptext,				setCBImage:setCBImage,				getCBImage:getCBImage,
+		setClipboardHtml:setClipboardHtml,	getClipboardHtml:getClipboardHtml, 
 	}
 
     var convert,defaults;
@@ -32,8 +33,8 @@ tiddlycut.modules.tcBrowser= (function () {
 		return thechrome; //BJ FIXME not sure if this is correct		
 	}
     //variables to store non-persistance broswer data  - set by call otherwise
-    var onImage=false, onLink=false, image, linkUrl, selectionText, url, html ,title,clipBoardString, 
-		twc=false, snapImage = "", usrstring = null, note= null, extraTags = "",extraFlags = [], cptext = null;
+    var onImage=false, onLink=false, image, linkUrl, selectionText, url, html ,title,clipBoardString,clipBoardHtml, 
+		twc=false, snapImage = "",CBImage = "", usrstring = null, note= null, extraTags = "",extraFlags = [], cptext = null;
     
 	function snap(size,sourcetab, callback,xx0,yy0,wdt,ht){ //async in chrome
 
@@ -84,13 +85,19 @@ tiddlycut.modules.tcBrowser= (function () {
 	function getImageURL() {
 		return imageUrl;
 	}
-	function getSnapImage() { //snap is not alway called so set to blank for this case.
-		var img = snapImage;
-		//snapImage = "";
+	function getCBImage() {
+		var img = CBImage;
 		return img;
 	}
-	function setSnapImage(img) { //snap is not alway called so set to blank for this case.
+	function setCBImage(img) {
 		
+		CBImage = img;
+	}
+	function getSnapImage() {
+		var img = snapImage;
+		return img;
+	}
+	function setSnapImage(img) { 		
 		snapImage = img;
 	}
 	function getLargestImgURL() {
@@ -103,7 +110,6 @@ tiddlycut.modules.tcBrowser= (function () {
 	function onLink(){
 		return onLink;
 	}
-	// Return plain text selection as a string.
 	function getSelectedAsText()
 	{
      return selectionText;
@@ -123,10 +129,16 @@ tiddlycut.modules.tcBrowser= (function () {
 	function setClipboardString(text){
 		clipBoardString=text;
 	}		
-	// Returns plain text from clipboard if any, or ''.
 	function getClipboardString()
 	{	
 		return clipBoardString||"";
+	}
+	function setClipboardHtml(text){
+		clipBoardHtml=text;
+	}		
+	function getClipboardHtml()
+	{	
+		return clipBoardHtml||"";
 	}
 	function getPageTitle() {
 		return tiddlyLinkEncode(title);
