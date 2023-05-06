@@ -67,6 +67,7 @@ tiddlycut.modules.browserOverlay = (function ()
 					return;
 				}				
 				if (!source.title) return;
+				chrome.tabs.update(tab.id, {autoDiscardable: false});
 				dockRegister(tab.id, source.url, source.config, source.title, source.opts);
 				console.log("item dock " + source.config);
 			}
@@ -107,7 +108,8 @@ tiddlycut.modules.browserOverlay = (function ()
 				  "title": msg.txt,
 				  "message": msg.aux,
 				  "iconUrl":"../skin/clip48.png"
-			});
+			},
+				function () {});
 			console.log ("got notify"+msg.txt+"-"+msg.aux);
 		}else if (msg.action == "bgbeep") {
 			new Audio(chrome.extension.getURL('beep.mp3')).play();

@@ -291,10 +291,26 @@ var Coords = function() {
 
 return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:restorescreen};  
 })();                
-/////////////////////////// get tiddler ///////////////////////////////                
+/////////////////////////// get tiddler ///////////////////////////////    
+
+	function findTidInJson(title,jnode){
+		var alltids = JSON.parse (jnode.textContent);
+		console.log("findTiddlerInPage_ByTitle jsn fnd")
+		for (var i = 0; i < alltids.length; i++) {
+			if (alltids[i].title==title) return alltids[i];
+		}
+	}
 	function findTiddlerInPage_ByTitle(title) {
 		var winWrapper = document;
-		var i,tid,nodes, store= document.getElementById("storeArea");
+		var i,tid,nodes, store, jnodes;
+		console.log("findTiddlerInPage_ByTitle")
+		jnodes = document.querySelectorAll("script.tiddlywiki-tiddler-store");
+		if (jnodes && jnodes.length > 0) {
+			console.log("findTiddlerInPage_ByTitle go")
+			tid = findTidInJson(title,jnodes[0]);console.log(tid)
+			if (tid) return JSON.stringify(tid);
+		}
+		store= document.getElementById("storeArea");
 		if (store) 	nodes = store.getElementsByTagName('div');
 		else nodes = [];
 		//try version 2.2 style store 
@@ -317,8 +333,47 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 		}
 		return null; //not found
 	}
+	function findTagTidInJson(tag,jnode){
+		var alltids = JSON.parse (jnode.textContent),found=false;
+		remoteTidArr= [];
+		console.log("findTiddlerInPage_ByTitle jsn fnd")
+		for (var i = 0; i < alltids.length; i++) {
+			if (hasTag(alltids[i].tags,tag))  remoteTidArr.push(JSON.stringify(alltids[i])); 
+			found = true;
+		}
+		return found;
+	}	
+	function hasTag(value, tag) {
+			if(typeof value === "string") {
+				var memberRegExp = /(?:^|[^\S\xA0])(?:\[\[(.*?)\]\])(?=[^\S\xA0]|$)|([\S\xA0]+)/mg,
+					results = [],
+					match;
+				do {
+					match = memberRegExp.exec(value);
+					if(match) {
+						var item = match[1] || match[2];
+						if(item !== undefined && results.indexOf(item) === -1) {
+							if (item == tag) return true;
+						}
+					}
+				} while(match);
+				return false;
+			} else {
+				return false;
+			}
+		};
+		
+		
 	function findTiddlersInPage_ByTag(tag) {
-		var i,tid,nodes, store= document.getElementById("storeArea");
+		var i,tid,nodes, store,
+		jnodes = document.querySelectorAll("script.tiddlywiki-tiddler-store");
+		if (jnodes && jnodes.length > 0) return findTagTidInJson(tag,jnodes[0]);
+		store= document.getElementById("storeArea");
+		if (jnodes && jnodes.length > 0) {
+			console.log("findTiddlerInPage_ByTag go")
+			return findTagTidInJson(tag,jnodes[0]);
+		}		
+		
 		if (store) 	nodes = store.getElementsByTagName('div');
 		else nodes = [];
 		var found=false;
@@ -687,8 +742,8 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 				var key = window.prompt('Enter tag');
 				tag.value =key;
 				filterRqst("[tag["+key+"]]");
-			return;	
-		}
+				return;	
+			}
 		return remoteTidArr;//no error
 	}//end func
 	function cutTids() {

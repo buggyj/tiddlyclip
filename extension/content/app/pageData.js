@@ -41,7 +41,7 @@
 		var i;
 		tiddlycut.log("setupvars ",category);
 		//expose parameters - used for userExtensions
-		api.data ={};
+		api.data ={"__remoteusage__":""};
 		api.data.section  = tClip.getSectionNames()[currentSection];
 		api.data.category = category;
 		api.data.pageTitle= tcBrowser.getPageTitle();//replaces  %PageTitle%
