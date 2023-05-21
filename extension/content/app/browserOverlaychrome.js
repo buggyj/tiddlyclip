@@ -136,6 +136,7 @@ tiddlycut.modules.browserOverlay = (function ()
  
     
     function checkduplicate(tabs, tabId, url, active){
+		if (!url) return;
         for(let tab of tabs){
             if(url == tab.url && tab.id != tabId){
                 chrome.windows.update(tab.windowId, {focused:true});

@@ -13,7 +13,7 @@ var test;
 function restore_options() {
 		
   chrome.storage.local.get({
-	nag: true
+	nodups: true
   }, function(items) {
     document.getElementById("nodups").checked = items.nodups;
   });
