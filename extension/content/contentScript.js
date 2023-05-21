@@ -244,6 +244,8 @@ var xhair = {
 }
 var div = document.createElement('div'),diva = document.createElement('div'),
 	divb = document.createElement('div'),box = document.createElement('div');
+	
+
 var On = function () {
 	setcss(div, styles);
 	div.id ="basexhair";
@@ -579,11 +581,12 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 					// first stage send back url
 					tiddlycut.log("cut  content cs");
 					remoteTidArr  = [''];
-					sendResponse({ url:window.location.href, html:getSelectedAsHtml(window.location.href), 
+					sendResponse({ url:window.location.href, html:"", 
 						title:document.title, twc:isTiddlyWikiClassic()||false, tw5:isTiddlyWiki5(), response: (request.prompt?UserInputDialog(request.prompt):null),
 						coords:xhairs.Coords()});
 				}
 		});
+
 	   chrome.runtime.onMessage.addListener(
 			  function(request, sender, sendResponse) {
 				//here we need to check that the tiddlywiki is open for cuts - in the new interactive way.
@@ -621,7 +624,16 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 					// first stage send back url
 					tiddlycut.log("restorescreen  content cs");
 					xhairs.restorescreen();
-					sendResponse({ });
+					sendResponse({ html:getSelectedAsHtml(window.location.href)});
+				}
+		});
+	   chrome.runtime.onMessage.addListener(
+			  function(request, sender, sendResponse) {
+				if (request.action == 'getSelection') {
+					// first stage send back url
+					tiddlycut.log("getSelection  content cs");
+					sendResponse({  url:window.location.href, html:getSelectedAsHtml(window.location.href),
+						title:document.title, twc:isTiddlyWikiClassic()||false, tw5:isTiddlyWiki5(), response: (request.prompt?UserInputDialog(request.prompt):null)});
 				}
 		});
 	   chrome.runtime.onMessage.addListener(

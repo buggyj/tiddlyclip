@@ -48,7 +48,7 @@ function keypressed(){
 }
 function main(){
 	var textarea = document.getElementById("inputarea");
-	chrome.storage.local.get({notepad:"", tags:{},flags:{}}, function(items){
+	chrome.storage.local.get({notepad:"", ncols:2, tags:{},flags:{}}, function(items){
 		var text = items.notepad, i,j=0, html = "", closehtml = "", aretags=false,areflags=false;
 		if(!!text ){textarea.value=text;}
 		else {textarea.value="";}
@@ -57,11 +57,12 @@ function main(){
 		closehtml = '</tr></table>';
 		
 		for (i in items.tags) {
+			var n = items.ncols;
 			aretags = true;
 			j++;
-			if (j === 5) html += '<tr></tr>';
-			if (j === 11) html += '<tr></tr>';
-			html += '<td align="right">'+i+'<input type="checkbox" id="tags'+i+'" ></td>';
+			if (j % n  === 0) html += '</tr><tr>';
+
+			html += '<td align="right"><div>'+i+'<input type="checkbox" id="tags'+i+'" ></div></td>';
 		}	
 		if (aretags) {
 			html += closehtml;//alert(html)

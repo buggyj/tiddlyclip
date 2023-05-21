@@ -16,7 +16,7 @@ tiddlycut.modules.tcBrowser= (function () {
 		getNote:getNote,					setNote:setNote,					getExtraTags:getExtraTags,
 		setExtraTags:setExtraTags,			getExtraFlags:getExtraFlags,		setClipboardString:setClipboardString,
 		getcptext:getcptext,				setCBImage:setCBImage,				getCBImage:getCBImage,
-		setClipboardHtml:setClipboardHtml,	getClipboardHtml:getClipboardHtml, 
+		setClipboardHtml:setClipboardHtml,	getClipboardHtml:getClipboardHtml, 	setHtml:setHtml
 	}
 
     var convert,defaults;
@@ -149,6 +149,10 @@ tiddlycut.modules.tcBrowser= (function () {
 	function getHtml()
 	{
 		return html;
+	}
+	function setHtml(somehtml)
+	{
+		 html = somehtml;
 	}
 	function getusrstring()
 	{

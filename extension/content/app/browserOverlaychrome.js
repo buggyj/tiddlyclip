@@ -289,7 +289,7 @@ tiddlycut.modules.browserOverlay = (function ()
 			// Set the new menu item's label
 			if (m == filechoiceclip) {
 				title=" "+m+"*"+fileLoc; //so we can see which section we are currently using
-				var tags = null,flag = null,flaglist = {}, taglist = {};
+				var tags = null,flag = null,flaglist = {}, taglist = {}, ncols = 0;
 				tags=pref.Get("tags");
 				if (tags) {
 					tags = tags.split(/\s*,\s*/);
@@ -303,10 +303,12 @@ tiddlycut.modules.browserOverlay = (function ()
 					for (var nn = 0; nn < flags.length; nn++) {
 						flaglist[flags[nn]] = false;
 					}				
-				}		
+				}
+				ncols = pref.Get("ncols")||2;
+				
 				resettags = taglist; //for resetting after aclip to empty boxes in the popup	
-				resetflags =flaglist
-				chrome.storage.local.set({'tags': taglist,'flags': flaglist}, function() {console.log("bg: set from taglist")});
+				resetflags =flaglist;
+				chrome.storage.local.set({'ncols': ncols, 'tags': taglist,'flags': flaglist}, function() {console.log("bg: set from taglist")});
 			}
 			else
 				title=" "+m+" "+fileLoc;
@@ -585,6 +587,7 @@ tiddlycut.modules.browserOverlay = (function ()
 								}, function (source)
 								{ 
 										tcBrowser.setSnapImage(dataURL);
+										tcBrowser.setHtml(source.html);
 										chrome.storage.local.get({tags:{},flags:{},cptext:''}, function(items){
 											tcBrowser.setExtraTags(items.tags,items.flags,items.cptext);
 											if (tClip.hasMode(tClip.getCategories()[category],"note") ) {
@@ -611,10 +614,11 @@ tiddlycut.modules.browserOverlay = (function ()
 				} 
 				*/
 				return;
-			}	
+			}
+			//else
 			bjSendMessage(tab.id,
 				{
-					action : 'cut',prompt:(promptindex?pref.Get(promptindex):null)
+					action : 'getSelection',prompt:(promptindex?pref.Get(promptindex):null)
 				}, function (source)
 				{ 
 					tiddlycut.log ("currentCat",currentCat,"tab.id",tab.id);
