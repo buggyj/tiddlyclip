@@ -29,18 +29,19 @@
 			(versionArea && /TiddlyWiki/.test(versionArea.text));
 	}
 
-	function isTiddlyWiki5() {
-		//from tiddlyfox
-		// Test whether the document is a TiddlyWiki5 (we don't have access to JS objects in it)
+	function getMeta() {
 		var doc = document;
-		var metaTags = doc.getElementsByTagName("meta"),
-			generator = false;
+		var metaTags = doc.getElementsByTagName("meta");
+	    var tw5 = false, description= "", mediaImage = "";
 		for(var t=0; t<metaTags.length; t++) {
-			if(metaTags[t].name === "application-name" && metaTags[t].content === "TiddlyWiki") {
-				generator = true;
-			}
+			if(metaTags[t].name === "application-name" && metaTags[t].content === "TiddlyWiki") tw5 = true;
+			else if(metaTags[t].name === "description") description = metaTags[t].content;
+			else if ( metaTags[t].getAttribute('property')=="og:image") mediaImage = metaTags[t].content;
+			else if ( metaTags[t].getAttribute('property')=="og:description") description = metaTags[t].content;
 		}
-		return generator;
+		
+		console.log(tw5,description,mediaImage);
+		return {tw5:tw5, description:description, mediaImage:mediaImage};
 	}
 
 	function extractToJson(node) {//based on tw5 boot
@@ -521,6 +522,7 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 				tiddlycut.log ("got show" + msg.action );
 				//event.currentTarget.parentNode.removeChild(message);
 				// Save the file
+				if (msg.action.substring(0,2) === "__") return true;
 				message.parentNode.removeChild(message);
 				if (msg.action in callbacks) {callbacks[msg.action](msg);return false;}
 				chrome.runtime.sendMessage(msg,function() {});
@@ -562,7 +564,7 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 				if (request.action == 'actiondock') {
 					// first stage send back url
 					tiddlycut.log("actiondock in cs");				
-					if(!isTiddlyWikiClassic() && !isTiddlyWiki5()) {
+					if(!isTiddlyWikiClassic() && !(getMeta().tw5)) {
 						sendResponse({title:null});
 						return;
 					}
@@ -578,11 +580,13 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 	   chrome.runtime.onMessage.addListener(
 			  function(request, sender, sendResponse) {
 				if (request.action == 'cut') {
+					const meta = getMeta();
 					// first stage send back url
 					tiddlycut.log("cut  content cs");
 					remoteTidArr  = [''];
+					
 					sendResponse({ url:window.location.href, html:"", 
-						title:document.title, twc:isTiddlyWikiClassic()||false, tw5:isTiddlyWiki5(), response: (request.prompt?UserInputDialog(request.prompt):null),
+						title:document.title, twc:isTiddlyWikiClassic()||false, tw5:meta.tw5, description:meta.description, mediaImage:meta.mediaImage, response: (request.prompt?UserInputDialog(request.prompt):null),
 						coords:xhairs.Coords()});
 				}
 		});
@@ -596,13 +600,15 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 						// first stage send back url
 						tiddlycut.log("cutTid dynamic content cs");
 						if (!!callbacks["cuttids"]) {//already a pending cut
+							const meta = getMeta();
 							sendResponse({ url:window.location.href, tids:null, title:document.title, 
-							twc:isTiddlyWikiClassic()||false, tw5:isTiddlyWiki5(),response: (request.prompt?UserInputDialog(request.prompt):null)});
+							twc:isTiddlyWikiClassic()||false,tw5: meta.tw5, description:meta.description, mediaImage:meta.mediaImage, response: (request.prompt?UserInputDialog(request.prompt):null)});
 							return;
 						}
 						callbacks["cuttids"]= function (x){
+							const meta = getMeta();
 							var resp = { url:window.location.href, tids:null, title:document.title, 
-							twc:isTiddlyWikiClassic()||false, tw5:isTiddlyWiki5(),response: (request.prompt?UserInputDialog(request.prompt):null)};
+							twc:isTiddlyWikiClassic()||false, tw5:meta.tw5, description:meta.description, mediaImage:meta.mediaImage, response: (request.prompt?UserInputDialog(request.prompt):null)};
 							tiddlycut.log("cuttids callback  "+x.txt);
 							resp.tids = getTiddlersAsJson(JSON.parse(x.txt));
 							sendResponse(resp);
@@ -612,10 +618,11 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 						return true;
 					} 
 					else  {
+						const meta = getMeta();
 						tiddlycut.log("cutTid  content cs");
 
 						sendResponse({ url:window.location.href, tids:cutTids(), title:document.title, 
-							twc:isTiddlyWikiClassic()||false, tw5:isTiddlyWiki5(),response: (request.prompt?UserInputDialog(request.prompt):null)});
+							twc:isTiddlyWikiClassic()||false, tw5:meta.tw5, description:meta.description, mediaImage:meta.mediaImage ,response: (request.prompt?UserInputDialog(request.prompt):null)});
 					}
 		});
 	   chrome.runtime.onMessage.addListener(
@@ -631,9 +638,10 @@ return {Coords:Coords, On:On, xhairsOff:xhairsOff, Remove:Remove,restorescreen:r
 			  function(request, sender, sendResponse) {
 				if (request.action == 'getSelection') {
 					// first stage send back url
+					const meta = getMeta();
 					tiddlycut.log("getSelection  content cs");
 					sendResponse({  url:window.location.href, html:getSelectedAsHtml(window.location.href),
-						title:document.title, twc:isTiddlyWikiClassic()||false, tw5:isTiddlyWiki5(), response: (request.prompt?UserInputDialog(request.prompt):null)});
+						title:document.title, twc:isTiddlyWikiClassic()||false, tw5:meta.tw5, description:meta.description, mediaImage:meta.mediaImage, response: (request.prompt?UserInputDialog(request.prompt):null)});
 				}
 		});
 	   chrome.runtime.onMessage.addListener(

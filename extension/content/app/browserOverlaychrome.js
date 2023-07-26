@@ -3,7 +3,19 @@ if (!tiddlycut)
 if (!tiddlycut.modules)
 	tiddlycut.modules = {};
 	
+	function onExecuted(result) {
+  console.log(`success: ${result}`);
+}
+
+function onMainError(error) {
+  console.log(`mainError: ${error}`);
+}
+
+function onLogError(error) {
+  console.log(`logError: ${error}`);
+}
 chrome.runtime.onInstalled.addListener(function(details){console.log ("oninstall "+details.reason)
+	if (details.temporary) return;
     if(details.reason == "install" ||details.reason == "update"){ 
   chrome.windows.getAll({'populate': true}, function(windows) {
     for (var i = 0; i < windows.length; i++) {
@@ -13,10 +25,10 @@ chrome.runtime.onInstalled.addListener(function(details){console.log ("oninstall
             try {
                 chrome.tabs.executeScript(
                     tabs[j].id,
-                    {file: 'content/util/logsimple.js', allFrames: false});
+                    {file: 'content/util/logsimple.js', allFrames: false}).then(onExecuted, onLogError);
                 chrome.tabs.executeScript(
                     tabs[j].id,
-                    {file: 'content/contentScript.js', allFrames: false});
+                    {file: 'content/contentScript.js', allFrames: false}).then(onExecuted, onMainError);
             }
             catch (err) {console.log ("cs refused at url "+tabs[j].url)};
         }
@@ -67,7 +79,7 @@ tiddlycut.modules.browserOverlay = (function ()
 					return;
 				}				
 				if (!source.title) return;
-				chrome.tabs.update(tab.id, {autoDiscardable: false});
+				//chrome.tabs.update(tab.id, {autoDiscardable: false});
 				dockRegister(tab.id, source.url, source.config, source.title, source.opts);
 				console.log("item dock " + source.config);
 			}
@@ -545,7 +557,7 @@ tiddlycut.modules.browserOverlay = (function ()
 							action : 'cut', prompt:(promptindex?pref.Get(promptindex):null)
 						}, function (source)
 						{ 
-							tcBrowser.setDatafromCS( source.url, source.html, source.title, source.twc, source.tw5, source.response, source.coords); //add data to tcbrowser object -retrived later
+							tcBrowser.setDatafromCS( source.url, source.html, source.title, source.twc, source.tw5, source.response, source.description, source.mediaImage); //add data to tcbrowser object -retrived later
 					try {
 					var pasteText = document.querySelector("#output");
 					pasteText.addEventListener('paste', function paste (e) {
@@ -622,7 +634,7 @@ tiddlycut.modules.browserOverlay = (function ()
 				}, function (source)
 				{ 
 					tiddlycut.log ("currentCat",currentCat,"tab.id",tab.id);
-					tcBrowser.setDatafromCS( source.url, source.html, source.title, source.twc, source.tw5, source.response); //add data to tcbrowser object -retrived later
+					tcBrowser.setDatafromCS( source.url, source.html, source.title, source.twc, source.tw5, source.response, source.description, source.mediaImage); //add data to tcbrowser object -retrived later
 					try {
 					var pasteText = document.querySelector("#output");
 					pasteText.addEventListener('paste', function paste (e) {
@@ -678,7 +690,7 @@ tiddlycut.modules.browserOverlay = (function ()
 					action : 'cutTid', prompt:(promptindex?pref.Get(promptindex):null)
 				}, function (source)
 				{
-					tcBrowser.setDatafromCS( source.url, null, source.title, source.twc, source.tw5,source.response); //add data to tcbrowser object -retrived later
+					tcBrowser.setDatafromCS( source.url, null, source.title, source.twc, source.tw5,source.response, source.description, source.mediaImage); //add data to tcbrowser object -retrived later
 					tiddlycut.log ("cuttid reply tids",source.tids);
 					if (tClip.hasMode(tClip.getCategories()[category],"note") ) {
 						chrome.storage.local.get("notepad", function(items){

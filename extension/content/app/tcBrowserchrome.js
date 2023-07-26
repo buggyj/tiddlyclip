@@ -16,7 +16,8 @@ tiddlycut.modules.tcBrowser= (function () {
 		getNote:getNote,					setNote:setNote,					getExtraTags:getExtraTags,
 		setExtraTags:setExtraTags,			getExtraFlags:getExtraFlags,		setClipboardString:setClipboardString,
 		getcptext:getcptext,				setCBImage:setCBImage,				getCBImage:getCBImage,
-		setClipboardHtml:setClipboardHtml,	getClipboardHtml:getClipboardHtml, 	setHtml:setHtml
+		setClipboardHtml:setClipboardHtml,	getClipboardHtml:getClipboardHtml, 	setHtml:setHtml,
+		getMediaImage:getMediaImage,		getDescription:getDescription
 	}
 
     var convert,defaults;
@@ -34,7 +35,8 @@ tiddlycut.modules.tcBrowser= (function () {
 	}
     //variables to store non-persistance broswer data  - set by call otherwise
     var onImage=false, onLink=false, image, linkUrl, selectionText, url, html ,title,clipBoardString,clipBoardHtml, 
-		twc=false, snapImage = "",CBImage = "", usrstring = null, note= null, extraTags = "",extraFlags = [], cptext = null;
+		twc=false, snapImage = "",CBImage = "", usrstring = null, note= null, extraTags = "",extraFlags = [], 
+		description="", mediaImage="", cptext = null;
     
 	function snap(size,sourcetab, callback,xx0,yy0,wdt,ht){ //async in chrome
 
@@ -74,13 +76,22 @@ tiddlycut.modules.tcBrowser= (function () {
 		onLink = (!!linkUrl);
 		selectionText=info.selectionText;
 	};	
-	function setDatafromCS( aurl, ahtml, atitle, atwc, atw5, ausrstring) {
+	function setDatafromCS( aurl, ahtml, atitle, atwc, atw5, ausrstring, adescription, amediaImage) {
 		html = ahtml;
 		title =atitle;
 		url = aurl;
 		twc = atwc; 
 		tw5 = atw5;
 		usrstring = ausrstring;
+		description = adescription;
+		mediaImage = amediaImage;
+		console.log("description",description,mediaImage)
+	}
+	function getMediaImage() {
+		return mediaImage;
+	}
+	function getDescription() {
+		return description;
 	}
 	function getImageURL() {
 		return imageUrl;

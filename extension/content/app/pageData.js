@@ -66,6 +66,9 @@
 		api.data.snap = tcBrowser.getSnapImage();
 		api.data.clipsnap = tcBrowser.getCBImage();
 		api.data.note = tcBrowser.getNote();
+		api.data.mediaImage = tcBrowser.getMediaImage();
+		api.data.description = tcBrowser.getDescription();
+				
 		if (tcBrowser.getExtraTags()) api.data.extraTags = tcBrowser.getExtraTags();
 		api.data.cptext = tcBrowser.getcptext();
 		var extraFlags = tcBrowser.getExtraFlags();	
